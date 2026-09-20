@@ -1,7 +1,7 @@
 import sympy as sp
 
 from persian_math.solver import (
-    differentiate, integrate, limit, optimize, solve, solve_complex, solve_inequality,
+    differentiate, integrate, limit, optimize, solve, solve_complex,
     solve_matrix, solve_polynomial, solve_probability, solve_statistics,
 )
 from persian_math.verification import (
