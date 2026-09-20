@@ -15,6 +15,7 @@ from persian_math.canonical import (
 )
 from persian_math.domain import EducationalLevel, ProblemInput, UserProfile
 from persian_math.education import curriculum_for, learning_objectives
+from persian_math.explanation import explain_solution
 from persian_math.geometry import Point, Segment, line_intersection
 from persian_math.input_understanding import understand
 from persian_math.ocr import (
@@ -27,10 +28,15 @@ from persian_math.ocr import (
     validate_image_bytes,
     validate_ocr_result,
 )
-from persian_math.explanation import explain_solution
 from persian_math.ocr_consensus import RecognitionCandidate, consensus
 from persian_math.verification import verify_equation_independently
-from persian_math.visual_math import GraphAxis, GraphPoint, VisualScene, graph_from_points, validate_scene
+from persian_math.visual_math import (
+    GraphAxis,
+    GraphPoint,
+    VisualScene,
+    graph_from_points,
+    validate_scene,
+)
 
 
 def _png_bytes() -> bytes:
