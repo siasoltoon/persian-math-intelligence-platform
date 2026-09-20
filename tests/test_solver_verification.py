@@ -31,7 +31,7 @@ def test_equation_solver():
 def test_inequality_solver():
     result = solve("x^2 < 4")
     assert result.success
-    assert -2 in result.value and 2 not in result.value
+    assert result.value == sp.And(sp.Lt(-2, sp.Symbol("x")), sp.Lt(sp.Symbol("x"), 2))
 
 
 def test_polynomial_solver():
