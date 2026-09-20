@@ -132,3 +132,48 @@ def parse_matrix(text: str) -> sp.MatrixBase:
         return sp.Matrix([[_parse(item) for item in row.strip(" []").split(",")] for row in rows])
     except (TypeError, ValueError) as exc:
         raise ValueError("invalid matrix") from exc
+
+def parse_fraction(text: str) -> sp.Expr:
+    normalized = normalize_math_text(text)
+    parts = normalized.split("/")
+    if len(parts) != 2:
+        raise ValueError("fraction must contain exactly one '/'")
+    return sp.cancel(_parse(parts[0]) / _parse(parts[1]))
+
+
+def parse_function(text: str) -> sp.Expr:
+    return parse_expression(text).expression
+
+
+def parse_vector(text: str) -> tuple[sp.Expr, ...]:
+    normalized = normalize_math_text(text).strip()
+    if not (normalized.startswith("[") and normalized.endswith("]")):
+        raise ValueError("vector must use bracket notation")
+    items = [item.strip() for item in normalized[1:-1].split(",")]
+    if not items or any(not item for item in items):
+        raise ValueError("invalid vector")
+    return tuple(_parse(item) for item in items)
+
+
+def parse_derivative(text: str, symbol: str = "x") -> sp.Expr:
+    return sp.diff(parse_expression(text).expression, sp.Symbol(symbol))
+
+
+def parse_integral(text: str, symbol: str = "x") -> sp.Expr:
+    return sp.integrate(parse_expression(text).expression, sp.Symbol(symbol))
+
+
+def parse_limit(text: str, symbol: str = "x", point: object = 0) -> sp.Expr:
+    return sp.limit(parse_expression(text).expression, sp.Symbol(symbol), point)
+
+
+def parse_series(text: str, symbol: str = "x", point: object = 0, order: int = 6) -> sp.Expr:
+    if order < 1:
+        raise ValueError("series order must be positive")
+    return sp.series(parse_expression(text).expression, sp.Symbol(symbol), point, order)
+
+
+def parse_probability(successes: int, trials: int) -> sp.Rational:
+    if trials <= 0 or successes < 0 or successes > trials:
+        raise ValueError("invalid probability counts")
+    return sp.Rational(successes, trials)
