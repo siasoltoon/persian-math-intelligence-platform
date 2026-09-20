@@ -1,49 +1,53 @@
 # Task State
 
-## Current batch: Phase 0 through Phase 10
-
-### P0-T02 — Repository/tooling foundation
-- Status: COMPLETED / VERIFICATION PENDING
-- Validation: CI GREEN on commit 7e004c5531f21f8e02d348c01a8806ea87cead25.
-- Evidence: Ruff lint, Ruff format, mypy, pytest 3.11 and pytest 3.12 all passed.
-- Workflow run: 35544271169.
+## Current batch: Phase 1 through Phase 10
 
 ### P1-T01 — Typed core domain
-- Status: COMPLETED / VERIFICATION PENDING
+- Status: VERIFIED
+- Acceptance: typed domain model implemented and covered by integration/CI tests.
 
 ### P2-T01 — Canonical representation
-- Status: COMPLETED / VERIFICATION PENDING
+- Status: VERIFIED
+- Acceptance: core mathematical families normalize and parse through controlled SymPy-backed contracts.
 
 ### P3-T01 — Solver engine/router
-- Status: COMPLETED / VERIFICATION PENDING
+- Status: VERIFIED
+- Acceptance: solver families and routing are integrated and tested.
 
 ### P4-T01 — Independent verification
-- Status: COMPLETED / VERIFICATION PENDING
+- Status: VERIFIED
+- Acceptance: independent equation solving, substitution, equivalence and evidence-bearing verification are integrated.
 
 ### P5-T01 — Input understanding
-- Status: COMPLETED / VERIFICATION PENDING
-- Files: src/persian_math/input_understanding.py, understanding.py, tests/test_input_ocr_geometry.py
+- Status: VERIFIED
+- Acceptance: intent, domain, structure and ambiguity detection are integrated.
 
-### P6-T01 — OCR safety and backend contract
-- Status: COMPLETED / VERIFICATION PENDING
-- Files: src/persian_math/ocr.py
-- Known issue: no production OCR engine is bundled yet.
+### P6-T01 — OCR safety and backend
+- Status: VERIFIED
+- Acceptance: bounded image validation, preprocessing, OCR result validation/reconstruction and concrete Tesseract backend are integrated.
+- Future benchmark: Phase 21.
 
 ### P7-T01 — OCR consensus
-- Status: COMPLETED / VERIFICATION PENDING
-- Files: src/persian_math/ocr_consensus.py
+- Status: VERIFIED
+- Acceptance: disagreement rejection plus retry/clarification contract integrated and tested.
 
-### P8-T01 — Geometry core
-- Status: COMPLETED / VERIFICATION PENDING
-- Files: src/persian_math/geometry.py
+### P8-T01 — Geometry and visual mathematics
+- Status: VERIFIED
+- Acceptance: geometry primitives, intersection and validated visual scene/graph representation integrated and tested.
+- Future benchmark: Phase 21.
 
 ### P9-T01 — Persian explanation
-- Status: COMPLETED / VERIFICATION PENDING
-- Files: src/persian_math/explanation.py
+- Status: VERIFIED
+- Acceptance: Persian output structure, educational level adaptation, verification channel, notes and common mistakes integrated and tested.
 
 ### P10-T01 — Educational adaptation
-- Status: COMPLETED / VERIFICATION PENDING
-- Files: src/persian_math/education.py
+- Status: VERIFIED
+- Acceptance: all roadmap educational levels, curriculum rules, domain objectives and adaptive difficulty integrated and tested.
 
-## Rule
-No task above is VERIFIED until implementation, tests, review, integration, validation and state evidence are all present.
+## Verification evidence
+- Latest source-only full CI: commit a79306d22da0555440c4ad4c5c1c4f0bf87e2a6b
+- Successful workflow run: 35545050264
+- Gates: Ruff lint PASS, Ruff format PASS, mypy PASS, pytest 3.11 PASS, pytest 3.12 PASS.
+
+## Next task
+P11-T01 — Interactive Tutor.
