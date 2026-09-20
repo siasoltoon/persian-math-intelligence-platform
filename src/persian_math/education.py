@@ -60,8 +60,18 @@ def recommended_difficulty(
 
 def learning_objectives(profile: UserProfile, domain: str) -> tuple[str, ...]:
     style = curriculum_for(profile).style
+    objectives = {
+        "algebra": ("معادله و نامعادله", "تبدیل و ساده‌سازی عبارت"),
+        "geometry": ("استدلال هندسی", "محاسبه طول، مساحت و زاویه"),
+        "calculus": ("حد، مشتق و انتگرال", "تفسیر تغییرات"),
+        "statistics": ("شاخص‌های آماری", "تفسیر داده"),
+        "probability": ("احتمال رویداد", "تحلیل فضای نمونه"),
+        "linear_algebra": ("بردار و ماتریس", "حل دستگاه خطی"),
+        "number_theory": ("بخش‌پذیری", "ساختار اعداد"),
+        "discrete_math": ("منطق و ترکیبیات", "مدل‌سازی ساختارهای گسسته"),
+    }.get(domain, ("درک ساختار مسئله", "انتخاب روش مناسب"))
     return (
-        f"تقویت {domain}",
+        *objectives,
         f"ارائه توضیح با سبک {style}",
         "حل یک نمونه و بررسی مستقل پاسخ",
     )
