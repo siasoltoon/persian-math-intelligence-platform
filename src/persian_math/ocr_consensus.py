@@ -38,4 +38,12 @@ def consensus(
         len(valid) == 1 and best.confidence >= 0.90 or agreement >= 0.66 and confidence >= 0.70
     )
     reason = "consensus_accepted" if accepted else "recognition_disagreement"
-    return ConsensusResult(accepted, best.text if accepted else "", confidence, candidates, reason)
+    return ConsensusResult(
+        accepted,
+        best.text if accepted else "",
+        confidence,
+        candidates,
+        reason,
+        retry_recommended=not accepted,
+        clarification_fa=None if accepted else "خوانش تصویر مطمئن نیست؛ لطفاً تصویر واضح‌تر یا متن مسئله را ارسال کنید.",
+    )
