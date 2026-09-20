@@ -72,7 +72,9 @@ def normalize_math_text(text: str) -> str:
     for source, target in replacements.items():
         value = value.replace(source, target)
     value = value.replace("٫", ".").replace("،", ",")
-    return re.sub(r"\s+", " ", value).strip()
+    value = re.sub(r"[^\S\n]+", " ", value)
+    value = re.sub(r" *\n *", "\n", value)
+    return value.strip()
 
 
 def _parse(text: str) -> sp.Expr:
