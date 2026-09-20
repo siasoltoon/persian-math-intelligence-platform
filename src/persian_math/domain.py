@@ -16,6 +16,7 @@ class EducationalLevel(str, Enum):
     ELEMENTARY = "elementary"
     MIDDLE = "middle"
     HIGH_SCHOOL = "high_school"
+    ENTRANCE_EXAM = "entrance_exam"
     UNIVERSITY = "university"
     ADVANCED = "advanced"
     OLYMPIAD = "olympiad"
