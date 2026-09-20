@@ -31,4 +31,4 @@ def test_matrix_and_function_normalization():
     from persian_math.canonical import normalize_math_text, parse_matrix
     matrix = parse_matrix("[[1, 2], [3, 4]]")
     assert matrix.shape == (2, 2)
-    assert normalize_math_text("√(x²) + π") == "sqrt(x²) + pi"
+    assert normalize_math_text("√(x²) + π") == "sqrt(x**2) + pi"
