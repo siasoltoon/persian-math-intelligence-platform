@@ -10,10 +10,13 @@
 
 ## Current execution
 - Current Phase: Phase 0 — PROJECT FOUNDATION
-- Current Task: P0-T01 — Repository and engineering state foundation
-- Status: IN_PROGRESS
-- Last VERIFIED Task: none
+- Current Task: P0-T02 — Repository/tooling foundation
+- Status: PENDING
+- Last VERIFIED Task: P0-T01 — Repository and engineering state foundation
 - Completed Phases: none
+
+## Verified baseline
+P0-T01 established and read back the project specification, fixed Phase 0–25 roadmap, architecture boundaries, state files, continuation contract and initial architecture decisions.
 
 ## Architecture
 - Core is deployment-agnostic and interface-independent.
@@ -22,20 +25,20 @@
 - No unnecessary agent/microservice architecture is part of scope.
 
 ## Repository baseline
-- Repository was newly created and currently contains only the initial README.
-- Engineering source-of-truth documents are being established before application implementation.
-- No mathematical runtime implementation is VERIFIED yet.
+- Engineering source-of-truth documentation exists under docs/engineering/.
+- Application implementation has not started.
+- No mathematical runtime capability is VERIFIED yet.
 
 ## Testing
-- Test suite: not established yet.
-- No feature is VERIFIED.
+- Documentation read-back validation for P0-T01: PASS.
+- Unit/integration/contract/OCR/solver/verification/security/performance/E2E/regression suites: not established yet.
 
 ## Risks / blockers
 - No current blocker.
 - Phase 0 still needs repository tooling, baseline application structure, CI and initial tests.
 
 ## Next action
-Complete P0-T01 by establishing the engineering documentation/state baseline, then proceed to P0-T02 for repository/tooling foundation.
+Start P0-T02: establish repository/application tooling, package structure, configuration boundaries, quality gates and baseline tests without coupling Core to Telegram or a deployment vendor.
 
 ## Continuation contract
 At the beginning of a future session:

@@ -2,23 +2,27 @@
 
 ## P0-T01 — Repository and engineering state foundation
 - Phase: 0
-- Status: IN_PROGRESS
+- Status: VERIFIED
 - Priority: P0
 - Objective: Establish the durable project specification, roadmap and engineering-state contract so future sessions can resume safely from repository state.
-- Input: New GitHub repository and fixed project requirements.
-- Output: PROJECT_SPECIFICATION.md, ROADMAP.md, PROJECT_STATE.md, ARCHITECTURE_MAP.md, PHASE_STATE.md, TASK_STATE.md, TEST_STATE.md, DECISIONS.md, CHANGELOG_ENGINEERING.md.
-- Acceptance Criteria:
-  - Project scope is documented.
-  - Phases 0–25 are recorded.
-  - Continuation contract is explicit.
-  - Current phase/task and last VERIFIED state are explicit.
-  - Architecture boundaries are recorded.
-  - No task is falsely marked VERIFIED.
-- Tests: Documentation consistency review required.
-- Validation: Pending post-write repository read-back.
+- Output: Project specification, fixed Phase 0–25 roadmap, architecture map, state files and initial architecture decisions.
+- Acceptance Criteria: scope documented; phases 0–25 recorded; continuation contract explicit; current phase/task and last VERIFIED state explicit; architecture boundaries recorded; no false capability claims.
+- Tests: Repository read-back of all engineering documents.
+- Validation: PASS — all nine engineering documents were successfully read back from main after commit 8041583.
 - Known issues: Application code, CI and test harness do not exist yet.
 - Dependencies: Repository main branch.
-- Next action: Read back all created state/specification files, then commit/verify the Phase 0 baseline.
+- Next action: P0-T02.
+
+## P0-T02 — Repository/tooling foundation
+- Phase: 0
+- Status: PENDING
+- Priority: P0
+- Objective: Establish implementation structure and quality gates.
+- Acceptance Criteria: package structure, configuration boundaries, formatting/lint/typecheck/test commands and CI baseline exist and are validated.
+- Tests: baseline test suite and CI validation.
+- Validation: pending.
+- Dependencies: P0-T01.
+- Next action: inspect repository baseline and implement tooling.
 
 ## Status rules
 PENDING | IN_PROGRESS | BLOCKED | COMPLETED | VERIFIED | FAILED | SUPERSEDED
