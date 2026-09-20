@@ -133,6 +133,7 @@ def parse_matrix(text: str) -> sp.MatrixBase:
     except (TypeError, ValueError) as exc:
         raise ValueError("invalid matrix") from exc
 
+
 def parse_fraction(text: str) -> sp.Expr:
     normalized = normalize_math_text(text)
     parts = normalized.split("/")
