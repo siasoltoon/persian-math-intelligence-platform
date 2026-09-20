@@ -13,7 +13,7 @@ _DOMAIN_PATTERNS: tuple[tuple[str, tuple[str, ...]], ...] = (
     ("algebra", ("معادله", "نامعادله", "جبر", "equation", "inequality", "polynomial")),
     ("linear_algebra", ("ماتریس", "بردار", "matrix", "vector")),
     ("number_theory", ("اعداد اول", "باقی‌مانده", "prime", "modulo")),
-)
+    ("discrete_math", ("گراف", "ترکیبیات", "منطق", "combinatorics", "graph theory")),\n)
 
 
 def classify_problem(problem: ProblemInput) -> ProblemClassification:
