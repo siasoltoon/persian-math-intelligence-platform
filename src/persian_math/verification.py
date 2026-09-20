@@ -81,9 +81,13 @@ def verify_equation_solution(
                 ("numerical_residual_check", "domain_checked"),
                 (candidate,),
             )
-        return VerificationResult(False, ConfidenceLevel.HIGH, ("nonzero_residual",), (candidate,))
+        return VerificationResult(
+            False, ConfidenceLevel.HIGH, ("nonzero_residual",), (candidate,)
+        )
     except (TypeError, ValueError, NotImplementedError):
-        return VerificationResult(False, ConfidenceLevel.LOW, ("verification_failed",), (candidate,))
+        return VerificationResult(
+            False, ConfidenceLevel.LOW, ("verification_failed",), (candidate,)
+        )
 
 
 def verify_solution_set(
@@ -99,7 +103,9 @@ def verify_solution_set(
         )
     verified = all(item.verified for item in checks)
     confidence = ConfidenceLevel.HIGH if verified else ConfidenceLevel.LOW
-    return VerificationResult(verified, confidence, ("solution_set_substitution",), candidates)
+    return VerificationResult(
+        verified, confidence, ("solution_set_substitution",), candidates
+    )
 
 
 def compare_independent_methods(
@@ -112,7 +118,10 @@ def compare_independent_methods(
         equivalent = _numeric_equal(claimed, alternate)
     if equivalent:
         return VerificationResult(
-            True, ConfidenceLevel.HIGH, ("independent_method_agreement",), (claimed, alternate)
+            True,
+            ConfidenceLevel.HIGH,
+            ("independent_method_agreement",),
+            (claimed, alternate),
         )
     return VerificationResult(
         False,

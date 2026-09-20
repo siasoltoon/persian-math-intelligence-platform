@@ -45,11 +45,14 @@ def distance(a: Point, b: Point) -> GeometryResult:
 
 
 def triangle_area(triangle: Triangle) -> GeometryResult:
-    value = abs(
-        triangle.a.x * (triangle.b.y - triangle.c.y)
-        + triangle.b.x * (triangle.c.y - triangle.a.y)
-        + triangle.c.x * (triangle.a.y - triangle.b.y)
-    ) / 2
+    value = (
+        abs(
+            triangle.a.x * (triangle.b.y - triangle.c.y)
+            + triangle.b.x * (triangle.c.y - triangle.a.y)
+            + triangle.c.x * (triangle.a.y - triangle.b.y)
+        )
+        / 2
+    )
     return GeometryResult(value, "shoelace_area", True)
 
 

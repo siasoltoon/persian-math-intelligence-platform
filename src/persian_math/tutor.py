@@ -34,7 +34,10 @@ def start_session(user: UserProfile) -> TutorSession:
 
 
 def next_hint(session: TutorSession, topic: str) -> TutorTurn:
-    return TutorTurn(TutorAction.HINT, f"راهنما: ابتدا مفهوم «{topic}» را مشخص کن و داده‌های مسئله را جدا کن.")
+    return TutorTurn(
+        TutorAction.HINT,
+        f"راهنما: ابتدا مفهوم «{topic}» را مشخص کن و داده‌های مسئله را جدا کن.",
+    )
 
 
 def ask_step(session: TutorSession, question: str, expected_answer: Any | None = None) -> TutorTurn:
@@ -44,4 +47,7 @@ def ask_step(session: TutorSession, question: str, expected_answer: Any | None =
 def check_answer(session: TutorSession, correct: bool) -> TutorTurn:
     if correct:
         return TutorTurn(TutorAction.CHECK, "درست است. حالا مرحله بعد را انجام بده.")
-    return TutorTurn(TutorAction.CHECK, "این پاسخ با بررسی ریاضی سازگار نیست؛ یک مرحله قبل را دوباره بررسی کن.")
+    return TutorTurn(
+        TutorAction.CHECK,
+        "این پاسخ با بررسی ریاضی سازگار نیست؛ یک مرحله قبل را دوباره بررسی کن.",
+    )

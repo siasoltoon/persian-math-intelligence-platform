@@ -32,7 +32,9 @@ def process(text: str, *, symbol_name: str = "x") -> EngineResult:
     elif solver_result.success and representation.kind == "equation":
         lhs, rhs = parse_equation(text)
         if isinstance(solver_result.value, tuple):
-            verification = verify_solution_set(lhs, rhs, sp.Symbol(symbol_name), solver_result.value)
+            verification = verify_solution_set(
+                lhs, rhs, sp.Symbol(symbol_name), solver_result.value
+            )
         else:
             verification = VerificationResult(
                 False,

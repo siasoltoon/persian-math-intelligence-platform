@@ -41,9 +41,9 @@ def test_polynomial_solver():
 
 def test_calculus_solvers():
     x = sp.Symbol("x")
-    assert differentiate(x**3, x).value == 3*x**2
-    assert integrate(2*x, x).value == x**2
-    assert limit(sp.sin(x)/x, x, 0).value == 1
+    assert differentiate(x**3, x).value == 3 * x**2
+    assert integrate(2 * x, x).value == x**2
+    assert limit(sp.sin(x) / x, x, 0).value == 1
 
 
 def test_matrix_solver():
