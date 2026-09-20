@@ -5,15 +5,15 @@ from decimal import Decimal
 from .canonical import normalize_math_text
 from .domain import ProblemClassification, ProblemInput, ProblemRepresentation
 
-
 _DOMAIN_PATTERNS: tuple[tuple[str, tuple[str, ...]], ...] = (
     ("calculus", ("مشتق", "انتگرال", "حد", "derivative", "integral", "limit")),
     ("geometry", ("هندسه", "مثلث", "دایره", "زاویه", "geometry", "triangle")),
     ("probability", ("احتمال", "probability")),
     ("statistics", ("آمار", "میانگین", "واریانس", "statistics")),
-    ("algebra", ("معادله", "نامعادله", "جبر", "equation", "inequality")),
+    ("algebra", ("معادله", "نامعادله", "جبر", "equation", "inequality", "polynomial")),
+    ("linear_algebra", ("ماتریس", "بردار", "matrix", "vector")),
+    ("number_theory", ("اعداد اول", "باقی‌مانده", "prime", "modulo")),
 )
-
 
 def classify_problem(problem: ProblemInput) -> ProblemClassification:
     text = normalize_math_text(problem.text).lower()
@@ -24,8 +24,12 @@ def classify_problem(problem: ProblemInput) -> ProblemClassification:
     intent = "solve" if any(ch.isdigit() for ch in text) else "explain"
     return ProblemClassification(intent, "general_math", Decimal("0.55"))
 
-
 def represent_problem(problem: ProblemInput) -> ProblemRepresentation:
     text = normalize_math_text(problem.text)
-    kind = "equation" if text.count("=") == 1 else "expression"
+    if any(op in text for op in ("<", ">", "<=", ">=")):
+        kind = "inequality"
+    elif text.count("=") == 1:
+        kind = "equation"
+    else:
+        kind = "expression"
     return ProblemRepresentation(kind, text, problem.text)
