@@ -5,7 +5,7 @@ from typing import Any, Callable
 
 import sympy as sp
 
-from .canonical import parse_equation, parse_expression, parse_inequality, parse_matrix, parse_system
+from .canonical import parse_equation, parse_expression, parse_inequality
 
 @dataclass(frozen=True)
 class SolverResult:
@@ -19,7 +19,8 @@ def _ok(value: Any, method: str, **metadata: Any) -> SolverResult:
     return SolverResult(True, value, method, metadata=metadata or None)
 
 def _fail(method: str, exc: Exception) -> SolverResult:
-    return SolverResult(False, None, method, "unable to solve the mathematical input", {"error_type": type(exc).__name__})
+    return SolverResult(False, None, method, "unable to solve the mathematical input",
+                        {"error_type": type(exc).__name__})
 
 def solve_expression(expression: sp.Expr) -> SolverResult:
     try:
@@ -29,57 +30,122 @@ def solve_expression(expression: sp.Expr) -> SolverResult:
 
 def solve_equation(lhs: sp.Expr, rhs: sp.Expr, symbol: sp.Symbol) -> SolverResult:
     try:
-        values = sp.solve(sp.Eq(lhs, rhs), symbol, dict=False)
-        return _ok(tuple(values), "symbolic_equation", symbol=str(symbol))
+        return _ok(tuple(sp.solve(sp.Eq(lhs, rhs), symbol, dict=False)),
+                   "symbolic_equation", symbol=str(symbol))
     except (TypeError, ValueError, NotImplementedError) as exc:
         return _fail("symbolic_equation", exc)
 
 def solve_inequality(lhs: sp.Expr, operator: str, rhs: sp.Expr, symbol: sp.Symbol) -> SolverResult:
     try:
         relation = {"<": sp.Lt, "<=": sp.Le, ">": sp.Gt, ">=": sp.Ge}[operator](lhs, rhs)
-        return _ok(sp.solve_univariate_inequality(relation, symbol), "symbolic_inequality", symbol=str(symbol))
-    except (TypeError, ValueError, NotImplementedError) as exc:
+        return _ok(sp.solve_univariate_inequality(relation, symbol),
+                   "symbolic_inequality", symbol=str(symbol))
+    except (KeyError, TypeError, ValueError, NotImplementedError) as exc:
         return _fail("symbolic_inequality", exc)
 
-def solve_system(equations: tuple[tuple[sp.Expr, sp.Expr], ...], symbols: tuple[sp.Symbol, ...]) -> SolverResult:
+def solve_system(equations: tuple[tuple[sp.Expr, sp.Expr], ...],
+                 symbols: tuple[sp.Symbol, ...]) -> SolverResult:
     try:
         eqs = [sp.Eq(lhs, rhs) for lhs, rhs in equations]
-        return _ok(sp.solve(eqs, symbols, dict=True), "symbolic_system", symbols=tuple(map(str, symbols)))
+        return _ok(sp.solve(eqs, symbols, dict=True), "symbolic_system",
+                   symbols=tuple(map(str, symbols)))
     except (TypeError, ValueError, NotImplementedError) as exc:
         return _fail("symbolic_system", exc)
 
 def solve_polynomial(expression: sp.Expr, symbol: sp.Symbol) -> SolverResult:
     try:
-        return _ok(tuple(sp.solve(sp.Poly(expression, symbol), symbol)), "polynomial", symbol=str(symbol))
+        return _ok(tuple(sp.solve(sp.Poly(expression, symbol), symbol)), "polynomial",
+                   symbol=str(symbol))
     except (TypeError, ValueError, NotImplementedError) as exc:
         return _fail("polynomial", exc)
 
 def differentiate(expression: sp.Expr, symbol: sp.Symbol, order: int = 1) -> SolverResult:
+    if order < 1:
+        return _fail("derivative", ValueError("order must be positive"))
     try:
-        return _ok(sp.diff(expression, symbol, order), "derivative", symbol=str(symbol), order=order)
+        return _ok(sp.diff(expression, symbol, order), "derivative",
+                   symbol=str(symbol), order=order)
     except (TypeError, ValueError) as exc:
         return _fail("derivative", exc)
 
-def integrate(expression: sp.Expr, symbol: sp.Symbol, lower: Any | None = None, upper: Any | None = None) -> SolverResult:
+def integrate(expression: sp.Expr, symbol: sp.Symbol, lower: Any | None = None,
+              upper: Any | None = None) -> SolverResult:
     try:
-        value = sp.integrate(expression, (symbol, lower, upper)) if lower is not None and upper is not None else sp.integrate(expression, symbol)
+        value = (sp.integrate(expression, (symbol, lower, upper))
+                 if lower is not None and upper is not None else sp.integrate(expression, symbol))
         return _ok(value, "integral", symbol=str(symbol), definite=lower is not None)
     except (TypeError, ValueError, NotImplementedError) as exc:
         return _fail("integral", exc)
 
 def limit(expression: sp.Expr, symbol: sp.Symbol, point: Any, direction: str = "+-") -> SolverResult:
     try:
-        return _ok(sp.limit(expression, symbol, point, dir=direction), "limit", symbol=str(symbol), point=str(point))
+        return _ok(sp.limit(expression, symbol, point, dir=direction), "limit",
+                   symbol=str(symbol), point=str(point))
     except (TypeError, ValueError, NotImplementedError) as exc:
         return _fail("limit", exc)
 
+def solve_trigonometric(expression: sp.Expr, symbol: sp.Symbol) -> SolverResult:
+    try:
+        return _ok(tuple(sp.solveset(expression, symbol, domain=sp.S.Reals)),
+                   "trigonometric", symbol=str(symbol))
+    except (TypeError, ValueError, NotImplementedError) as exc:
+        return _fail("trigonometric", exc)
+
+def solve_numeric(expression: sp.Expr, symbol: sp.Symbol, guess: float = 0.0) -> SolverResult:
+    try:
+        return _ok(sp.nsolve(expression, symbol, guess), "numerical_root", symbol=str(symbol))
+    except (TypeError, ValueError, sp.SympifyError) as exc:
+        return _fail("numerical_root", exc)
+
+def solve_complex(expression: sp.Expr, symbol: sp.Symbol) -> SolverResult:
+    try:
+        return _ok(tuple(sp.solveset(expression, symbol, domain=sp.S.Complexes)),
+                   "complex_solution", symbol=str(symbol))
+    except (TypeError, ValueError, NotImplementedError) as exc:
+        return _fail("complex_solution", exc)
+
+def solve_number_theory(expression: sp.Expr) -> SolverResult:
+    try:
+        value = sp.factorint(int(expression))
+        return _ok(value, "integer_factorization")
+    except (TypeError, ValueError, sp.SympifyError) as exc:
+        return _fail("integer_factorization", exc)
+
+def optimize(expression: sp.Expr, symbol: sp.Symbol) -> SolverResult:
+    try:
+        derivative = sp.diff(expression, symbol)
+        critical = tuple(sp.solve(derivative, symbol))
+        return _ok({"critical_points": critical, "second_derivative": sp.diff(expression, symbol, 2)},
+                   "symbolic_optimization", symbol=str(symbol))
+    except (TypeError, ValueError, NotImplementedError) as exc:
+        return _fail("symbolic_optimization", exc)
+
+def solve_ode(expression: sp.Eq, function: sp.FunctionClass) -> SolverResult:
+    try:
+        return _ok(sp.dsolve(expression, function), "differential_equation")
+    except (TypeError, ValueError, NotImplementedError) as exc:
+        return _fail("differential_equation", exc)
+
+def solve_statistics(values: list[Any]) -> SolverResult:
+    try:
+        data = [sp.sympify(value) for value in values]
+        return _ok({"mean": sp.Rational(sum(data), len(data)),
+                    "median": sp.median(data), "variance": sp.variance(data)},
+                   "statistics")
+    except (TypeError, ValueError, ZeroDivisionError) as exc:
+        return _fail("statistics", exc)
+
+def solve_probability(successes: int, trials: int) -> SolverResult:
+    if trials <= 0 or successes < 0 or successes > trials:
+        return _fail("probability", ValueError("invalid probability counts"))
+    return _ok(sp.Rational(successes, trials), "empirical_probability")
+
 def solve_matrix(matrix: sp.MatrixBase, operation: str) -> SolverResult:
     try:
-        if operation == "det": return _ok(matrix.det(), "matrix_determinant")
-        if operation == "inv": return _ok(matrix.inv(), "matrix_inverse")
-        if operation == "rank": return _ok(matrix.rank(), "matrix_rank")
-        if operation == "transpose": return _ok(matrix.T, "matrix_transpose")
-        raise ValueError("unsupported matrix operation")
+        operations = {"det": matrix.det, "inv": matrix.inv, "rank": matrix.rank, "transpose": lambda: matrix.T}
+        if operation not in operations:
+            raise ValueError("unsupported matrix operation")
+        return _ok(operations[operation](), f"matrix_{operation}")
     except (TypeError, ValueError, sp.NonInvertibleMatrixError) as exc:
         return _fail("matrix", exc)
 
@@ -106,10 +172,9 @@ class SolverRoute:
 class SolverRouter:
     def __init__(self) -> None:
         self._routes: tuple[SolverRoute, ...] = (
-            SolverRoute("inequality", lambda t: any(op in t for op in ("<", ">", "≤", "≥")),
-                        lambda t: solve(t)),
-            SolverRoute("equation", lambda t: t.count("=") == 1, lambda t: solve(t)),
-            SolverRoute("expression", lambda t: True, lambda t: solve(t)),
+            SolverRoute("inequality", lambda t: any(op in t for op in ("<", ">", "≤", "≥")), solve),
+            SolverRoute("equation", lambda t: t.count("=") == 1, solve),
+            SolverRoute("expression", lambda t: True, solve),
         )
 
     def route(self, text: str) -> SolverResult:
