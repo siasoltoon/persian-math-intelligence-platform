@@ -8,7 +8,7 @@ from .canonical import parse_equation, parse_expression
 from .domain import ConfidenceLevel, Problem, ProblemInput, VerificationResult
 from .solver import SolverResult, solve
 from .understanding import classify_problem, represent_problem
-from .verification import verify_expression_result, verify_solution_set
+from .verification import verify_equation_independently, verify_expression_result, verify_solution_set
 
 
 @dataclass(frozen=True)
@@ -32,7 +32,7 @@ def process(text: str, *, symbol_name: str = "x") -> EngineResult:
     elif solver_result.success and representation.kind == "equation":
         lhs, rhs = parse_equation(text)
         if isinstance(solver_result.value, tuple):
-            verification = verify_solution_set(
+            verification = verify_equation_independently(
                 lhs, rhs, sp.Symbol(symbol_name), solver_result.value
             )
         else:
