@@ -17,7 +17,12 @@ _RULES = {
     EducationalLevel.ELEMENTARY: CurriculumRule(
         EducationalLevel.ELEMENTARY, Difficulty.EASY, "concrete"
     ),
-    EducationalLevel.MIDDLE: CurriculumRule(EducationalLevel.MIDDLE, Difficulty.MEDIUM, "guided"),
+    EducationalLevel.MIDDLE: CurriculumRule(
+        EducationalLevel.MIDDLE, Difficulty.MEDIUM, "guided"
+    ),
+    EducationalLevel.ENTRANCE_EXAM: CurriculumRule(
+        EducationalLevel.ENTRANCE_EXAM, Difficulty.HARD, "exam_ready"
+    ),
     EducationalLevel.HIGH_SCHOOL: CurriculumRule(
         EducationalLevel.HIGH_SCHOOL, Difficulty.MEDIUM, "exam_ready"
     ),
