@@ -1,16 +1,16 @@
 # Engineering Changelog
 
 ## 2026-09-21
-- Added Python 3.11+ package/tooling foundation with SymPy as the specialized symbolic engine.
-- Added deployment-agnostic core domain models.
-- Added Persian/Arabic digit and mathematical operator normalization plus implicit multiplication parsing.
-- Added initial symbolic expression/equation solving and independent verification primitives.
-- Added Persian/English mathematical intent/domain classification foundations.
-- Added baseline unit tests and CI quality matrix for Python 3.11/3.12.
-- Initial CI run failed; parser, confidence typing and mypy dependency configuration were corrected.
-- Current CI validation remains in progress.
-- No Phase 1–4 capability is marked VERIFIED until full acceptance criteria and validation are met.
 
-## Previous
-- P0-T01 established and read back the engineering baseline.
-- Fixed Phase 0–25 roadmap and continuation/state contract.
+### Core expansion through Phase 10
+- Expanded canonical representation for inequalities, systems, matrices and superscript exponents.
+- Expanded solver primitives across algebra, calculus, matrices, probability, statistics, numerical roots, complex roots, optimization and ODE foundations.
+- Added independent verification and integrated processing pipeline.
+- Added input-understanding intent and ambiguity detection.
+- Added OCR validation, bounded preprocessing planning, backend protocol and controlled unavailable state.
+- Added OCR consensus/confidence aggregation with disagreement rejection.
+- Added geometry primitives for coordinate mathematics.
+- Added Persian-first explanation objects with education-level adaptation.
+- Added educational curriculum rules, adaptive difficulty, tutoring session primitives and validated exercise generation.
+- Added tests for all newly introduced foundations.
+- CI remains the final gate; these capabilities are not yet claimed VERIFIED.
