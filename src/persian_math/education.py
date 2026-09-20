@@ -29,3 +29,25 @@ def curriculum_for(profile: UserProfile) -> CurriculumRule:
 
 def adapt_explanation_level(profile: UserProfile, requested: EducationalLevel | None = None) -> EducationalLevel:
     return requested or profile.educational_level
+
+
+def recommended_difficulty(profile: UserProfile, recent_accuracy: float | None = None) -> Difficulty:
+    base = curriculum_for(profile).max_difficulty
+    if recent_accuracy is None:
+        return base
+    if not 0.0 <= recent_accuracy <= 1.0:
+        raise ValueError("accuracy must be between 0 and 1")
+    if recent_accuracy < 0.50:
+        return Difficulty.EASY
+    if recent_accuracy < 0.75:
+        return Difficulty.MEDIUM
+    return base
+
+
+def learning_objectives(profile: UserProfile, domain: str) -> tuple[str, ...]:
+    style = curriculum_for(profile).style
+    return (
+        f"تقویت {domain}",
+        f"ارائه توضیح با سبک {style}",
+        "حل یک نمونه و بررسی مستقل پاسخ",
+    )
