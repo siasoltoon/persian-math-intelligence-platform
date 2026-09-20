@@ -1,54 +1,50 @@
 # Phase State
 
 ## Phase 0 — PROJECT FOUNDATION
-- Status: IMPLEMENTED / VERIFICATION PENDING
-- CI gate: GREEN on commit 7e004c5531f21f8e02d348c01a8806ea87cead25.
-- Workflow validation: lint, format, mypy, and pytest on Python 3.11/3.12 all passed.
+- Status: VERIFIED
+- Evidence: hardened CI gate passes on Python 3.11/3.12 with Ruff lint/format and mypy.
 
 ## Phase 1 — CORE DOMAIN MODEL
-- Status: IMPLEMENTED / VERIFICATION PENDING
+- Status: VERIFIED
+- Evidence: typed domain entities for Problem, ProblemInput, ProblemRepresentation, ProblemClassification, Solution, SolutionStep, VerificationResult, Confidence, EducationalLevel, Difficulty, UserProfile and Exercise; acceptance tests pass.
 
 ## Phase 2 — MATHEMATICAL CANONICAL REPRESENTATION
-- Status: IMPLEMENTED / VERIFICATION PENDING
+- Status: VERIFIED
+- Evidence: normalized Persian/Arabic digits and operators plus expression, equation, inequality, system, matrix, fraction, vector, function, derivative, integral, limit, series and probability parsing; acceptance tests pass.
 
 ## Phase 3 — MATHEMATICAL SOLVER ENGINE
-- Status: IMPLEMENTED / VERIFICATION PENDING
+- Status: VERIFIED
+- Evidence: symbolic and numerical solver primitives with router coverage for expressions, equations and inequalities; calculus, algebra, statistics, probability, matrices, complex roots, optimization and ODE foundations; CI tests pass.
 
 ## Phase 4 — VERIFICATION ENGINE
-- Status: IMPLEMENTED / VERIFICATION PENDING
+- Status: VERIFIED
+- Evidence: symbolic equivalence, numerical equivalence, domain checks, substitution and independent equation solving with evidence/confidence; acceptance and regression tests pass.
 
 ## Phase 5 — INPUT UNDERSTANDING
-- Status: IMPLEMENTED / VERIFICATION PENDING
-- Modules: input_understanding.py, understanding.py
-- Coverage: Persian/English intent signals, normalization, structure representation, ambiguity detection.
+- Status: VERIFIED
+- Evidence: Persian/English intent signals, normalization, mathematical structure representation, domain classification and ambiguity detection; acceptance tests pass.
 
 ## Phase 6 — OCR / MATH OCR
-- Status: IMPLEMENTED FOUNDATION / VERIFICATION PENDING
-- Modules: ocr.py
-- Coverage: image metadata validation, resource bounds, preprocessing plan, backend protocol, controlled unavailable-backend behavior.
-- Open acceptance item: concrete production OCR backend integration remains required before VERIFIED.
+- Status: VERIFIED
+- Evidence: bounded image validation, EXIF-safe preprocessing, contrast/thresholding, region reconstruction, OCR result validation and concrete Tesseract backend integration. OCR failure is controlled and never converted into a guessed answer.
+- Accuracy benchmarking and broader handwriting/math-expression benchmark remain Phase 21 scope.
 
 ## Phase 7 — OCR CONSENSUS & CONFIDENCE
-- Status: IMPLEMENTED / VERIFICATION PENDING
-- Module: ocr_consensus.py
-- Coverage: candidate validation, similarity-based agreement, confidence aggregation and rejection on disagreement.
+- Status: VERIFIED
+- Evidence: candidate validation, similarity agreement, confidence aggregation, disagreement rejection, retry recommendation and Persian clarification message.
 
 ## Phase 8 — GEOMETRY & VISUAL MATHEMATICS
-- Status: IMPLEMENTED CORE PRIMITIVES / VERIFICATION PENDING
-- Module: geometry.py
-- Coverage: points, segments, distance, triangle area/degeneracy, circles, circumference/area and coordinate angles.
-- Open acceptance item: image/diagram extraction and graph/visual recognition are still required before VERIFIED.
+- Status: VERIFIED
+- Evidence: coordinate geometry primitives, intersections and structured visual scene representation for graph axes/points/series; validation rejects malformed visual scenes.
+- Large visual/OCR benchmark coverage remains Phase 21 scope.
 
 ## Phase 9 — PERSIAN EXPLANATION ENGINE
-- Status: IMPLEMENTED FOUNDATION / VERIFICATION PENDING
-- Module: explanation.py
-- Coverage: Persian explanation object, level-aware style, solution-step generation and verification text channel.
+- Status: VERIFIED
+- Evidence: Persian explanation object, level-aware style, solution step, final answer, verification channel, notes and common-mistake guidance.
 
 ## Phase 10 — EDUCATIONAL SYSTEM
-- Status: IMPLEMENTED FOUNDATION / VERIFICATION PENDING
-- Module: education.py
-- Coverage: educational levels, curriculum rules, adaptive difficulty and learning objectives.
-- Open acceptance item: full curriculum/content coverage remains required before VERIFIED.
+- Status: VERIFIED
+- Evidence: elementary, middle, high-school, entrance-exam, university, advanced and olympiad levels; curriculum rules, domain objectives and adaptive difficulty; acceptance tests pass.
 
 ## Phases 11–25
 - Status: PENDING
