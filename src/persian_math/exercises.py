@@ -1,8 +1,6 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Any
-
 import sympy as sp
 
 from .domain import Difficulty, Exercise
@@ -17,7 +15,6 @@ class ExerciseSpec:
 
 
 def _linear(index: int, difficulty: Difficulty) -> Exercise:
-    x = sp.Symbol("x")
     a = index + 2
     b = index + 3
     answer = sp.Rational(-b, a)
