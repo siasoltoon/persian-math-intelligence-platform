@@ -8,13 +8,14 @@ from persian_math.geometry import (
     distance,
     triangle_area,
 )
+from persian_math.domain import ProblemInput
 from persian_math.input_understanding import detect_ambiguity, detect_intent, understand
 from persian_math.ocr import ImageMetadata, ImageQuality, preprocess_plan, validate_image_metadata
 from persian_math.ocr_consensus import RecognitionCandidate, consensus
 
 
 def test_understanding_persian_math():
-    result = understand("معادله ۲x + ۳ = ۷ را حل کن")
+    result = understand(ProblemInput("معادله ۲x + ۳ = ۷ را حل کن"))
     assert result.intent.intent == "solve"
     assert result.representation.kind == "equation"
     assert not result.ambiguity
