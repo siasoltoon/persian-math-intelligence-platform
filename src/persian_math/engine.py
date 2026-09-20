@@ -8,7 +8,7 @@ from .canonical import parse_equation, parse_expression
 from .domain import ConfidenceLevel, Problem, ProblemInput, VerificationResult
 from .solver import SolverResult, solve
 from .understanding import classify_problem, represent_problem
-from .verification import verify_equation_independently, verify_expression_result, verify_solution_set
+from .verification import verify_equation_independently, verify_expression_result
 
 
 @dataclass(frozen=True)
