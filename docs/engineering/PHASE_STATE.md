@@ -1,8 +1,9 @@
 # Phase State
 
 ## Phase 0 — PROJECT FOUNDATION
-- Status: IN_PROGRESS
-- CI validation pending.
+- Status: IMPLEMENTED / VERIFICATION PENDING
+- CI gate: GREEN on commit 7e004c5531f21f8e02d348c01a8806ea87cead25.
+- Workflow validation: lint, format, mypy, and pytest on Python 3.11/3.12 all passed.
 
 ## Phase 1 — CORE DOMAIN MODEL
 - Status: IMPLEMENTED / VERIFICATION PENDING

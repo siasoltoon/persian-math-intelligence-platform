@@ -3,8 +3,10 @@
 ## Current batch: Phase 0 through Phase 10
 
 ### P0-T02 — Repository/tooling foundation
-- Status: IN_PROGRESS
-- Validation: CI pending after iterative lint/syntax fixes.
+- Status: COMPLETED / VERIFICATION PENDING
+- Validation: CI GREEN on commit 7e004c5531f21f8e02d348c01a8806ea87cead25.
+- Evidence: Ruff lint, Ruff format, mypy, pytest 3.11 and pytest 3.12 all passed.
+- Workflow run: 35544271169.
 
 ### P1-T01 — Typed core domain
 - Status: COMPLETED / VERIFICATION PENDING

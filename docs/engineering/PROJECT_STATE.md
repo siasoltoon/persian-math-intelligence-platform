@@ -2,10 +2,10 @@
 
 ## Identity
 - Project: Production-Grade Persian Mathematical Intelligence & Tutoring Platform
-- Repository: siasloltoon/persian-math-intelligence-platform
+- Repository: siasoltoon/persian-math-intelligence-platform
 - Current execution date: 2026-09-21
 - Current Phase target: Phase 10
-- Status: IMPLEMENTATION IN PROGRESS; verification gates pending
+- Status: IMPLEMENTATION IN PROGRESS; formal phase acceptance review pending
 - Last VERIFIED Task: P0-T01
 
 ## Current implementation coverage
@@ -27,7 +27,16 @@ These phases are not marked VERIFIED until CI is green and acceptance review con
 Core is deployment-agnostic and independent of Telegram. Specialized mathematical computation and independent verification remain separate capabilities. OCR inputs are treated as untrusted and bounded before processing. Uncertain recognition must not be guessed.
 
 ## Current validation
-GitHub Actions is running iterative validation after fixing parser, import-order, syntax and lint issues. No phase is falsely marked VERIFIED.
+The hardened GitHub Actions CI gate is GREEN on commit 7e004c5531f21f8e02d348c01a8806ea87cead25:
+- Ruff lint: PASS
+- Ruff format: PASS
+- mypy: PASS
+- pytest Python 3.11: PASS
+- pytest Python 3.12: PASS
+
+Workflow run: 35544271169.
+
+The CI workflow now uses independent quality/test jobs, Python 3.11/3.12 test coverage, explicit read-only permissions, manual dispatch, and job timeouts. CI green does not by itself satisfy the remaining Phase 0–10 roadmap acceptance items.
 
 ## Next action
-Continue monitoring/fixing CI, then perform a formal Phase 0–10 acceptance review. Any unmet roadmap requirement remains explicitly open and is not silently declared complete.
+Perform the formal Phase 0–10 acceptance review against ROADMAP.md, keeping open items explicit. Do not mark a phase VERIFIED merely because CI is green.
