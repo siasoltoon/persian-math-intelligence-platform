@@ -52,7 +52,7 @@ def verify_expression_result(expression: sp.Expr, claimed: Any) -> VerificationR
             (expected, claimed),
         )
     except (TypeError, ValueError, NotImplementedError):
-        return VerificationResult(False, ConfidenceLevel.LOW, ("verification_failed", ()))
+        return VerificationResult(False, ConfidenceLevel.LOW, ("verification_failed",), ())
 
 
 def verify_equation_solution(
