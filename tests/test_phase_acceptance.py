@@ -66,7 +66,9 @@ def test_phase_6_ocr_validation_and_reconstruction():
     prepared = preprocess_image(image, metadata)
     assert prepared
     result = OcrResult(
-        "x + 1", 0.95, (OcrRegion("x + 1", 0.95, (0, 0, 20, 20)),)
+        "x + 1",
+        0.95,
+        (OcrRegion("x + 1", 0.95, (0, 0, 20, 20)),),
     )
     validate_ocr_result(result, metadata)
     assert reconstruct_math_text(result, metadata) == "x + 1"
