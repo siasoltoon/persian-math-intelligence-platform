@@ -1,19 +1,30 @@
 # Test State
 
-## Baseline
-- Date: 2026-09-21
-- Unit tests: ESTABLISHED
-- Solver tests: ESTABLISHED
-- Verification tests: ESTABLISHED
-- Canonical representation tests: ESTABLISHED
-- Integrated engine tests: ESTABLISHED
-- Integration/contract/OCR/security/performance/E2E/regression suites: NOT YET ESTABLISHED
+## Established suites
+- Canonical representation
+- Solver/verification
+- Integrated core engine
+- Input understanding
+- OCR validation/consensus
+- Geometry
+- Education/tutor/exercise foundations
 
-## Current CI
-- CI workflow: .github/workflows/ci.yml
-- Matrix: Python 3.11 and 3.12
-- Gates: Ruff lint, Ruff format check, mypy, pytest
-- Latest validation runs are being monitored after iterative fixes.
+## CI gates
+- Python 3.11
+- Python 3.12
+- Ruff lint
+- Ruff format
+- mypy
+- pytest
 
-## Validation rule
-A task or phase cannot be VERIFIED from code presence alone. Record actual green CI and acceptance-review evidence before changing status to VERIFIED.
+## Current status
+CI is undergoing iterative validation. Earlier failures were real and were fixed from logs; the current implementation has not yet received a green final run.
+
+## Missing future suites
+- Production OCR accuracy benchmark
+- Visual/diagram benchmark
+- Full E2E
+- Security suite
+- Performance/load
+- Regression corpus
+- Mathematical benchmark
