@@ -1,11 +1,16 @@
 # Engineering Changelog
 
 ## 2026-09-21
-### Foundation
-- Initialized the repository engineering source-of-truth documentation.
-- Added fixed Phase 0–25 roadmap.
-- Established continuation/state contract.
-- Recorded deployment-agnostic Core and Telegram boundary decisions.
-- Verified repository read-back of the engineering baseline.
-- Marked P0-T01 VERIFIED and advanced the next action to P0-T02.
-- No application capability is claimed as VERIFIED yet.
+- Added Python 3.11+ package/tooling foundation with SymPy as the specialized symbolic engine.
+- Added deployment-agnostic core domain models.
+- Added Persian/Arabic digit and mathematical operator normalization plus implicit multiplication parsing.
+- Added initial symbolic expression/equation solving and independent verification primitives.
+- Added Persian/English mathematical intent/domain classification foundations.
+- Added baseline unit tests and CI quality matrix for Python 3.11/3.12.
+- Initial CI run failed; parser, confidence typing and mypy dependency configuration were corrected.
+- Current CI validation remains in progress.
+- No Phase 1–4 capability is marked VERIFIED until full acceptance criteria and validation are met.
+
+## Previous
+- P0-T01 established and read back the engineering baseline.
+- Fixed Phase 0–25 roadmap and continuation/state contract.
