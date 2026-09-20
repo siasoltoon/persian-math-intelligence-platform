@@ -1,13 +1,15 @@
 # Test State
 
-## Established suites
+## Phase 1–10 established suites
 - Canonical representation
-- Solver/verification
+- Solver and verification
 - Integrated core engine
 - Input understanding
-- OCR validation/consensus
-- Geometry
-- Education/tutor/exercise foundations
+- OCR validation, preprocessing and consensus
+- Geometry and visual scene contracts
+- Persian explanation
+- Education, tutor and exercise foundations
+- Phase acceptance/regression suite
 
 ## CI gates
 - Python 3.11
@@ -17,23 +19,32 @@
 - mypy
 - pytest
 
-## Current status
-CI is GREEN for commit 7e004c5531f21f8e02d348c01a8806ea87cead25 in workflow run 35544271169.
+## Current evidence
+- Full CI GREEN on workflow run 35545050264.
+- Commit under test: a79306d22da0555440c4ad4c5c1c4f0bf87e2a6b.
+- Previous full CI GREEN on workflow run 35545046438.
+- All current unit, integration and phase-acceptance tests pass on Python 3.11 and 3.12.
 
-Verified CI job results:
-- Ruff lint: PASS
-- Ruff format: PASS
-- mypy: PASS
-- pytest (Python 3.11): PASS
-- pytest (Python 3.12): PASS
+## Security validation included
+- Image byte-size bounding
+- Image dimension/channel bounding
+- Decode/verify before OCR
+- OCR confidence bounds
+- OCR bounding-box bounds
+- Controlled backend failure
+- No execution of uploaded image contents
 
-The green CI result establishes the repository quality/test gate for the current implementation. It does not automatically mark Phase 0–10 VERIFIED because roadmap acceptance, security/performance/regression requirements, and explicitly documented open capabilities still require review.
+## Regression validation included
+- Existing Phase 0–10 test suite
+- New phase acceptance tests
+- Persian input normalization and typed understanding contract
+- Independent equation verification
 
-## Missing future suites
-- Production OCR accuracy benchmark
-- Visual/diagram benchmark
-- Full E2E
-- Security suite
-- Performance/load
-- Regression corpus
-- Mathematical benchmark
+## Future dedicated suites
+- Production OCR accuracy benchmark — Phase 21
+- Visual/diagram benchmark — Phase 21
+- Full E2E — Phase 19
+- Dedicated security suite — Phase 19/17
+- Performance/load — Phase 19/24
+- Mathematical benchmark — Phase 20
+- Adversarial/failure corpus — Phase 22
