@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+
 import sympy as sp
 
 from .domain import Difficulty, Exercise
@@ -34,5 +35,5 @@ def validate_exercise(exercise: Exercise) -> bool:
         lhs, rhs = exercise.prompt.split("=", 1)
         x = sp.Symbol("x")
         expr = sp.sympify(lhs.replace("x", "*x")) - sp.sympify(rhs)
-        return sp.simplify(expr.subs(x, exercise.answer)) == 0
+        return bool(sp.simplify(expr.subs(x, exercise.answer) == 0))
     return False
