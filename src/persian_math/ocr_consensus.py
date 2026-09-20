@@ -18,6 +18,8 @@ class ConsensusResult:
     confidence: float
     candidates: tuple[RecognitionCandidate, ...]
     reason: str
+    retry_recommended: bool = False
+    clarification_fa: str | None = None
 
 
 def _similarity(a: str, b: str) -> float:
