@@ -50,9 +50,7 @@ def solve_equation(lhs: sp.Expr, rhs: sp.Expr, symbol: sp.Symbol) -> SolverResul
         return _fail("symbolic_equation", exc)
 
 
-def solve_inequality(
-    lhs: sp.Expr, operator: str, rhs: sp.Expr, symbol: sp.Symbol
-) -> SolverResult:
+def solve_inequality(lhs: sp.Expr, operator: str, rhs: sp.Expr, symbol: sp.Symbol) -> SolverResult:
     try:
         relation = {"<": sp.Lt, "<=": sp.Le, ">": sp.Gt, ">=": sp.Ge}[operator](lhs, rhs)
         return _ok(
@@ -201,7 +199,9 @@ def solve_statistics(values: list[Any]) -> SolverResult:
             raise ValueError("empty dataset")
         ordered = sorted(data, key=lambda item: float(item))
         middle = len(ordered) // 2
-        median = ordered[middle] if len(ordered) % 2 else (ordered[middle - 1] + ordered[middle]) / 2
+        median = (
+            ordered[middle] if len(ordered) % 2 else (ordered[middle - 1] + ordered[middle]) / 2
+        )
         mean = sp.Rational(sum(data), len(data))
         variance = sp.Rational(sum((item - mean) ** 2 for item in data), len(data))
         return _ok({"mean": mean, "median": median, "variance": variance}, "statistics")

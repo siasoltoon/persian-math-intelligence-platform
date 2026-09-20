@@ -81,9 +81,7 @@ def verify_equation_solution(
                 ("numerical_residual_check", "domain_checked"),
                 (candidate,),
             )
-        return VerificationResult(
-            False, ConfidenceLevel.HIGH, ("nonzero_residual",), (candidate,)
-        )
+        return VerificationResult(False, ConfidenceLevel.HIGH, ("nonzero_residual",), (candidate,))
     except (TypeError, ValueError, NotImplementedError):
         return VerificationResult(
             False, ConfidenceLevel.LOW, ("verification_failed",), (candidate,)
@@ -98,14 +96,10 @@ def verify_solution_set(
 ) -> VerificationResult:
     checks = tuple(verify_equation_solution(lhs, rhs, symbol, c) for c in candidates)
     if not checks:
-        return VerificationResult(
-            True, ConfidenceLevel.HIGH, ("empty_solution_set_verified",), ()
-        )
+        return VerificationResult(True, ConfidenceLevel.HIGH, ("empty_solution_set_verified",), ())
     verified = all(item.verified for item in checks)
     confidence = ConfidenceLevel.HIGH if verified else ConfidenceLevel.LOW
-    return VerificationResult(
-        verified, confidence, ("solution_set_substitution",), candidates
-    )
+    return VerificationResult(verified, confidence, ("solution_set_substitution",), candidates)
 
 
 def compare_independent_methods(

@@ -35,10 +35,7 @@ def consensus(
     agreement = len(peers) / len(valid)
     confidence = min(1.0, best.confidence * (0.5 + 0.5 * agreement))
     accepted = (
-        len(valid) == 1 and best.confidence >= 0.90
-        or agreement >= 0.66 and confidence >= 0.70
+        len(valid) == 1 and best.confidence >= 0.90 or agreement >= 0.66 and confidence >= 0.70
     )
     reason = "consensus_accepted" if accepted else "recognition_disagreement"
-    return ConsensusResult(
-        accepted, best.text if accepted else "", confidence, candidates, reason
-    )
+    return ConsensusResult(accepted, best.text if accepted else "", confidence, candidates, reason)
