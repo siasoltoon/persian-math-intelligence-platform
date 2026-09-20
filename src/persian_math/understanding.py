@@ -15,6 +15,7 @@ _DOMAIN_PATTERNS: tuple[tuple[str, tuple[str, ...]], ...] = (
     ("number_theory", ("اعداد اول", "باقی‌مانده", "prime", "modulo")),
 )
 
+
 def classify_problem(problem: ProblemInput) -> ProblemClassification:
     text = normalize_math_text(problem.text).lower()
     for domain, patterns in _DOMAIN_PATTERNS:
@@ -23,6 +24,7 @@ def classify_problem(problem: ProblemInput) -> ProblemClassification:
             return ProblemClassification(intent, domain, Decimal("0.90"))
     intent = "solve" if any(ch.isdigit() for ch in text) else "explain"
     return ProblemClassification(intent, "general_math", Decimal("0.55"))
+
 
 def represent_problem(problem: ProblemInput) -> ProblemRepresentation:
     text = normalize_math_text(problem.text)
