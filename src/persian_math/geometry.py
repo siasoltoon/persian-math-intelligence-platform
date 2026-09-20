@@ -79,3 +79,17 @@ def angle_degrees(vertex: Point, first: Point, second: Point) -> GeometryResult:
         raise ValueError("angle requires distinct points")
     value = abs(degrees(atan2(ay, ax) - atan2(by, bx))) % 360
     return GeometryResult(min(value, 360 - value), "coordinate_angle", True)
+
+def line_intersection(first: Segment, second: Segment) -> Point | None:
+    x1, y1 = first.start.x, first.start.y
+    x2, y2 = first.end.x, first.end.y
+    x3, y3 = second.start.x, second.start.y
+    x4, y4 = second.end.x, second.end.y
+    denominator = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4)
+    if denominator == 0:
+        return None
+    determinant1 = x1 * y2 - y1 * x2
+    determinant2 = x3 * y4 - y3 * x4
+    px = (determinant1 * (x3 - x4) - (x1 - x2) * determinant2) / denominator
+    py = (determinant1 * (y3 - y4) - (y1 - y2) * determinant2) / denominator
+    return Point(px, py)
