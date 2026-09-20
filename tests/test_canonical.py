@@ -1,6 +1,6 @@
 import sympy as sp
 
-from persian_math.canonical import normalize_math_text, parse_equation, parse_expression
+from persian_math.canonical import (\n    normalize_math_text,\n    parse_equation,\n    parse_expression,\n    parse_inequality,\n    parse_matrix,\n    parse_system,\n)
 
 
 def test_persian_digits_and_operators_are_normalized():
