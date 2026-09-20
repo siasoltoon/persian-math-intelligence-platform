@@ -107,7 +107,6 @@ def test_phase_10_education_levels_are_distinct():
     assert EducationalLevel.ENTRANCE_EXAM.value == "entrance_exam"
 
 
-
 def test_phase_7_rejection_provides_retry_and_clarification():
     result = consensus(
         (
