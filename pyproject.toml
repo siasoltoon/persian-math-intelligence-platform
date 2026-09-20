@@ -11,6 +11,7 @@ dependencies = ["sympy>=1.13,<2"]
 
 [project.optional-dependencies]
 dev = ["pytest>=8,<9", "ruff>=0.6,<1", "mypy>=1.11,<2"]
+ocr = ["pillow>=10,<12", "pytesseract>=0.3.13,<1"]
 
 [tool.setuptools.packages.find]
 where = ["src"]
