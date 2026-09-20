@@ -47,5 +47,9 @@ def consensus(
         candidates,
         reason,
         retry_recommended=not accepted,
-        clarification_fa=None if accepted else "خوانش تصویر مطمئن نیست؛ لطفاً تصویر واضح‌تر یا متن مسئله را ارسال کنید.",
+        clarification_fa=(
+            None
+            if accepted
+            else "خوانش تصویر مطمئن نیست؛ لطفاً تصویر واضح‌تر یا متن مسئله را ارسال کنید."
+        ),
     )
