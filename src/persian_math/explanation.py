@@ -32,7 +32,14 @@ def explain_solution(
     }[level]
     step = SolutionStep(f"روش حل: {method}؛ سطح توضیح: {level_text}.", value)
     final = f"پاسخ نهایی: {value}"
-    return Explanation("حل مسئله", (step,), final, verification)
+    return Explanation(
+        "حل مسئله",
+        (step,),
+        final,
+        verification,
+        ("فرمول‌ها و نمادها با نمایش استاندارد ریاضی ارائه می‌شوند.",),
+        ("جایگذاری نادرست مقدار، تغییر علامت و حذف شرط دامنه از خطاهای رایج‌اند.",),
+    )
 
 
 def explanation_to_solution(explanation: Explanation, value: Any, method: str) -> Solution:
