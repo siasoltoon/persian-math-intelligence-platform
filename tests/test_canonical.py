@@ -22,8 +22,7 @@ def test_inequality_and_system_parsing():
     from persian_math.canonical import parse_inequality, parse_system
     lhs, op, rhs = parse_inequality("x^2 <= 4")
     assert op == "<=" and lhs == sp.Symbol("x")**2 and rhs == 4
-    system = parse_system("x + y = 3
-2*x - y = 0")
+    system = parse_system("x + y = 3\n2*x - y = 0")
     assert len(system) == 2
 
 
