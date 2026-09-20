@@ -123,3 +123,32 @@ def compare_independent_methods(
         ("independent_method_disagreement",),
         (claimed, alternate),
     )
+
+def verify_equation_independently(
+    lhs: sp.Expr, rhs: sp.Expr, symbol: sp.Symbol, candidates: tuple[Any, ...]
+) -> VerificationResult:
+    try:
+        expected = tuple(sp.solve(sp.Eq(lhs, rhs), symbol, dict=False))
+        actual = tuple(candidates)
+        expected_set = {sp.simplify(item) for item in expected}
+        actual_set = {sp.simplify(item) for item in actual}
+        if expected_set != actual_set:
+            return VerificationResult(
+                False,
+                ConfidenceLevel.HIGH,
+                ("independent_solution_set_mismatch",),
+                (expected, actual),
+            )
+        substitution = verify_solution_set(lhs, rhs, symbol, actual)
+        if substitution.verified:
+            return VerificationResult(
+                True,
+                ConfidenceLevel.HIGH,
+                ("independent_solver_agreement", "solution_set_substitution"),
+                (expected, actual),
+            )
+        return substitution
+    except (TypeError, ValueError, NotImplementedError):
+        return VerificationResult(
+            False, ConfidenceLevel.LOW, ("independent_verification_failed",), ()
+        )
