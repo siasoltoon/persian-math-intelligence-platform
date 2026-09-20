@@ -70,6 +70,7 @@ class UnavailableOcrBackend:
 
 MAX_IMAGE_BYTES = 12 * 1024 * 1024
 
+
 def validate_image_bytes(image: bytes) -> None:
     if not image:
         raise ValueError("empty image")
@@ -138,8 +139,10 @@ class TesseractOcrBackend:
             try:
                 confidence = max(0.0, min(1.0, float(data["conf"][i]) / 100.0))
                 bbox = (
-                    int(data["left"][i]), int(data["top"][i]),
-                    int(data["width"][i]), int(data["height"][i]),
+                    int(data["left"][i]),
+                    int(data["top"][i]),
+                    int(data["width"][i]),
+                    int(data["height"][i]),
                 )
             except (KeyError, IndexError, TypeError, ValueError):
                 continue
