@@ -5,7 +5,7 @@ from dataclasses import dataclass
 import sympy as sp
 
 from .canonical import parse_equation, parse_expression
-from .domain import Problem, ProblemInput, VerificationResult
+from .domain import ConfidenceLevel, Problem, ProblemInput, VerificationResult
 from .solver import SolverResult, solve
 from .understanding import classify_problem, represent_problem
 from .verification import verify_expression_result, verify_solution_set
@@ -31,8 +31,14 @@ def process(text: str, *, symbol_name: str = "x") -> EngineResult:
         verification = verify_expression_result(expression, solver_result.value)
     elif solver_result.success and representation.kind == "equation":
         lhs, rhs = parse_equation(text)
-        verification = verify_solution_set(
-            lhs, rhs, sp.Symbol(symbol_name), solver_result.value
-        )
+        if isinstance(solver_result.value, tuple):
+            verification = verify_solution_set(lhs, rhs, sp.Symbol(symbol_name), solver_result.value)
+        else:
+            verification = VerificationResult(
+                False,
+                ConfidenceLevel.LOW,
+                ("invalid_solver_output",),
+                (solver_result.value,),
+            )
 
     return EngineResult(problem, solver_result, verification)
