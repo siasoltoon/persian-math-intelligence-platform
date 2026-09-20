@@ -16,6 +16,17 @@ PERSIAN_DIGITS = str.maketrans("۰۱۲۳۴۵۶۷۸۹", "0123456789")
 ARABIC_DIGITS = str.maketrans("٠١٢٣٤٥٦٧٨٩", "0123456789")
 _TRANSFORMATIONS = standard_transformations + (implicit_multiplication_application, convert_xor)
 _LOCALS = {"pi": sp.pi, "e": sp.E, "sqrt": sp.sqrt}
+_SAFE_GLOBALS = {
+    "Integer": sp.Integer,
+    "Float": sp.Float,
+    "Rational": sp.Rational,
+    "Symbol": sp.Symbol,
+    "Add": sp.Add,
+    "Mul": sp.Mul,
+    "Pow": sp.Pow,
+    "pi": sp.pi,
+    "E": sp.E,
+}
 
 
 def normalize_math_text(text: str) -> str:
@@ -34,7 +45,13 @@ class CanonicalExpression:
 
 def _parse(text: str) -> sp.Expr:
     try:
-        return parse_expr(text, local_dict=_LOCALS, transformations=_TRANSFORMATIONS, evaluate=True)
+        return parse_expr(
+            text,
+            local_dict=_LOCALS,
+            global_dict=_SAFE_GLOBALS,
+            transformations=_TRANSFORMATIONS,
+            evaluate=True,
+        )
     except (sp.SympifyError, SyntaxError, TypeError, ValueError) as exc:
         raise ValueError("invalid mathematical expression") from exc
 
