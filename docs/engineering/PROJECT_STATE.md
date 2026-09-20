@@ -4,7 +4,7 @@
 - Project: Production-Grade Persian Mathematical Intelligence & Tutoring Platform
 - Repository: siasoltoon/persian-math-intelligence-platform
 - Default branch: main
-- Current version: 0.2.0-dev
+- Current version: 0.3.0-dev
 - State authority: repository reality + engineering state
 - Last state update: 2026-09-21
 
@@ -15,38 +15,35 @@
 - Last VERIFIED Task: P0-T01 — Repository and engineering state foundation
 - Completed Phases: none
 
-## Verified baseline
-P0-T01 established and read back the project specification, fixed Phase 0–25 roadmap, architecture boundaries, state files, continuation contract and initial architecture decisions.
+## Implementation track
+The repository now contains a deployment-agnostic Python mathematical core covering the Phase 1–4 architectural foundations:
+- Phase 1 domain entities and typed value objects.
+- Phase 2 canonical normalization/parsing for expressions, equations, inequalities, systems and matrices.
+- Phase 3 symbolic/numerical solver primitives plus a deterministic SolverRouter.
+- Phase 4 independent verification, substitution, domain safety, solution-set checking and method agreement.
+- An integrated core processing pipeline connects understanding → representation → solving → verification.
 
-## Current implementation
-A deployment-agnostic Python core foundation has been added, including domain models, canonical mathematical parsing/normalization, initial symbolic solving, independent result verification primitives, Persian/English problem classification and CI/tooling.
-
-These capabilities are NOT yet marked VERIFIED because the required CI validation is still running and Phase acceptance criteria are broader than the current foundation.
+These phases are **NOT VERIFIED yet**. Verification requires green CI plus phase acceptance review.
 
 ## Architecture
 - Core is deployment-agnostic and interface-independent.
-- Telegram is an interface layer, not the Core.
-- Specialized solvers and independent verification are required architectural concepts.
-- No unnecessary agent/microservice architecture is part of scope.
-
-## Repository baseline
-- Engineering source-of-truth documentation exists under docs/engineering/.
-- Core implementation now exists under src/persian_math/.
-- Baseline tests exist under tests/.
-- CI exists under .github/workflows/ci.yml.
-- No mathematical Phase 1–4 capability is currently VERIFIED.
+- Telegram remains an interface layer and is not part of the Core.
+- Mathematical computation is delegated to specialized symbolic/numerical primitives.
+- Independent verification is mandatory for important results.
+- No unnecessary agent/microservice architecture is in scope.
 
 ## Testing
-- P0-T01 documentation read-back: PASS.
-- Latest CI run is validating Python 3.11/3.12 quality gates.
-- Unit/integration/contract/OCR/solver/verification/security/performance/E2E/regression suites beyond the current baseline are not yet established.
+- Baseline unit, solver and verification tests exist.
+- Canonical structure tests and integrated pipeline tests exist.
+- CI validates Python 3.11 and 3.12 with Ruff, formatting, mypy and pytest.
+- Current latest CI validation is still running.
 
 ## Risks / blockers
-- CI validation must complete before P0-T02 can be VERIFIED.
-- Solver and canonical-representation coverage is currently foundational, not the full scope of Phases 2–4.
+- Current implementation is broader than the original foundation but Phase 0–4 cannot be marked VERIFIED until the current CI pipeline is green and review/acceptance evidence is recorded.
+- Full production breadth of later phases (OCR, Telegram, jobs, security hardening, observability, benchmarks) remains intentionally unimplemented.
 
 ## Next action
-Complete P0-T02 quality validation, then continue Phase 1–4 implementation and verification without claiming incomplete phases as VERIFIED.
+Monitor the latest CI run. If green, perform Phase 0–4 acceptance review, update all engineering state to VERIFIED where criteria are actually satisfied, and then begin Phase 5.
 
 ## Continuation contract
 At the beginning of a future session:

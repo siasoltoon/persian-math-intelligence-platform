@@ -2,22 +2,18 @@
 
 ## Baseline
 - Date: 2026-09-21
-- Unit tests: ESTABLISHED (baseline)
-- Integration tests: NOT ESTABLISHED
-- Contract tests: NOT ESTABLISHED
-- OCR tests: NOT ESTABLISHED
-- Solver tests: ESTABLISHED (baseline)
-- Verification tests: ESTABLISHED (baseline)
-- Security tests: NOT ESTABLISHED
-- Performance/load tests: NOT ESTABLISHED
-- E2E tests: NOT ESTABLISHED
-- Regression suite: NOT ESTABLISHED
+- Unit tests: ESTABLISHED
+- Solver tests: ESTABLISHED
+- Verification tests: ESTABLISHED
+- Canonical representation tests: ESTABLISHED
+- Integrated engine tests: ESTABLISHED
+- Integration/contract/OCR/security/performance/E2E/regression suites: NOT YET ESTABLISHED
 
-## Validation evidence
-- P0-T01 documentation read-back: PASS.
-- CI run 35540871327 for current main commit 5b4cea3bc18edadcaffffa5b563a7c467f64c617: IN_PROGRESS.
-- Previous baseline CI run 35540849452 failed; subsequent commits corrected parser/classification/type-check configuration and triggered new validation.
-- Local container execution was attempted but could not reach GitHub due DNS/network restrictions.
+## Current CI
+- CI workflow: .github/workflows/ci.yml
+- Matrix: Python 3.11 and 3.12
+- Gates: Ruff lint, Ruff format check, mypy, pytest
+- Latest validation runs are being monitored after iterative fixes.
 
-## Rule
-A task cannot be VERIFIED from code presence alone. Record actual commands/results after test execution.
+## Validation rule
+A task or phase cannot be VERIFIED from code presence alone. Record actual green CI and acceptance-review evidence before changing status to VERIFIED.

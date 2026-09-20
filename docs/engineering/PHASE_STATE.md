@@ -2,21 +2,30 @@
 
 ## Phase 0 — PROJECT FOUNDATION
 - Status: IN_PROGRESS
-- Started: 2026-09-21
-- Completed: —
 - Current task: P0-T02
 - Completed tasks: P0-T01
-- Remaining: P0-T02+
-- Blocked: none
-- Risks: CI validation still running; broader phase acceptance remains.
-- Validation: P0-T01 documentation read-back PASS; P0-T02 implementation present, validation pending.
-- Next: finish P0-T02 verification, then continue through Phases 1–4.
+- Validation: implementation present; final CI validation pending.
 
-## Phases 1–4
+## Phase 1 — CORE DOMAIN MODEL
 - Status: IN_PROGRESS / NOT VERIFIED
-- Initial domain, canonical, solver, verification and understanding foundations exist.
-- Full phase scopes remain incomplete and must not be marked complete prematurely.
+- Scope coverage: Problem, ProblemInput, ProblemRepresentation, ProblemClassification, Solution, SolutionStep, VerificationResult, ConfidenceLevel, EducationalLevel, Difficulty, UserProfile and Exercise are implemented as typed domain objects.
+- Remaining acceptance: CI green, review and explicit state verification.
+
+## Phase 2 — MATHEMATICAL CANONICAL REPRESENTATION
+- Status: IN_PROGRESS / NOT VERIFIED
+- Scope coverage: Persian/Arabic digits, operator normalization, superscripts, constants, functions, expressions, equations, inequalities, systems and matrices; restricted SymPy parser globals.
+- Remaining acceptance: CI green, broader edge-case review and explicit state verification.
+
+## Phase 3 — MATHEMATICAL SOLVER ENGINE
+- Status: IN_PROGRESS / NOT VERIFIED
+- Scope coverage: arithmetic/expression simplification, equations, inequalities, polynomial roots, systems, calculus derivatives/integrals/limits, trigonometric/complex solving, numerical roots, matrix operations, probability, statistics, number factorization and optimization primitives; deterministic SolverRouter.
+- Remaining acceptance: CI green, broader edge-case review and explicit state verification.
+
+## Phase 4 — VERIFICATION ENGINE
+- Status: IN_PROGRESS / NOT VERIFIED
+- Scope coverage: symbolic equivalence, numerical equivalence, substitution, domain safety, residual checks, solution-set validation and independent-method agreement.
+- Remaining acceptance: CI green, review and explicit state verification.
 
 ## Phases 5–25
 - Status: PENDING
-- Detailed fixed scope is in ROADMAP.md.
+- Detailed fixed scope: ROADMAP.md
