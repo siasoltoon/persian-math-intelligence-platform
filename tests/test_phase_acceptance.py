@@ -27,7 +27,10 @@ from persian_math.ocr import (
     validate_image_bytes,
     validate_ocr_result,
 )
+from persian_math.explanation import explain_solution
+from persian_math.ocr_consensus import RecognitionCandidate, consensus
 from persian_math.verification import verify_equation_independently
+from persian_math.visual_math import GraphAxis, GraphPoint, VisualScene, graph_from_points, validate_scene
 
 
 def _png_bytes() -> bytes:
@@ -96,3 +99,32 @@ def test_phase_10_full_level_coverage():
 
 def test_phase_10_education_levels_are_distinct():
     assert EducationalLevel.ENTRANCE_EXAM.value == "entrance_exam"
+
+
+
+def test_phase_7_rejection_provides_retry_and_clarification():
+    result = consensus(
+        (
+            RecognitionCandidate("2x+3", 0.95, "a"),
+            RecognitionCandidate("2x-3", 0.94, "b"),
+        )
+    )
+    assert not result.accepted
+    assert result.retry_recommended
+    assert result.clarification_fa
+
+
+def test_phase_8_visual_scene_contract():
+    series = graph_from_points("f(x)", (GraphPoint(0, 0), GraphPoint(1, 1)))
+    scene = VisualScene(
+        axes=(GraphAxis("x", -1, 2, "x"), GraphAxis("y", -1, 2, "y")),
+        series=(series,),
+    )
+    validate_scene(scene)
+
+
+def test_phase_9_persian_explanation_has_notes_and_mistakes():
+    explanation = explain_solution(5, method="symbolic")
+    assert explanation.verification_fa is None
+    assert explanation.notes_fa
+    assert explanation.common_mistakes_fa
