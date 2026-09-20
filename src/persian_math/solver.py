@@ -130,9 +130,14 @@ def solve_ode(expression: sp.Eq, function: sp.FunctionClass) -> SolverResult:
 def solve_statistics(values: list[Any]) -> SolverResult:
     try:
         data = [sp.sympify(value) for value in values]
-        return _ok({"mean": sp.Rational(sum(data), len(data)),
-                    "median": sp.median(data), "variance": sp.variance(data)},
-                   "statistics")
+        if not data:
+            raise ValueError("empty dataset")
+        ordered = sorted(data, key=lambda item: float(item))
+        middle = len(ordered) // 2
+        median = ordered[middle] if len(ordered) % 2 else (ordered[middle - 1] + ordered[middle]) / 2
+        mean = sp.Rational(sum(data), len(data))
+        variance = sp.Rational(sum((item - mean) ** 2 for item in data), len(data))
+        return _ok({"mean": mean, "median": median, "variance": variance}, "statistics")
     except (TypeError, ValueError, ZeroDivisionError) as exc:
         return _fail("statistics", exc)
 
