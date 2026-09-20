@@ -5,8 +5,8 @@ from enum import Enum
 from io import BytesIO
 from typing import Protocol
 
-from PIL import Image, ImageEnhance, ImageOps
 import pytesseract
+from PIL import Image, ImageEnhance, ImageOps
 
 
 class ImageQuality(str, Enum):
