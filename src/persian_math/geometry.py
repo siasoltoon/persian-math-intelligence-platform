@@ -80,6 +80,7 @@ def angle_degrees(vertex: Point, first: Point, second: Point) -> GeometryResult:
     value = abs(degrees(atan2(ay, ax) - atan2(by, bx))) % 360
     return GeometryResult(min(value, 360 - value), "coordinate_angle", True)
 
+
 def line_intersection(first: Segment, second: Segment) -> Point | None:
     x1, y1 = first.start.x, first.start.y
     x2, y2 = first.end.x, first.end.y
