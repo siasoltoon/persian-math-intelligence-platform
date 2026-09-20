@@ -1,4 +1,4 @@
-from persian_math.geometry import Point, Segment, Triangle, distance, triangle_area
+from persian_math.geometry import (\n    Circle,\n    Point,\n    Segment,\n    Triangle,\n    angle_degrees,\n    circle_area,\n    distance,\n    triangle_area,\n)
 from persian_math.input_understanding import detect_ambiguity, detect_intent, understand
 from persian_math.ocr import ImageMetadata, ImageQuality, preprocess_plan, validate_image_metadata
 from persian_math.ocr_consensus import RecognitionCandidate, consensus
@@ -35,4 +35,4 @@ def test_geometry_primitives():
     a, b, c = Point(0, 0), Point(3, 0), Point(0, 4)
     assert Segment(a, b).length == 3
     assert distance(a, c).value == 4
-    assert triangle_area(Triangle(a, b, c)).value == 6
+    assert triangle_area(Triangle(a, b, c)).value == 6\n    assert circle_area(Circle(a, 2)).value == 4 * 3.141592653589793\n    assert round(angle_degrees(a, b, c).value) == 90
