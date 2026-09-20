@@ -12,6 +12,8 @@ class Explanation:
     steps: tuple[SolutionStep, ...]
     final_fa: str
     verification_fa: str | None = None
+    notes_fa: tuple[str, ...] = ()
+    common_mistakes_fa: tuple[str, ...] = ()
 
 
 def explain_solution(
