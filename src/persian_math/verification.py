@@ -124,6 +124,7 @@ def compare_independent_methods(
         (claimed, alternate),
     )
 
+
 def verify_equation_independently(
     lhs: sp.Expr, rhs: sp.Expr, symbol: sp.Symbol, candidates: tuple[Any, ...]
 ) -> VerificationResult:
