@@ -29,7 +29,7 @@ class CanonicalExpression:
     expression: sp.Expr
 
 def normalize_math_text(text: str) -> str:
-    value = text.translate(PERSIAN_DIGITS).translate(ARABIC_DIGITS)\n    value = value.translate(str.maketrans("⁰¹²³⁴⁵⁶⁷⁸⁹", "0123456789"))
+    value = text.translate(PERSIAN_DIGITS).translate(ARABIC_DIGITS)\n    superscript = str.maketrans("⁰¹²³⁴⁵⁶⁷⁸⁹⁻⁺", "0123456789-+")\n    value = re.sub(r"([A-Za-z0-9_)]+)([⁰¹²³⁴⁵⁶⁷⁸⁹⁻⁺]+)", lambda m: m.group(1) + "**" + m.group(2).translate(superscript), value)
     replacements = {"×": "*", "÷": "/", "−": "-", "–": "-", "—": "-", "√": "sqrt",
                     "π": "pi", "∞": "oo", "∑": "sum", "∫": "integral", "≤": "<=", "≥": ">="}
     for source, target in replacements.items():
