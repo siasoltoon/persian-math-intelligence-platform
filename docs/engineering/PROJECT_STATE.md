@@ -4,19 +4,24 @@
 - Project: Production-Grade Persian Mathematical Intelligence & Tutoring Platform
 - Repository: siasoltoon/persian-math-intelligence-platform
 - Default branch: main
-- Current version: 0.1.0-dev
+- Current version: 0.2.0-dev
 - State authority: repository reality + engineering state
 - Last state update: 2026-09-21
 
 ## Current execution
 - Current Phase: Phase 0 — PROJECT FOUNDATION
 - Current Task: P0-T02 — Repository/tooling foundation
-- Status: PENDING
+- Status: IN_PROGRESS
 - Last VERIFIED Task: P0-T01 — Repository and engineering state foundation
 - Completed Phases: none
 
 ## Verified baseline
 P0-T01 established and read back the project specification, fixed Phase 0–25 roadmap, architecture boundaries, state files, continuation contract and initial architecture decisions.
+
+## Current implementation
+A deployment-agnostic Python core foundation has been added, including domain models, canonical mathematical parsing/normalization, initial symbolic solving, independent result verification primitives, Persian/English problem classification and CI/tooling.
+
+These capabilities are NOT yet marked VERIFIED because the required CI validation is still running and Phase acceptance criteria are broader than the current foundation.
 
 ## Architecture
 - Core is deployment-agnostic and interface-independent.
@@ -26,19 +31,22 @@ P0-T01 established and read back the project specification, fixed Phase 0–25 r
 
 ## Repository baseline
 - Engineering source-of-truth documentation exists under docs/engineering/.
-- Application implementation has not started.
-- No mathematical runtime capability is VERIFIED yet.
+- Core implementation now exists under src/persian_math/.
+- Baseline tests exist under tests/.
+- CI exists under .github/workflows/ci.yml.
+- No mathematical Phase 1–4 capability is currently VERIFIED.
 
 ## Testing
-- Documentation read-back validation for P0-T01: PASS.
-- Unit/integration/contract/OCR/solver/verification/security/performance/E2E/regression suites: not established yet.
+- P0-T01 documentation read-back: PASS.
+- Latest CI run is validating Python 3.11/3.12 quality gates.
+- Unit/integration/contract/OCR/solver/verification/security/performance/E2E/regression suites beyond the current baseline are not yet established.
 
 ## Risks / blockers
-- No current blocker.
-- Phase 0 still needs repository tooling, baseline application structure, CI and initial tests.
+- CI validation must complete before P0-T02 can be VERIFIED.
+- Solver and canonical-representation coverage is currently foundational, not the full scope of Phases 2–4.
 
 ## Next action
-Start P0-T02: establish repository/application tooling, package structure, configuration boundaries, quality gates and baseline tests without coupling Core to Telegram or a deployment vendor.
+Complete P0-T02 quality validation, then continue Phase 1–4 implementation and verification without claiming incomplete phases as VERIFIED.
 
 ## Continuation contract
 At the beginning of a future session:
