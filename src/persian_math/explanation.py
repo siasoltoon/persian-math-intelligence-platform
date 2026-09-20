@@ -25,6 +25,7 @@ def explain_solution(
         EducationalLevel.ELEMENTARY: "ساده و مرحله‌به‌مرحله",
         EducationalLevel.MIDDLE: "ساده و آموزشی",
         EducationalLevel.HIGH_SCHOOL: "آموزشی و استاندارد",
+        EducationalLevel.ENTRANCE_EXAM: "آزمونی و نکته‌محور",
         EducationalLevel.UNIVERSITY: "دقیق و دانشگاهی",
         EducationalLevel.ADVANCED: "فنی و تحلیلی",
         EducationalLevel.OLYMPIAD: "تحلیلی و نکته‌محور",
