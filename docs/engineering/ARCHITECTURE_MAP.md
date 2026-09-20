@@ -1,28 +1,26 @@
 # Architecture Map
 
-## Current state
-Architecture is intentionally skeletal during Phase 0. This document records boundaries before implementation so later code does not accidentally couple Core to Telegram or a deployment vendor.
+## Verified Phase 1–10 architecture
 
-## Planned logical components
-- Interface adapters
-- Application/API orchestration
-- Problem/domain model
-- Canonical mathematical representation
-- Input understanding
-- OCR/math OCR
-- Geometry/visual mathematics
-- Solver router and specialized solvers
-- Independent verification
-- Persian explanation
-- Educational system
-- Interactive tutor
-- Exercise generation
-- Learning profile
-- File/PDF pipeline
-- Job/queue system
-- Persistence
-- Security
-- Observability
+### Core
+- domain.py — typed mathematical/problem/education contracts
+- canonical.py — controlled normalization and canonical parsing
+- understanding.py / input_understanding.py — intent, domain and ambiguity
+- solver.py — specialized SymPy-backed solver primitives and router
+- verification.py — independent verification and evidence
+- engine.py — integrated request pipeline
+
+### OCR / Visual Mathematics
+- ocr.py — bounded image validation, preprocessing, OCR protocol, Tesseract backend and structural reconstruction
+- ocr_consensus.py — multi-candidate agreement/confidence/retry
+- geometry.py — coordinate geometry primitives
+- visual_math.py — validated graph/visual scene representation
+
+### Education / Explanation
+- explanation.py — Persian explanation object and level-aware presentation
+- education.py — curriculum rules, objectives and adaptive difficulty
+- tutor.py — tutoring turn primitives
+- exercises.py — validated exercise generation foundation
 
 ## Required boundaries
 - Core mathematical modules MUST NOT depend on Telegram.
@@ -32,15 +30,11 @@ Architecture is intentionally skeletal during Phase 0. This document records bou
 - Deployment adapters MUST remain replaceable.
 - User-facing error mapping MUST be separated from internal exceptions/logging.
 
-## Planned critical flows
-Input → understanding/OCR → canonical representation → classification → solver router → specialized solver → independent verification → confidence → Persian explanation → educational adaptation → interface response.
-
-Long-running input:
-Request → validation → job/queue → worker → solver/OCR → verification → result persistence → interface notification.
+## Verified critical flow
+Input → understanding/OCR → canonical representation → classification → solver router → specialized solver → independent verification → confidence/evidence → Persian explanation → educational adaptation.
 
 ## Failure boundaries
-Uncertain OCR/parsing → clarification/fallback, not guessing.
+Uncertain OCR/parsing → retry/clarification, not guessing.
 Solver failure → controlled failure, not fabricated result.
 Verification failure → result remains unverified.
-Resource exhaustion → bounded/cancellable job.
-Provider/deployment failure → infrastructure-level degraded state without changing Core semantics.
+Resource exhaustion → bounded/cancellable input handling.
