@@ -82,9 +82,7 @@ def normalize_math_text(text: str) -> str:
     return value.strip()
 
 
-_MATH_CANDIDATE_RE = re.compile(
-    r"[A-Za-z0-9_+*/^().,\\[\\]{}<>=|:;\\s×÷−–—√π⁰¹²³⁴⁵⁶⁷⁸⁹⁻⁺-]+"
-)
+_MATH_CANDIDATE_RE = re.compile(r"[A-Za-z0-9_+*/^().,\\[\\]{}<>=|:;\\s×÷−–—√π⁰¹²³⁴⁵⁶⁷⁸⁹⁻⁺-]+")
 
 
 def extract_math_payload(text: str) -> str:
