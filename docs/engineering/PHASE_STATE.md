@@ -16,7 +16,8 @@
 
 ## Phase 21 — OCR BENCHMARK
 - Status: IMPLEMENTED / VERIFICATION PENDING
-- Added: character/expression/structure metrics and benchmark case model; document OCR now performs bounded page rendering, sparse-page OCR fallback and source selection.
+- Added: character/expression/structure metrics, benchmark case model, bounded page rendering, sparse/scanned-page OCR fallback, page-level source selection, and extreme-degradation preprocessing.
+- OCR hardening now includes deskew, content cropping, adaptive upscaling, denoising, CLAHE, normalization, unsharp recovery, adaptive/OTSU thresholding, morphology and multiple recognition passes.
 - Pending: real labeled image corpus covering printed/degraded/rotated/cropped/handwriting/fractions/superscripts/nested expressions/matrices/diagrams.
 
 ## Phase 22 — ADVERSARIAL / FAILURE TESTING
