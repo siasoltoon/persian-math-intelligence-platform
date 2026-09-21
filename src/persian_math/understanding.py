@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from decimal import Decimal
 
-from .canonical import normalize_math_text
+from .canonical import extract_math_payload, normalize_math_text
 from .domain import ProblemClassification, ProblemInput, ProblemRepresentation
 
 _DOMAIN_PATTERNS: tuple[tuple[str, tuple[str, ...]], ...] = (
