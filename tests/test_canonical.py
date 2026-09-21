@@ -1,5 +1,5 @@
-import sympy as sp
 import pytest
+import sympy as sp
 
 from persian_math.canonical import (
     normalize_math_text,

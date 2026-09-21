@@ -102,9 +102,8 @@ def _read_pdf(data: bytes, limits: FileLimits) -> tuple[tuple[str, ...], tuple[b
             remaining = max(0, remaining - len(clipped))
 
             scale = _render_scale(page, limits.max_page_pixels)
-            pix = page.get_pixmap(  # type: ignore[no-untyped-call]
-                matrix=pymupdf.Matrix(scale, scale), alpha=False
-            )
+            matrix = pymupdf.Matrix(scale, scale)  # type: ignore[no-untyped-call]
+            pix = page.get_pixmap(matrix=matrix, alpha=False)
             if pix.width * pix.height > limits.max_page_pixels:
                 raise ValueError("PDF page exceeds pixel limit")
             images.append(pix.tobytes("png"))
