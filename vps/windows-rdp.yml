@@ -1,0 +1,45 @@
+name: Windows Cloud RDP
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+    timeout-minutes: 360
+    steps:
+      - name: Enable Remote Desktop
+        shell: powershell
+        run: |
+          Set-ItemProperty -Path 'HKLM:\\System\\CurrentControlSet\\Control\\Terminal Server' -Name 'fDenyTSConnections' -Value 0
+          Enable-NetFirewallRule -DisplayGroup 'Remote Desktop'
+          Set-ItemProperty -Path 'HKLM:\\System\\CurrentControlSet\\Control\\Terminal Server\\WinStations\\RDP-Tcp' -Name 'UserAuthentication' -Value 0
+
+      - name: Create administrator account
+        shell: powershell
+        env:
+          RDP_PASSWORD: ${{ secrets.RDP_PASSWORD }}
+        run: |
+          if ([string]::IsNullOrWhiteSpace($env:RDP_PASSWORD)) { throw 'RDP_PASSWORD secret is required' }
+          $secure = ConvertTo-SecureString $env:RDP_PASSWORD -AsPlainText -Force
+          if (Get-LocalUser -Name 'runneradmin' -ErrorAction SilentlyContinue) {
+            Set-LocalUser -Name 'runneradmin' -Password $secure
+          } else {
+            New-LocalUser -Name 'runneradmin' -Password $secure -AccountNeverExpires
+          }
+          Add-LocalGroupMember -Group 'Administrators' -Member 'runneradmin' -ErrorAction SilentlyContinue
+
+      - name: Install and connect Tailscale
+        shell: powershell
+        env:
+          TAILSCALE_AUTHKEY: ${{ secrets.TAILSCALE_AUTHKEY }}
+        run: |
+          if ([string]::IsNullOrWhiteSpace($env:TAILSCALE_AUTHKEY)) { throw 'TAILSCALE_AUTHKEY secret is required' }
+          choco install tailscale -y --no-progress
+          & "$env:ProgramFiles\\Tailscale\\tailscale.exe" up --authkey=$env:TAILSCALE_AUTHKEY --hostname=github-rdp-server
+          & "$env:ProgramFiles\\Tailscale\\tailscale.exe" ip -4
+
+      - name: Keep runner alive
+        shell: powershell
+        run: |
+          for ($i = 0; $i -lt 330; $i++) { Start-Sleep -Seconds 60 }
