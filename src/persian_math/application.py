@@ -27,7 +27,7 @@ class ApplicationService:
     def menu(self, user_id: str) -> OutgoingMessage:
         self.session(user_id)
         return OutgoingMessage(
-            "منوی اصلی را انتخاب کن:",
+            "سلام! منوی اصلی را انتخاب کن:",
             ("حل مسئله", "تمرین", "پروفایل", "تاریخچه", "راهنما", "تنظیمات"),
         )
 
@@ -121,9 +121,7 @@ class ApplicationService:
         if text == "/exercise":
             return self.exercises(message.user_id)
         result = process(text)
-        self._sessions[message.user_id] = replace(
-            session, history=(*session.history[-19:], text)
-        )
+        self._sessions[message.user_id] = replace(session, history=(*session.history[-19:], text))
         if not result.solver.success:
             return OutgoingMessage(
                 "این مسئله فعلاً با اطمینان کافی قابل حل نیست. لطفاً صورت سؤال را واضح‌تر ارسال کن."
