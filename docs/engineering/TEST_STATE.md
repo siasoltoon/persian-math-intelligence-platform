@@ -1,43 +1,29 @@
 # Test State
 
-## Phase 1–10 established suites
-- Canonical representation
-- Solver and verification
-- Input understanding
-- OCR validation/preprocessing/consensus
-- Geometry and visual scene contracts
-- Persian explanation
-- Education and acceptance regression
+## P19–P25 added coverage
+- Failure/retry matrix
+- Mathematical benchmark execution
+- OCR benchmark scoring
+- Adversarial mathematical input matrix
+- Persian RTL rendering contract
+- Production configuration/recovery validation
+- Release audit blocking behavior
 
-## Phase 11–20 suites
-- Interactive tutor progression/hints/checking
-- Multi-domain exercise validation
-- Learning profile accuracy/weak-topic/privacy behavior
-- Telegram/application message contracts
-- PDF signature/size validation and question indexing
-- Job lifecycle/retry/cancellation
-- Text/path/URL security baseline
-- Metrics observation
-- Benchmark execution and pass-rate calculation
-- Application command/history/file transport integration
-
-## CI gates
-- Python 3.11: PASS
-- Python 3.12: PASS
+## Latest CI evidence
+- Run: 35574264424
+- SHA: e84744b85941c46298c3221f4288c51d3919ed31
 - Ruff lint: PASS
-- Ruff format: PASS
+- Ruff format: FAIL on that SHA
 - mypy: PASS
-- pytest: PASS
+- pytest 3.11: PASS
+- pytest 3.12: PASS
 
-## Current evidence
-- Full CI GREEN on workflow run 35573378971.
-- Commit under test: e0616a742448ddad90af72eeb39b4b792a1905d0.
-
-## Remaining extended validation
-- Real Telegram SDK/webhook E2E
-- Real multi-page PDF extraction and OCR reconstruction
-- Distributed queue/worker concurrency and cancellation
-- SSRF DNS-rebinding and cloud-metadata test corpus
-- Load/performance testing
-- Full mathematical benchmark corpus across roadmap domains
-- Adversarial/failure-recovery matrix
+## Required next validation
+- CI on latest HEAD
+- Real OCR benchmark dataset
+- Full mathematical corpus
+- Live interface E2E
+- Distributed/load/failure recovery
+- Security adversarial and dependency audit
+- Production backup/restore/rollback
+- UX/mobile visual regression
