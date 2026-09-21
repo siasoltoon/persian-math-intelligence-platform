@@ -80,12 +80,10 @@ def solve_system(
 
 def solve_polynomial(expression: sp.Expr, symbol: sp.Symbol) -> SolverResult:
     try:
-        poly = sp.Poly(expression, symbol)
         return _ok(
-            tuple(sp.solve(poly, symbol)),
+            tuple(sp.solve(sp.Poly(expression, symbol), symbol)),
             "polynomial",
             symbol=str(symbol),
-            degree=poly.degree(),
         )
     except (TypeError, ValueError, NotImplementedError) as exc:
         return _fail("polynomial", exc)
@@ -147,15 +145,9 @@ def solve_trigonometric(expression: sp.Expr, symbol: sp.Symbol) -> SolverResult:
         return _fail("trigonometric", exc)
 
 
-def solve_numeric(
-    expression: sp.Expr, symbol: sp.Symbol, guess: float = 0.0
-) -> SolverResult:
+def solve_numeric(expression: sp.Expr, symbol: sp.Symbol, guess: float = 0.0) -> SolverResult:
     try:
-        return _ok(
-            sp.nsolve(expression, symbol, guess),
-            "numerical_root",
-            symbol=str(symbol),
-        )
+        return _ok(sp.nsolve(expression, symbol, guess), "numerical_root", symbol=str(symbol))
     except (TypeError, ValueError, sp.SympifyError) as exc:
         return _fail("numerical_root", exc)
 
@@ -210,16 +202,11 @@ def solve_statistics(values: list[Any]) -> SolverResult:
         ordered = sorted(data, key=lambda item: float(item))
         middle = len(ordered) // 2
         median = (
-            ordered[middle]
-            if len(ordered) % 2
-            else (ordered[middle - 1] + ordered[middle]) / 2
+            ordered[middle] if len(ordered) % 2 else (ordered[middle - 1] + ordered[middle]) / 2
         )
         mean = sp.Rational(sum(data), len(data))
         variance = sp.Rational(sum((item - mean) ** 2 for item in data), len(data))
-        return _ok(
-            {"mean": mean, "median": median, "variance": variance},
-            "statistics",
-        )
+        return _ok({"mean": mean, "median": median, "variance": variance}, "statistics")
     except (TypeError, ValueError, ZeroDivisionError) as exc:
         return _fail("statistics", exc)
 
@@ -250,22 +237,13 @@ def solve(expression_text: str, *, symbol_name: str = "x") -> SolverResult:
     symbol = sp.Symbol(symbol_name)
     try:
         if any(op in text for op in ("<", ">", "≤", "≥")):
-            lhs, operator, rhs = parse_inequality(text)
-            return solve_inequality(lhs, operator, rhs, symbol)
+            lhs, op, rhs = parse_inequality(text)
+            return solve_inequality(lhs, op, rhs, symbol)
         if text.count("=") == 1:
             lhs, rhs = parse_equation(text)
             return solve_equation(lhs, rhs, symbol)
-        expression = sp.simplify(parse_expression(text).expression)
-        if not expression.free_symbols:
-            return solve_expression(expression)
-        if expression.free_symbols:
-            if expression.has(sp.sin, sp.cos, sp.tan, sp.cot, sp.sec, sp.csc):
-                return solve_trigonometric(expression, symbol)
-            poly = sp.Poly(expression, symbol)
-            if poly.is_univariate and poly.degree() >= 2:
-                return solve_polynomial(expression, symbol)
-        return solve_expression(expression)
-    except (TypeError, ValueError, sp.SympifyError) as exc:
+        return solve_expression(parse_expression(text).expression)
+    except (TypeError, ValueError) as exc:
         return _fail("router", exc)
 
 
@@ -278,7 +256,7 @@ class SolverRoute:
 
 class SolverRouter:
     def __init__(self) -> None:
-        self._routes = (
+        self._routes: tuple[SolverRoute, ...] = (
             SolverRoute(
                 "inequality",
                 lambda t: any(op in t for op in ("<", ">", "≤", "≥")),
