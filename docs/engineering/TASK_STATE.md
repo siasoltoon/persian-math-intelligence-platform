@@ -4,14 +4,14 @@
 - Status: IMPLEMENTED / VERIFICATION PENDING
 - Objective: bring the operational behavior of `siasoltoon/vps` into the math repository without propagating its committed credential.
 - Acceptance: Windows runner provisions RDP/Tailscale, installs Python/Tesseract, validates secrets and starts the Telegram process.
-- Tests: runtime configuration tests; CI #278 green.
+- Tests: runtime configuration tests; repository CI green.
 - Live evidence: pending.
 
 ### VPS-T02 — Telegram execution adapter
 - Status: IMPLEMENTED / VERIFICATION PENDING
 - Objective: run the existing ApplicationService through a real Telegram polling adapter.
 - Acceptance: /start, /help, text problems and validated photo OCR reach the application service and return Persian responses without raw exceptions.
-- Tests: runtime configuration and regression suite; CI #278 green.
+- Tests: runtime configuration and regression suite; repository CI green.
 - Live evidence: pending.
 
 ### TUI-T01 — Interactive Telegram UI
@@ -29,9 +29,16 @@
 - Implemented: PDF signature validation, encrypted-PDF rejection, byte/page/pixel/text limits, adaptive page rendering, per-page text preservation, automatic OCR for sparse/scanned pages, page-level source selection, scanner-watermark handling, image-file handling, unified document result model, configurable Tesseract language.
 - OCR hardening: multi-pass image variants, line/region reconstruction, confidence gating and consensus rejection; disagreement is rejected rather than guessed.
 - Mathematical hardening: bounded/safe parser input and stronger independent verification.
-- Tests: `tests/test_file_intelligence.py`, `tests/test_canonical.py`, `tests/test_solver_verification.py` plus existing OCR/consensus regression suites.
-- CI: #278 / run ID 35634158094 green on Python 3.11/3.12 with Ruff and mypy.
+- Tests: `tests/test_file_intelligence.py`, `tests/test_canonical.py`, `tests/test_solver_verification.py` plus OCR/consensus regression suites.
 - Pending: live multi-page PDF, scanned-PDF, mixed text/image PDF, difficult handwriting corpus and malformed/adversarial external evidence.
+
+### OCR-T02 — Extreme degradation and handwriting robustness
+- Status: COMPLETED / VERIFICATION PENDING
+- Phase: 21/22
+- Objective: improve the visual-input path before recognition so degraded and handwritten mathematical input has more recoverable signal while preserving no-guess behavior.
+- Implemented: OpenCV preprocessing, deskew, content crop, bounded upscaling, denoising, CLAHE, normalization, unsharp recovery, adaptive/OTSU thresholding, morphology, six preprocessing variants, expanded Tesseract PSM coverage, source-quality warning and regression tests.
+- Validation: CI #290 / run 35639811372 green on Python 3.11/3.12 with Ruff lint/format, mypy and pytest.
+- Remaining: real labeled handwriting corpus and a handwriting-specific recognition backend are required before claiming production handwriting accuracy.
 
 ## Phase 19–25 hardening batch
 - P19–P24: IMPLEMENTED / VERIFICATION PENDING
