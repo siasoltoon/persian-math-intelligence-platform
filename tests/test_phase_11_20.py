@@ -1,21 +1,38 @@
 import pytest
 
-from persian_math.tutoring import TutorAction, TutorStep, check, hint, reexplain, start_tutor
-from persian_math.learning_profile import ProblemRecord, create_learning_profile
+from persian_math.benchmark import BenchmarkCase, pass_rate, run_benchmark
 from persian_math.domain import Difficulty, EducationalLevel, UserProfile
-from persian_math.telegram_adapter import IncomingMessage, MessageKind, localize_error, validate_incoming
 from persian_math.file_pipeline import Page, index_text_pages, validate_document
 from persian_math.jobs import InMemoryJobQueue, JobStatus
+from persian_math.learning_profile import ProblemRecord, create_learning_profile
 from persian_math.security import safe_filename, validate_text, validate_url
-from persian_math.benchmark import BenchmarkCase, pass_rate, run_benchmark
+from persian_math.telegram_adapter import (
+    IncomingMessage,
+    MessageKind,
+    localize_error,
+    validate_incoming,
+)
+from persian_math.tutoring import (
+    TutorAction,
+    TutorStep,
+    check,
+    hint,
+    reexplain,
+    start_tutor,
+)
 
 
-def user():
+def user() -> UserProfile:
     return UserProfile("u", EducationalLevel.HIGH_SCHOOL)
 
 
 def test_phase_11_tutor_progress_and_hint():
-    s = start_tutor("s1", user(), "معادله", (TutorStep(0, "x را پیدا کن", 3, "عدد ثابت را به طرف دیگر ببر."),))
+    s = start_tutor(
+        "s1",
+        user(),
+        "معادله",
+        (TutorStep(0, "x را پیدا کن", 3, "عدد ثابت را به طرف دیگر ببر."),),
+    )
     assert hint(s).action == TutorAction.HINT
     s2, response = check(s, 3)
     assert response.correct is True
@@ -72,6 +89,7 @@ def test_phase_17_security_bounds_and_ssrf_baseline():
 
 def test_phase_18_metrics():
     from persian_math.observability import Metrics
+
     metrics = Metrics()
     metrics.observe("solver.latency_ms", 12.5, domain="algebra")
     assert metrics.snapshot()[0].tags == (("domain", "algebra"),)
@@ -84,6 +102,9 @@ def test_phase_19_failure_is_a_benchmark_result():
 
 
 def test_phase_20_benchmark_detects_failure():
-    cases = (BenchmarkCase("a", "algebra", "1+1", "2"), BenchmarkCase("b", "geometry", "bad", "ok"))
+    cases = (
+        BenchmarkCase("a", "algebra", "1+1", "2"),
+        BenchmarkCase("b", "geometry", "bad", "ok"),
+    )
     results = run_benchmark(cases, lambda x: "2" if x == "1+1" else "wrong")
     assert pass_rate(results) == 0.5
