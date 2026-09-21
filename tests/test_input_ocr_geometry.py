@@ -77,3 +77,13 @@ def test_quality_estimator_rejects_blank_low_information_image():
     Image.new("L", (400, 300), 245).save(output, format="PNG")
     assert estimate_image_quality(output.getvalue()) == ImageQuality.POOR
     assert "multi_pass_ocr" in preprocess_plan(ImageMetadata(400, 300, 1, ImageQuality.POOR))
+
+
+def test_ocr_plan_declares_structural_math_recovery():
+    metadata = ImageMetadata(2400, 1800, 3, ImageQuality.POOR)
+    plan = preprocess_plan(metadata)
+    assert "line_reconstruction" in plan
+    assert "math_text_segmentation" in plan
+    assert "fraction_detection" in plan
+    assert "superscript_subscript_detection" in plan
+    assert "matrix_layout_detection" in plan
