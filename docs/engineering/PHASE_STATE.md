@@ -74,3 +74,11 @@
 - Added concept-only representation fallback and structured engine failure for prompts without a mathematical payload.
 - PR #11 CI run 35656388276 passed all required jobs, including both Python versions and Heavy OCR runtime.
 - Remaining evidence: live Telegram text-input validation and broader real-user corpus coverage.
+
+
+## Phase 19/20/23/24 — Structured Persian word-problem routing
+- Status: VERIFIED for repository/CI integration; live re-test pending.
+- Added deterministic structured routing for common geometry, function-evaluation and arithmetic-sequence natural-language prompts.
+- Added independent verification through the existing canonical verification path and safe user-facing solution rendering.
+- CI run 35659054757 passed all required jobs, including Heavy OCR runtime.
+- Remaining evidence: live Telegram re-test and broader real mathematical benchmark.
