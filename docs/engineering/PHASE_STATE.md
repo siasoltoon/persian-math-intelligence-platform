@@ -43,3 +43,11 @@
 
 ## Gate
 - No phase is marked VERIFIED solely because source code exists or unit tests pass.
+
+## Phase 21 — Specialized visual recognition extension
+- Status: IMPLEMENTED / VERIFICATION PENDING
+- Added concrete optional TrOCR handwriting recognition with line segmentation.
+- Added concrete optional pix2tex formula-to-LaTeX recognition.
+- Added safe LaTeX output validation and multi-backend formula consensus.
+- CI run #315 passed all jobs.
+- Pending: deploy/cache model artifacts, run real handwriting/formula corpus, record character/expression/structural metrics, and perform live Telegram validation.
