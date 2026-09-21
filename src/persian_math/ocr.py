@@ -57,10 +57,18 @@ def validate_image_metadata(metadata: ImageMetadata) -> None:
 
 def preprocess_plan(metadata: ImageMetadata) -> tuple[str, ...]:
     validate_image_metadata(metadata)
-    plan = ["decode", "orientation_check", "deskew", "scale_up", "contrast_normalization"]
+    plan = [
+        "decode",
+        "orientation_check",
+        "deskew",
+        "scale_up",
+        "contrast_normalization",
+    ]
     if metadata.quality in (ImageQuality.POOR, ImageQuality.UNKNOWN):
         plan.extend(("denoise", "adaptive_threshold"))
-    plan.extend(("multi_pass_ocr", "region_detection", "math_text_segmentation", "consensus"))
+    plan.extend(
+        ("multi_pass_ocr", "region_detection", "math_text_segmentation", "consensus")
+    )
     return tuple(plan)
 
 
