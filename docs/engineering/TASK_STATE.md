@@ -61,3 +61,11 @@
 - Implemented: TrOCR handwritten backend, line segmentation, pix2tex formula backend, safe LaTeX validation, multi-backend formula consensus, lazy model loading and local-only defaults.
 - Tests: specialized backend regression suite; CI run #315 green on Python 3.11/3.12.
 - Remaining: real model artifact deployment, labeled benchmark corpus, live Telegram E2E and production performance evidence.
+
+
+### OCR-T05 — GitHub-hosted heavy OCR worker
+- Status: IMPLEMENTED / VERIFICATION PENDING
+- Phase: 21/24
+- Objective: temporarily execute heavyweight OCR/model runtime on GitHub Actions until the future PC worker is introduced.
+- Implemented: isolated heavy dependency manifest, Hugging Face model cache, Tesseract provisioning, TrOCR prefetch, pix2tex import smoke test and full regression execution.
+- Remaining: successful workflow execution evidence and real labeled model-accuracy benchmark.
