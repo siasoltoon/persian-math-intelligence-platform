@@ -211,9 +211,7 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -
             response = _SERVICE.settings(user_id)
             await query.edit_message_text(
                 response.text_fa,
-                reply_markup=_inline(
-                    [[("تغییر سطح", "level_menu"), ("منوی اصلی", "menu")]]
-                ),
+                reply_markup=_inline([[("تغییر سطح", "level_menu"), ("منوی اصلی", "menu")]]),
             )
             return
         if data == "help":
