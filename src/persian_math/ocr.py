@@ -71,6 +71,7 @@ def estimate_image_quality(image: bytes) -> ImageQuality:
         return ImageQuality.ACCEPTABLE
     return ImageQuality.GOOD
 
+
 def preprocess_plan(metadata: ImageMetadata) -> tuple[str, ...]:
     validate_image_metadata(metadata)
     plan = [
@@ -130,7 +131,10 @@ def _deskew(gray: np.ndarray) -> np.ndarray:
         return gray
     h, w = gray.shape[:2]
     matrix = cv2.getRotationMatrix2D((w / 2, h / 2), angle, 1.0)
-    return cv2.warpAffine(gray, matrix, (w, h), flags=cv2.INTER_CUBIC, borderMode=cv2.BORDER_REPLICATE)
+    return cv2.warpAffine(
+        gray, matrix, (w, h), flags=cv2.INTER_CUBIC, borderMode=cv2.BORDER_REPLICATE
+    )
+
 
 def _crop_content(gray: np.ndarray) -> np.ndarray:
     mask = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)[1]
@@ -139,7 +143,10 @@ def _crop_content(gray: np.ndarray) -> np.ndarray:
         return gray
     x, y, w, h = cv2.boundingRect(coords)
     pad = max(12, int(0.025 * max(w, h)))
-    return gray[max(0, y-pad):min(gray.shape[0], y+h+pad), max(0, x-pad):min(gray.shape[1], x+w+pad)]
+    return gray[
+        max(0, y - pad) : min(gray.shape[0], y + h + pad),
+        max(0, x - pad) : min(gray.shape[1], x + w + pad),
+    ]
 
 def _variants(decoded: Image.Image) -> tuple[Image.Image, ...]:
     gray = np.asarray(ImageOps.exif_transpose(decoded).convert("L"), dtype=np.uint8)
@@ -152,11 +159,15 @@ def _variants(decoded: Image.Image) -> tuple[Image.Image, ...]:
     normalized = cv2.normalize(clahe, None, 0, 255, cv2.NORM_MINMAX)
     smooth = cv2.GaussianBlur(normalized, (3, 3), 0)
     unsharp = cv2.addWeighted(normalized, 1.65, smooth, -0.65, 0)
-    adaptive = cv2.adaptiveThreshold(unsharp, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 31, 9)
+    adaptive = cv2.adaptiveThreshold(
+        unsharp, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 31, 9
+    )
     otsu = cv2.threshold(unsharp, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)[1]
     kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (2, 2))
     closed = cv2.morphologyEx(adaptive, cv2.MORPH_CLOSE, kernel, iterations=1)
-    return tuple(Image.fromarray(item) for item in (gray, normalized, unsharp, adaptive, closed, otsu))
+    return tuple(
+        Image.fromarray(item) for item in (gray, normalized, unsharp, adaptive, closed, otsu)
+    )
 
 def preprocess_image(image: bytes, metadata: ImageMetadata) -> bytes:
     validate_image_metadata(metadata)
