@@ -78,3 +78,13 @@
 - Implemented: isolated heavy dependency manifest, CPU-only PyTorch workflow installation, Hugging Face model cache, Tesseract provisioning, TrOCR prefetch, pix2tex backend smoke test and full regression execution.
 - Verification: Heavy OCR workflow run 35649732688 passed; main CI run 35649997963 passed.
 - Remaining: real labeled model-accuracy benchmark and live Telegram evidence.
+
+
+### INPUT-T01 — Persian natural-language text math extraction
+- Status: IMPLEMENTED / VERIFICATION PENDING
+- Phase: 19/23/24
+- Objective: make ordinary Persian text questions reach the existing safe mathematical parser/solver without weakening parser security or verification gates.
+- Root cause: full Persian prose was being submitted to the restricted parser; valid math embedded in the prompt was never isolated.
+- Implemented: bounded lexical math-fragment extraction, equation preference, sentence-punctuation trimming, solver integration, representation-aware verification, and regression tests for arithmetic/equation prompts.
+- Expected examples: Persian arithmetic prompt → 29; Persian linear-equation prompt → x = 5.
+- Remaining: green CI evidence and live Telegram re-test.
