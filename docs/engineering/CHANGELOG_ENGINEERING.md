@@ -1,5 +1,15 @@
 # Engineering Changelog
 
+## 2026-09-21 — Extreme degradation OCR hardening
+- Added OpenCV-based image recovery before recognition: deskew, content cropping, bounded upscaling, denoising, CLAHE, normalization, unsharp recovery, adaptive/OTSU thresholding and morphology.
+- Expanded preprocessing to six variants and widened Tesseract page-segmentation coverage.
+- Added poor-source quality signaling and regression coverage for degraded input.
+- Preserved confidence/consensus gating so uncertain recognition is rejected rather than guessed.
+- Added strict NumPy/OpenCV typing fixes required by mypy.
+- CI #290 / run ID 35639811372 passed Ruff lint, Ruff format, mypy and pytest on Python 3.11/3.12.
+- Merged PR #7 to main as `dc7d37367fc1d4cb0e3ce7d8a9ff63fa80e72f11`.
+- Real labeled handwriting benchmark evidence and a handwriting-specific recognition backend remain pending.
+
 ## 2026-09-21 — Production document/OCR and verification hardening
 - Replaced deprecated `fitz` document imports with `pymupdf`.
 - Added adaptive PDF page rendering constrained by a pixel budget.
@@ -12,8 +22,6 @@
 - Hardened SymPy parsing with bounded input, a restricted grammar and disabled builtins.
 - Strengthened mathematical verification with deterministic numeric re-evaluation and an alternate `solveset` equation path.
 - Added regression tests for scanned-like PDFs, low-confidence OCR, parser injection/resource bounds and verification.
-- CI #278 / run ID 35634158094 passed Ruff lint, Ruff format, mypy and pytest on Python 3.11/3.12.
-- Merged to main as `b573f1078edc8f864a7e9371fb4492fd8dbef729`.
 - Live OCR corpus, live Telegram/VPS execution, production load and operational evidence remain pending.
 
 ## 2026-09-21 — Secure document and OCR hardening
@@ -23,7 +31,6 @@
 - Added multi-pass OCR preprocessing with scaling, contrast, sharpening and threshold variants.
 - Added OCR consensus gating so disagreeing recognition passes are rejected instead of guessed.
 - Narrowed recoverable per-pass OCR exceptions and fixed static type checking.
-- CI #258 passed Ruff lint, Ruff format, mypy, and pytest on Python 3.11 and 3.12.
 - Live OCR/PDF benchmark evidence remains pending.
 
 ## 2026-09-21 — Interactive Telegram UI
@@ -33,8 +40,6 @@
 - Added educational-level selection.
 - Added /menu and safe back navigation.
 - Added dedicated application-service regression coverage.
-- CI #202 passed Ruff lint, Ruff format, mypy, and pytest on Python 3.11 and 3.12.
-- Merged as `f17d65f1409f333789066e00c3c775c083483887`.
 - Live Telegram/mobile verification remains pending.
 
 ## 2026-09-21 — Phase 19–25 hardening batch
@@ -45,7 +50,6 @@
 - Added production configuration/resource/recovery contracts.
 - Added release-audit gate and production verification runbook.
 - Added P19–P25 acceptance tests.
-- Fixed Ruff/mypy issues during CI iterations.
 - No external production/OCR/load/security evidence has been fabricated.
 
 ## 2026-09-21 — Windows VPS / Telegram runtime integration
