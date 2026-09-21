@@ -45,3 +45,9 @@
 - Main CI run 35649997963: success. Ruff lint, Ruff format, mypy, pytest Python 3.11, pytest Python 3.12 and Heavy OCR runtime all passed.
 - First heavy run 35649274960 failed because the workflow smoke test referenced a nonexistent available() method; the check was corrected and replacement run 35649732688 passed.
 - Heavy runtime is verified as installable/model-loadable on GitHub-hosted Actions; production accuracy is still not claimed.
+
+
+## Plain-text Telegram math input regression — 2026-09-22
+- Root cause reproduced from live behavior: natural-language Persian wrappers reached the restricted parser instead of first being reduced to a safe mathematical payload.
+- Added regression tests for arithmetic and linear-equation Persian prompts, including independent verification assertions.
+- Current status: code-level regression coverage added; CI/live Telegram execution evidence still required before marking the task VERIFIED.
