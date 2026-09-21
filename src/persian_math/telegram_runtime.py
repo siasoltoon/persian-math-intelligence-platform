@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import logging
 from io import BytesIO
+from typing import Any
 
 from PIL import Image
 from telegram import Update
@@ -56,7 +57,9 @@ async def photo_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
             metadata = ImageMetadata(image.width, image.height, len(image.getbands()))
         ocr = _OCR.recognize(data, metadata)
         if ocr.confidence < 0.60:
-            await update.message.reply_text("اطمینان OCR کافی نیست؛ لطفاً عکس واضح‌تر و مستقیم‌تری ارسال کن.")
+            await update.message.reply_text(
+                "اطمینان OCR کافی نیست؛ لطفاً عکس واضح‌تر و مستقیم‌تری ارسال کن.",
+            )
             return
         text = reconstruct_math_text(ocr, metadata)
         if not text.strip():
@@ -69,7 +72,7 @@ async def photo_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
         await update.message.reply_text("تصویر قابل پردازش نبود؛ لطفاً عکس واضح‌تری ارسال کن.")
 
 
-def build_application() -> Application:
+def build_application() -> Application[Any, Any, Any, Any, Any]:
     config = load_runtime_config()
     application = Application.builder().token(config.telegram_bot_token).build()
     application.add_handler(CommandHandler("start", start))
