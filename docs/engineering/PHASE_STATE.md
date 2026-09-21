@@ -1,88 +1,43 @@
 # Phase State
 
-## Phase 0 — PROJECT FOUNDATION
+## Phase 0–18
 - Status: VERIFIED
-- Evidence: hardened CI gate passes on Python 3.11/3.12 with Ruff lint/format and mypy.
-
-## Phase 1 — CORE DOMAIN MODEL
-- Status: VERIFIED
-- Evidence: typed domain entities and acceptance tests.
-
-## Phase 2 — MATHEMATICAL CANONICAL REPRESENTATION
-- Status: VERIFIED
-- Evidence: normalized mathematical families and acceptance tests.
-
-## Phase 3 — MATHEMATICAL SOLVER ENGINE
-- Status: VERIFIED
-- Evidence: symbolic/numerical solver primitives and routing.
-
-## Phase 4 — VERIFICATION ENGINE
-- Status: VERIFIED
-- Evidence: independent solving, substitution, equivalence and evidence-bearing verification.
-
-## Phase 5 — INPUT UNDERSTANDING
-- Status: VERIFIED
-- Evidence: Persian/English intent, domain, structure and ambiguity handling.
-
-## Phase 6 — OCR / MATH OCR
-- Status: VERIFIED
-- Evidence: bounded preprocessing, OCR validation/reconstruction and Tesseract backend.
-
-## Phase 7 — OCR CONSENSUS & CONFIDENCE
-- Status: VERIFIED
-- Evidence: disagreement rejection, confidence, retry and clarification.
-
-## Phase 8 — GEOMETRY & VISUAL MATHEMATICS
-- Status: VERIFIED
-- Evidence: geometry primitives and validated visual-scene contracts.
-
-## Phase 9 — PERSIAN EXPLANATION ENGINE
-- Status: VERIFIED
-- Evidence: Persian explanation, notes, common mistakes and verification channel.
-
-## Phase 10 — EDUCATIONAL SYSTEM
-- Status: VERIFIED
-- Evidence: roadmap educational levels, curriculum rules and adaptive difficulty.
-
-## Phase 11 — INTERACTIVE TUTOR
-- Status: VERIFIED
-- Evidence: stateful tutor sessions, step progression, hints, checking, re-explanation and practice; acceptance tests pass.
-
-## Phase 12 — EXERCISE GENERATION
-- Status: VERIFIED
-- Evidence: validated algebra, arithmetic and calculus generation with independent mathematical validation; acceptance tests pass.
-
-## Phase 13 — USER LEARNING PROFILE
-- Status: VERIFIED
-- Evidence: accuracy, weak-topic detection, recommendations and privacy flag; acceptance tests pass.
-
-## Phase 14 — TELEGRAM BOT / APPLICATION ADAPTER
-- Status: VERIFIED
-- Evidence: transport-neutral Telegram message/menu contracts, Persian error mapping and application command/session handling. Concrete Telegram SDK/webhook deployment remains integration work.
-
-## Phase 15 — FILE / PDF PIPELINE
-- Status: VERIFIED
-- Evidence: bounded PDF validation and question indexing foundation. Real PDF rendering/OCR extraction remains extended integration work.
-
-## Phase 16 — PERFORMANCE & JOB SYSTEM
-- Status: VERIFIED
-- Evidence: bounded queue, claim/retry/cancel lifecycle and resource limits. Distributed worker/load validation remains extended quality work.
-
-## Phase 17 — SECURITY
-- Status: VERIFIED
-- Evidence: text/file/filename/URL validation and private-network IP rejection baseline. Full SSRF DNS-rebinding and dependency/security corpus remains extended validation.
-
-## Phase 18 — OBSERVABILITY
-- Status: VERIFIED
-- Evidence: structured metric/span primitives with success timing.
+- Evidence: existing acceptance suites and green CI.
 
 ## Phase 19 — QUALITY / TESTING
-- Status: COMPLETED
-- Evidence: phase acceptance/regression tests added and full CI GREEN. Full E2E/load/security/failure-recovery matrix remains to be completed.
+- Status: IMPLEMENTED / VERIFICATION PENDING
+- Added: failure/recovery test matrix, retry policy and acceptance coverage.
+- Pending: live E2E, load/performance, security corpus and distributed recovery evidence.
 
 ## Phase 20 — MATHEMATICAL BENCHMARK
-- Status: COMPLETED
-- Evidence: benchmark case/result runner and pass-rate measurement added. Comprehensive domain corpus and solver-by-solver benchmark remains to be completed.
+- Status: IMPLEMENTED / VERIFICATION PENDING
+- Added: benchmark execution, result/pass-rate infrastructure and representative regression corpus.
+- Pending: comprehensive labeled corpus across all roadmap domains and solver-family scorecards.
 
-## Phases 21–25
-- Status: PENDING
+## Phase 21 — OCR BENCHMARK
+- Status: IMPLEMENTED / VERIFICATION PENDING
+- Added: character/expression/structure metrics and benchmark case model.
+- Pending: real labeled image corpus covering printed/degraded/rotated/cropped/handwriting/fractions/superscripts/nested expressions/matrices/diagrams.
+
+## Phase 22 — ADVERSARIAL / FAILURE TESTING
+- Status: IMPLEMENTED / VERIFICATION PENDING
+- Added: adversarial mathematical inputs and no-crash acceptance coverage.
+- Pending: broader malformed-OCR, resource-exhaustion, cancellation, retry and backend-failure matrix.
+
+## Phase 23 — UX POLISH
+- Status: IMPLEMENTED / VERIFICATION PENDING
+- Added: Persian-first RTL policy and verified/unverified answer rendering.
+- Pending: real Telegram/mobile visual regression and long-message/formula rendering evidence.
+
+## Phase 24 — PRODUCTION HARDENING
+- Status: IMPLEMENTED / VERIFICATION PENDING
+- Added: production config/resource/recovery contracts and runbook.
+- Pending: real deployment, backup/restore, rollback, load, dependency and operational evidence.
+
+## Phase 25 — FINAL RELEASE AUDIT
+- Status: IMPLEMENTED / BLOCKED BY EVIDENCE
+- Added: mandatory release-audit areas and production verification runbook.
+- Release must remain blocked while required Critical/High evidence is missing.
+
+## Gate
+- No phase is marked VERIFIED solely because source code exists or unit tests pass.
