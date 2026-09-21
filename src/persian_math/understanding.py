@@ -28,7 +28,10 @@ def classify_problem(problem: ProblemInput) -> ProblemClassification:
 
 
 def represent_problem(problem: ProblemInput) -> ProblemRepresentation:
-    text = extract_math_payload(problem.text)
+    try:
+        text = extract_math_payload(problem.text)
+    except ValueError:
+        return ProblemRepresentation("concept", None, problem.text)
     if any(op in text for op in ("<", ">", "<=", ">=")):
         kind = "inequality"
     elif text.count("=") == 1:
