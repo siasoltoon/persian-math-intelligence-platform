@@ -29,5 +29,9 @@ def validate_config(config: ProductionConfig) -> None:
 
 
 def validate_recovery(plan: RecoveryPlan) -> None:
-    if not plan.backup_required or not plan.rollback_supported or not plan.restore_verification_required:
+    if (
+        not plan.backup_required
+        or not plan.rollback_supported
+        or not plan.restore_verification_required
+    ):
         raise ValueError("production recovery controls are incomplete")
