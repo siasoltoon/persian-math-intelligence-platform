@@ -46,6 +46,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           python -m pip install -e ".[dev]"
+          python -m pip install "torch==2.14.0" "torchvision==0.29.0" --index-url https://download.pytorch.org/whl/cpu
           python -m pip install -r requirements-heavy-ocr.txt
       - name: Run full regression suite
         run: python -m pytest
@@ -62,10 +63,10 @@ jobs:
         run: |
           python - <<'PY'
           from persian_math.specialized_ocr import Pix2TexMathBackend, TrOCRHandwritingBackend
-          print("TrOCR backend import: OK")
-          print("Pix2Tex backend import: OK")
-          print(f"TrOCR backend available: {TrOCRHandwritingBackend().available()}")
-          print(f"Pix2Tex backend available: {Pix2TexMathBackend().available()}")
+          TrOCRHandwritingBackend()
+          Pix2TexMathBackend()
+          print("TrOCR backend construction: OK")
+          print("Pix2Tex backend construction: OK")
           PY
       - name: Verify heavyweight runtime is CPU-safe
         run: |
