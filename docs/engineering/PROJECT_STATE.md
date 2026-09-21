@@ -54,3 +54,14 @@
 
 ## Next action
 Execute the live Windows/Tailscale/Telegram E2E matrix and build the real labeled handwriting/math OCR benchmark. Do not mark handwriting production accuracy VERIFIED until a concrete recognition backend and real benchmark evidence exist. Keep Phase 25 blocked until required external evidence is recorded.
+
+## Specialized OCR backend hardening — 2026-09-21
+- Added a concrete optional handwriting backend: Microsoft TrOCR base handwritten, loaded lazily and configured for local-only model loading by default.
+- Added line segmentation before handwriting recognition so the handwriting model receives text-line crops rather than an arbitrary full page.
+- Added a concrete optional mathematical formula backend: pix2tex image-to-LaTeX adapter.
+- Added LaTeX safety validation for bounded output, balanced braces and blocked unsafe TeX execution commands.
+- Added multi-backend formula consensus; conflicting formula predictions are rejected rather than guessed.
+- Heavy model dependencies remain outside core packaging; model weights are not committed to the repository.
+- Specialized-backend CI: run #315 green across Ruff, format, mypy and pytest on Python 3.11/3.12.
+- PR #9 merged as `ef75b36ed0bc5e4259a5aa0e414b3b7185876144`.
+- Production accuracy remains evidence-gated until the actual model artifacts are deployed on the compute worker and evaluated against a labeled real-world corpus.
