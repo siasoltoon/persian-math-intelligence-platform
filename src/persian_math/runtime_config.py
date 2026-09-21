@@ -16,4 +16,5 @@ def load_runtime_config() -> RuntimeConfig:
     token = os.environ.get("TELEGRAM_BOT_TOKEN", "").strip()
     if not token:
         raise RuntimeError("TELEGRAM_BOT_TOKEN is required")
-    language = os.environ.get("TESSERACT_LANG", "eng").strip() or "eng"\n    return RuntimeConfig(telegram_bot_token=token, ocr_language=language)
+    language = os.environ.get("TESSERACT_LANG", "eng").strip() or "eng"
+    return RuntimeConfig(telegram_bot_token=token, ocr_language=language)
