@@ -16,12 +16,12 @@
 
 ## Phase 21 — OCR BENCHMARK
 - Status: IMPLEMENTED / VERIFICATION PENDING
-- Added: character/expression/structure metrics and benchmark case model.
+- Added: character/expression/structure metrics and benchmark case model; document OCR now performs bounded page rendering, sparse-page OCR fallback and source selection.
 - Pending: real labeled image corpus covering printed/degraded/rotated/cropped/handwriting/fractions/superscripts/nested expressions/matrices/diagrams.
 
 ## Phase 22 — ADVERSARIAL / FAILURE TESTING
 - Status: IMPLEMENTED / VERIFICATION PENDING
-- Added: adversarial mathematical inputs and no-crash acceptance coverage.
+- Added: adversarial mathematical inputs, safe parser boundaries and no-crash acceptance coverage.
 - Pending: broader malformed-OCR, resource-exhaustion, cancellation, retry and backend-failure matrix.
 
 ## Phase 23 — UX POLISH
@@ -31,7 +31,7 @@
 
 ## Phase 24 — PRODUCTION HARDENING
 - Status: IMPLEMENTED / VERIFICATION PENDING
-- Added: production config/resource/recovery contracts and runbook.
+- Added: production config/resource/recovery contracts, secure document limits and hardened parser/OCR boundaries.
 - Pending: real deployment, backup/restore, rollback, load, dependency and operational evidence.
 
 ## Phase 25 — FINAL RELEASE AUDIT

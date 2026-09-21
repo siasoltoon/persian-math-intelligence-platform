@@ -29,3 +29,17 @@
 - Runtime: RDP + Tailscale + Tesseract + Telegram polling run in the same Windows job.
 - Limitation: GitHub-hosted runners are ephemeral and Actions jobs are time-limited, so this is a disposable runtime rather than a permanent VPS.
 - Status: ACCEPTED
+
+## ADR-0006 — Page-level PDF text/OCR source selection
+- Date: 2026-09-21
+- Context: Scanned PDFs may contain a sparse native text layer such as a scanner watermark while the mathematical content exists only in the rendered page image.
+- Decision: Preserve the native text for provenance, but select exactly one page-level problem-text source: substantial native text or confidence-accepted OCR. Known scanner-watermark-only text is not promoted to the mathematical problem.
+- Consequence: The pipeline avoids duplicating native text and OCR, avoids treating a scanner watermark as a problem, and rejects pages when neither source is sufficiently trustworthy.
+- Status: ACCEPTED
+
+## ADR-0007 — Safe mathematical parser boundary
+- Date: 2026-09-21
+- Context: SymPy expression parsing uses a Python parser internally and mathematical input is untrusted.
+- Decision: Bound mathematical input length, restrict accepted characters, disable Python builtins in the parser globals and reject explicit Python execution constructs before parsing.
+- Consequence: malformed or hostile text fails closed instead of being evaluated as arbitrary Python.
+- Status: ACCEPTED
