@@ -32,9 +32,12 @@ class JobPolicy:
     max_queue: int = 100
 
 
+_DEFAULT_POLICY = JobPolicy()
+
+
 class InMemoryJobQueue:
-    def __init__(self, policy: JobPolicy = JobPolicy()) -> None:
-        self.policy = policy
+    def __init__(self, policy: JobPolicy | None = None) -> None:
+        self.policy = policy or _DEFAULT_POLICY
         self._jobs: dict[str, Job] = {}
 
     def enqueue(self, kind: str, payload: dict[str, str]) -> Job:
@@ -50,19 +53,34 @@ class InMemoryJobQueue:
         job = self._jobs[job_id]
         if job.status != JobStatus.QUEUED:
             raise ValueError("job is not claimable")
-        claimed = Job(job.job_id, job.kind, job.payload, JobStatus.RUNNING, job.attempts + 1, job.created_at)
+        claimed = Job(
+            job.job_id,
+            job.kind,
+            job.payload,
+            JobStatus.RUNNING,
+            job.attempts + 1,
+            job.created_at,
+        )
         self._jobs[job_id] = claimed
         return claimed
 
     def finish(self, job_id: str, success: bool) -> Job:
         job = self._jobs[job_id]
-        status = JobStatus.SUCCEEDED if success else (JobStatus.FAILED if job.attempts >= self.policy.max_attempts else JobStatus.QUEUED)
+        status = (
+            JobStatus.SUCCEEDED
+            if success
+            else JobStatus.FAILED
+            if job.attempts >= self.policy.max_attempts
+            else JobStatus.QUEUED
+        )
         updated = Job(job.job_id, job.kind, job.payload, status, job.attempts, job.created_at)
         self._jobs[job_id] = updated
         return updated
 
     def cancel(self, job_id: str) -> Job:
         job = self._jobs[job_id]
-        updated = Job(job.job_id, job.kind, job.payload, JobStatus.CANCELLED, job.attempts, job.created_at)
+        updated = Job(
+            job.job_id, job.kind, job.payload, JobStatus.CANCELLED, job.attempts, job.created_at
+        )
         self._jobs[job_id] = updated
         return updated
