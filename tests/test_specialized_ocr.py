@@ -1,6 +1,9 @@
 from __future__ import annotations
 
 import builtins
+from io import BytesIO
+
+from PIL import Image
 
 from persian_math.ocr import ImageMetadata
 
@@ -11,6 +14,12 @@ def test_environment_backend_defaults_to_local_model():
     backend = EnvironmentConfiguredHandwritingBackend.from_environment()
     assert backend.config.model_id == "microsoft/trocr-base-handwritten"
     assert backend.config.local_files_only is True
+
+
+def _image_bytes() -> bytes:
+    output = BytesIO()
+    Image.new("L", (100, 100), 255).save(output, format="PNG")
+    return output.getvalue()
 
 
 def test_trocr_backend_missing_dependency_is_safe(monkeypatch):
@@ -25,7 +34,7 @@ def test_trocr_backend_missing_dependency_is_safe(monkeypatch):
     from persian_math.specialized_ocr import TrOCRHandwritingBackend
 
     result = TrOCRHandwritingBackend().recognize_handwriting(
-        b"not-an-image", ImageMetadata(100, 100)
+        _image_bytes(), ImageMetadata(100, 100)
     )
     assert result.text == ""
 
@@ -42,7 +51,7 @@ def test_pix2tex_backend_missing_dependency_is_safe(monkeypatch):
     from persian_math.specialized_ocr import Pix2TexMathBackend
 
     result = Pix2TexMathBackend().recognize_math(
-        b"not-an-image", ImageMetadata(100, 100)
+        _image_bytes(), ImageMetadata(100, 100)
     )
     assert result.text == ""
 
