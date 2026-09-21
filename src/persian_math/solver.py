@@ -6,7 +6,7 @@ from typing import Any
 
 import sympy as sp
 
-from .canonical import parse_equation, parse_expression, parse_inequality
+from .canonical import extract_math_payload, parse_equation, parse_expression, parse_inequality
 
 
 @dataclass(frozen=True)
