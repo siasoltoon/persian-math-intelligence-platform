@@ -50,9 +50,7 @@ def solve_equation(lhs: sp.Expr, rhs: sp.Expr, symbol: sp.Symbol) -> SolverResul
         return _fail("symbolic_equation", exc)
 
 
-def solve_inequality(
-    lhs: sp.Expr, operator: str, rhs: sp.Expr, symbol: sp.Symbol
-) -> SolverResult:
+def solve_inequality(lhs: sp.Expr, operator: str, rhs: sp.Expr, symbol: sp.Symbol) -> SolverResult:
     try:
         relation = {"<": sp.Lt, "<=": sp.Le, ">": sp.Gt, ">=": sp.Ge}[operator](lhs, rhs)
         return _ok(

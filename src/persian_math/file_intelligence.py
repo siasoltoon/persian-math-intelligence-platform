@@ -54,9 +54,7 @@ def _pdf_magic(data: bytes) -> bool:
     return data.startswith(b"%PDF-")
 
 
-def _read_pdf(
-    data: bytes, limits: FileLimits
-) -> tuple[tuple[str, ...], tuple[bytes, ...]]:
+def _read_pdf(data: bytes, limits: FileLimits) -> tuple[tuple[str, ...], tuple[bytes, ...]]:
     if not _pdf_magic(data):
         raise ValueError("invalid PDF signature")
     try:
@@ -125,9 +123,7 @@ def inspect_document(
             pages.append(DocumentPage(number, page_text, ocr_result))
 
         extracted_text = "\n".join(page_texts)[: limits.max_text_chars].strip()
-        if not extracted_text and not any(
-            page.ocr and page.ocr.text.strip() for page in pages
-        ):
+        if not extracted_text and not any(page.ocr and page.ocr.text.strip() for page in pages):
             warnings.append("document_text_not_detected")
 
         return DocumentResult(

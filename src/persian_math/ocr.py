@@ -66,9 +66,7 @@ def preprocess_plan(metadata: ImageMetadata) -> tuple[str, ...]:
     ]
     if metadata.quality in (ImageQuality.POOR, ImageQuality.UNKNOWN):
         plan.extend(("denoise", "adaptive_threshold"))
-    plan.extend(
-        ("multi_pass_ocr", "region_detection", "math_text_segmentation", "consensus")
-    )
+    plan.extend(("multi_pass_ocr", "region_detection", "math_text_segmentation", "consensus"))
     return tuple(plan)
 
 
@@ -134,9 +132,7 @@ def validate_ocr_result(result: OcrResult, metadata: ImageMetadata) -> None:
 def reconstruct_math_text(result: OcrResult, metadata: ImageMetadata) -> str:
     validate_ocr_result(result, metadata)
     ordered = sorted(result.regions, key=lambda r: (r.bbox[1], r.bbox[0]))
-    return normalize_math_text(
-        "\n".join(r.text.strip() for r in ordered if r.text.strip())
-    )
+    return normalize_math_text("\n".join(r.text.strip() for r in ordered if r.text.strip()))
 
 
 class TesseractOcrBackend:
