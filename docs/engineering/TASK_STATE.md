@@ -53,3 +53,11 @@
 ## Phase 19–25 hardening batch
 - P19–P24: IMPLEMENTED / VERIFICATION PENDING
 - P25: IMPLEMENTED / BLOCKED by required external evidence
+
+### OCR-T04 — Specialized handwriting and formula recognition backends
+- Status: COMPLETED / VERIFICATION PENDING
+- Phase: 21/22
+- Objective: move beyond generic OCR by providing concrete specialized recognition implementations while preserving strict no-guess behavior.
+- Implemented: TrOCR handwritten backend, line segmentation, pix2tex formula backend, safe LaTeX validation, multi-backend formula consensus, lazy model loading and local-only defaults.
+- Tests: specialized backend regression suite; CI run #315 green on Python 3.11/3.12.
+- Remaining: real model artifact deployment, labeled benchmark corpus, live Telegram E2E and production performance evidence.
