@@ -1,0 +1,80 @@
+name: Windows Math VPS Runtime
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: windows-latest
+    timeout-minutes: 360
+    env:
+      PYTHONUNBUFFERED: "1"
+      PYTHONUTF8: "1"
+      APP_ENV: production
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Enable Remote Desktop
+        shell: powershell
+        run: |
+          Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server' -Name 'fDenyTSConnections' -Value 0
+          Enable-NetFirewallRule -DisplayGroup 'Remote Desktop'
+          Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp' -Name 'UserAuthentication' -Value 0
+
+      - name: Create administrator account
+        shell: powershell
+        env:
+          RDP_PASSWORD: ${{ secrets.RDP_PASSWORD }}
+        run: |
+          if ([string]::IsNullOrWhiteSpace($env:RDP_PASSWORD)) { throw 'RDP_PASSWORD secret is required' }
+          $secure = ConvertTo-SecureString $env:RDP_PASSWORD -AsPlainText -Force
+          if (Get-LocalUser -Name 'runneradmin' -ErrorAction SilentlyContinue) {
+            Set-LocalUser -Name 'runneradmin' -Password $secure
+          } else {
+            New-LocalUser -Name 'runneradmin' -Password $secure -AccountNeverExpires
+          }
+          Add-LocalGroupMember -Group 'Administrators' -Member 'runneradmin' -ErrorAction SilentlyContinue
+
+      - name: Install and connect Tailscale
+        shell: powershell
+        env:
+          TAILSCALE_AUTHKEY: ${{ secrets.TAILSCALE_AUTHKEY }}
+        run: |
+          if ([string]::IsNullOrWhiteSpace($env:TAILSCALE_AUTHKEY)) { throw 'TAILSCALE_AUTHKEY secret is required' }
+          choco install tailscale -y --no-progress
+          & "$env:ProgramFiles\Tailscale\tailscale.exe" up --authkey=$env:TAILSCALE_AUTHKEY --hostname=github-rdp-server
+          Write-Host 'Tailscale IPv4:'
+          & "$env:ProgramFiles\Tailscale\tailscale.exe" ip -4
+          Write-Host 'RDP username: runneradmin'
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install Tesseract OCR
+        shell: powershell
+        run: choco install tesseract -y --no-progress
+
+      - name: Install application
+        shell: powershell
+        run: python -m pip install --upgrade pip; python -m pip install -e ".[dev]"
+
+      - name: Validate configuration
+        shell: powershell
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+        run: |
+          if ([string]::IsNullOrWhiteSpace($env:TELEGRAM_BOT_TOKEN)) { throw 'TELEGRAM_BOT_TOKEN secret is required' }
+          python -c "from persian_math.runtime_config import load_runtime_config; load_runtime_config(); print('runtime configuration OK')"
+
+      - name: Start Telegram math bot
+        shell: powershell
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+        run: python -m persian_math.telegram_runtime

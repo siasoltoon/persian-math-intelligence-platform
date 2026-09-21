@@ -21,3 +21,11 @@
 - Decision: External evidence such as labeled OCR data, live integration, load tests and backup/restore execution must be recorded separately and may not be inferred from CI.
 - Consequence: A phase remains IMPLEMENTED/VERIFICATION PENDING until its actual acceptance evidence exists.
 - Status: ACCEPTED
+
+## ADR-0005 — Windows VPS runtime integration
+- Date: 2026-09-21
+- Decision: Integrate the operational architecture of `siasoltoon/vps` into this repository through a repository-local Windows workflow and a Telegram runtime adapter.
+- Security: credentials are supplied only through GitHub Secrets; the source repository's committed administrator credential is not propagated.
+- Runtime: RDP + Tailscale + Tesseract + Telegram polling run in the same Windows job.
+- Limitation: GitHub-hosted runners are ephemeral and Actions jobs are time-limited, so this is a disposable runtime rather than a permanent VPS.
+- Status: ACCEPTED
