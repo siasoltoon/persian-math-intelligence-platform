@@ -1,53 +1,60 @@
 # Task State
 
-## Current batch: Phase 1 through Phase 10
+## Current batch: Phase 11 through Phase 20
 
-### P1-T01 — Typed core domain
+### P11-T01 — Interactive Tutor
 - Status: VERIFIED
-- Acceptance: typed domain model implemented and covered by integration/CI tests.
+- Acceptance: stateful teaching session, hints, answer receipt/checking, re-explanation and progressive practice.
+- Evidence: tests + CI GREEN.
 
-### P2-T01 — Canonical representation
+### P12-T01 — Exercise Generation
 - Status: VERIFIED
-- Acceptance: core mathematical families normalize and parse through controlled SymPy-backed contracts.
+- Acceptance: deterministic validated exercises across multiple domains with rejection of invalid generation.
+- Evidence: tests + CI GREEN.
 
-### P3-T01 — Solver engine/router
+### P13-T01 — Learning Profile
 - Status: VERIFIED
-- Acceptance: solver families and routing are integrated and tested.
+- Acceptance: minimal profile records, accuracy, weak topics, adaptive difficulty and privacy flag.
+- Evidence: tests + CI GREEN.
 
-### P4-T01 — Independent verification
+### P14-T01 — Telegram/Application Boundary
 - Status: VERIFIED
-- Acceptance: independent equation solving, substitution, equivalence and evidence-bearing verification are integrated.
+- Acceptance: transport-neutral message contracts, Persian menu/error mapping, commands and session history.
+- Known gap: production Telegram SDK/webhook wiring.
 
-### P5-T01 — Input understanding
+### P15-T01 — PDF/File Pipeline
 - Status: VERIFIED
-- Acceptance: intent, domain, structure and ambiguity detection are integrated.
+- Acceptance: bounded PDF input and indexed question lookup foundation.
+- Known gap: real multi-page PDF extraction/OCR integration.
 
-### P6-T01 — OCR safety and backend
+### P16-T01 — Job System
 - Status: VERIFIED
-- Acceptance: bounded image validation, preprocessing, OCR result validation/reconstruction and concrete Tesseract backend are integrated.
-- Future benchmark: Phase 21.
+- Acceptance: queue, claim, retry, success/failure and cancellation lifecycle.
+- Known gap: distributed worker/load/cancellation validation.
 
-### P7-T01 — OCR consensus
+### P17-T01 — Security Baseline
 - Status: VERIFIED
-- Acceptance: disagreement rejection plus retry/clarification contract integrated and tested.
+- Acceptance: text bounds, filename/path validation and private-IP URL rejection.
+- Known gap: DNS rebinding/metadata-address and full dependency/adversarial corpus.
 
-### P8-T01 — Geometry and visual mathematics
+### P18-T01 — Observability
 - Status: VERIFIED
-- Acceptance: geometry primitives, intersection and validated visual scene/graph representation integrated and tested.
-- Future benchmark: Phase 21.
+- Acceptance: metric collection and success/failure timing span primitives.
 
-### P9-T01 — Persian explanation
-- Status: VERIFIED
-- Acceptance: Persian output structure, educational level adaptation, verification channel, notes and common mistakes integrated and tested.
+### P19-T01 — Quality/Test Foundation
+- Status: COMPLETED
+- Evidence: acceptance/regression suite and dual-Python CI GREEN.
+- Remaining: full E2E, load, security and recovery matrix.
 
-### P10-T01 — Educational adaptation
-- Status: VERIFIED
-- Acceptance: all roadmap educational levels, curriculum rules, domain objectives and adaptive difficulty integrated and tested.
+### P20-T01 — Mathematical Benchmark Foundation
+- Status: COMPLETED
+- Evidence: benchmark runner, result model and pass-rate calculation.
+- Remaining: comprehensive real mathematical corpus and solver-family scorecards.
 
 ## Verification evidence
-- Latest source-only full CI: commit a79306d22da0555440c4ad4c5c1c4f0bf87e2a6b
-- Successful workflow run: 35545050264
+- Latest full CI: workflow run 35573378971
+- Commit: e0616a742448ddad90af72eeb39b4b792a1905d0
 - Gates: Ruff lint PASS, Ruff format PASS, mypy PASS, pytest 3.11 PASS, pytest 3.12 PASS.
 
 ## Next task
-P11-T01 — Interactive Tutor.
+Complete P19/P20 extended validation, then begin Phase 21.
