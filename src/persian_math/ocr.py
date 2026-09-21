@@ -316,7 +316,9 @@ class TesseractOcrBackend:
 
         ranked = sorted(candidates, key=lambda r: (r.confidence, len(r.text)), reverse=True)
         source_quality = estimate_image_quality(image)
-        quality_warning = ("source_image_poor_quality",) if source_quality == ImageQuality.POOR else ()
+        quality_warning = (
+            ("source_image_poor_quality",) if source_quality == ImageQuality.POOR else ()
+        )
         candidate_set = tuple(
             RecognitionCandidate(item.text, item.confidence, f"pass-{index}")
             for index, item in enumerate(ranked)
@@ -325,7 +327,9 @@ class TesseractOcrBackend:
         best = ranked[0]
         if agreement.accepted:
             confidence = min(1.0, max(best.confidence, agreement.confidence))
-            warnings: tuple[str, ...] = (("ocr_low_confidence",) if confidence < 0.60 else ()) + quality_warning
+            warnings: tuple[str, ...] = (
+                ("ocr_low_confidence",) if confidence < 0.60 else ()
+            ) + quality_warning
         else:
             confidence = min(best.confidence, agreement.confidence)
             warnings = ("ocr_disagreement", "ocr_low_confidence") + quality_warning
