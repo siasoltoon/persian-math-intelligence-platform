@@ -1,60 +1,42 @@
 # Task State
 
-## Current batch: Phase 11 through Phase 20
+## Phase 19–25 hardening batch
 
-### P11-T01 — Interactive Tutor
-- Status: VERIFIED
-- Acceptance: stateful teaching session, hints, answer receipt/checking, re-explanation and progressive practice.
-- Evidence: tests + CI GREEN.
+### P19-T01 — Quality / failure matrix
+- Status: IMPLEMENTED / VERIFICATION PENDING
+- Added quality matrix, retry policy and acceptance tests.
+- Pending: E2E/load/security/recovery evidence.
 
-### P12-T01 — Exercise Generation
-- Status: VERIFIED
-- Acceptance: deterministic validated exercises across multiple domains with rejection of invalid generation.
-- Evidence: tests + CI GREEN.
+### P20-T01 — Mathematical benchmark
+- Status: IMPLEMENTED / VERIFICATION PENDING
+- Added benchmark execution and representative regression cases.
+- Pending: comprehensive real corpus and solver-family report.
 
-### P13-T01 — Learning Profile
-- Status: VERIFIED
-- Acceptance: minimal profile records, accuracy, weak topics, adaptive difficulty and privacy flag.
-- Evidence: tests + CI GREEN.
+### P21-T01 — OCR benchmark
+- Status: IMPLEMENTED / VERIFICATION PENDING
+- Added benchmark metrics for character, expression and structure.
+- Pending: labeled image dataset and measured backend results.
 
-### P14-T01 — Telegram/Application Boundary
-- Status: VERIFIED
-- Acceptance: transport-neutral message contracts, Persian menu/error mapping, commands and session history.
-- Known gap: production Telegram SDK/webhook wiring.
+### P22-T01 — Adversarial/failure testing
+- Status: IMPLEMENTED / VERIFICATION PENDING
+- Added undefined-domain and malformed-expression cases.
+- Pending: broader failure injection and OCR/resource/cancellation matrix.
 
-### P15-T01 — PDF/File Pipeline
-- Status: VERIFIED
-- Acceptance: bounded PDF input and indexed question lookup foundation.
-- Known gap: real multi-page PDF extraction/OCR integration.
+### P23-T01 — UX polish
+- Status: IMPLEMENTED / VERIFICATION PENDING
+- Added RTL/UI policy and answer rendering contract.
+- Pending: live Telegram/mobile visual evidence.
 
-### P16-T01 — Job System
-- Status: VERIFIED
-- Acceptance: queue, claim, retry, success/failure and cancellation lifecycle.
-- Known gap: distributed worker/load/cancellation validation.
+### P24-T01 — Production hardening
+- Status: IMPLEMENTED / VERIFICATION PENDING
+- Added production configuration and recovery controls.
+- Pending: actual deployment, restore/rollback/load/security execution.
 
-### P17-T01 — Security Baseline
-- Status: VERIFIED
-- Acceptance: text bounds, filename/path validation and private-IP URL rejection.
-- Known gap: DNS rebinding/metadata-address and full dependency/adversarial corpus.
+### P25-T01 — Final release audit
+- Status: IMPLEMENTED / BLOCKED
+- Added release-audit gate and runbook.
+- Blocker: missing external evidence listed in PROJECT_STATE.md.
 
-### P18-T01 — Observability
-- Status: VERIFIED
-- Acceptance: metric collection and success/failure timing span primitives.
-
-### P19-T01 — Quality/Test Foundation
-- Status: COMPLETED
-- Evidence: acceptance/regression suite and dual-Python CI GREEN.
-- Remaining: full E2E, load, security and recovery matrix.
-
-### P20-T01 — Mathematical Benchmark Foundation
-- Status: COMPLETED
-- Evidence: benchmark runner, result model and pass-rate calculation.
-- Remaining: comprehensive real mathematical corpus and solver-family scorecards.
-
-## Verification evidence
-- Latest full CI: workflow run 35573378971
-- Commit: e0616a742448ddad90af72eeb39b4b792a1905d0
-- Gates: Ruff lint PASS, Ruff format PASS, mypy PASS, pytest 3.11 PASS, pytest 3.12 PASS.
-
-## Next task
-Complete P19/P20 extended validation, then begin Phase 21.
+## CI evidence
+- Run 35574264424 tested SHA e84744b85941c46298c3221f4288c51d3919ed31.
+- Lint/type/tests passed; format failed because subsequent formatting commits were not part of that run.
