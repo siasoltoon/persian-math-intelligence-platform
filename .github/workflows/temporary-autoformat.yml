@@ -28,8 +28,10 @@ jobs:
           python -m ruff format .
           python -m ruff format --check . > ruff-format-report.txt 2>&1 || true
           python -m ruff check . --fix > ruff-report.txt 2>&1 || true
+          python -m mypy src > mypy-report.txt 2>&1 || true
           cat ruff-format-report.txt
           cat ruff-report.txt
+          cat mypy-report.txt
       - name: Upload ruff report
         uses: actions/upload-artifact@v4
         with:
@@ -41,6 +43,12 @@ jobs:
         with:
           name: ruff-format-report
           path: ruff-format-report.txt
+
+      - name: Upload mypy report
+        uses: actions/upload-artifact@v4
+        with:
+          name: mypy-report
+          path: mypy-report.txt
 
       - name: Commit formatting changes
         run: |
