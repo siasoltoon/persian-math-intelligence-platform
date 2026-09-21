@@ -43,7 +43,8 @@ class DocumentResult:
     warnings: tuple[str, ...] = ()
 
 
-def validate_file_bytes(data: bytes, limits: FileLimits = FileLimits()) -> None:
+def validate_file_bytes(data: bytes, limits: FileLimits | None = None) -> None:
+    limits = limits or FileLimits()
     if not data:
         raise ValueError("empty file")
     if len(data) > limits.max_bytes:
@@ -95,8 +96,9 @@ def inspect_document(
     data: bytes,
     filename: str,
     ocr_backend: OcrBackend | None = None,
-    limits: FileLimits = FileLimits(),
+    limits: FileLimits | None = None,
 ) -> DocumentResult:
+    limits = limits or FileLimits()
     validate_file_bytes(data, limits)
     suffix = PurePosixPath(filename.lower()).suffix
 
