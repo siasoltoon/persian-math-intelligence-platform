@@ -1,0 +1,77 @@
+name: Heavy OCR Worker
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - "requirements-heavy-ocr.txt"
+      - ".github/workflows/heavy-ocr-worker.yml"
+      - "src/persian_math/specialized_ocr.py"
+      - "tests/test_specialized_ocr.py"
+
+permissions:
+  contents: read
+
+jobs:
+  heavy-ocr:
+    name: Heavy OCR runtime smoke
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    env:
+      PYTHONUNBUFFERED: "1"
+      HF_HOME: ${{ github.workspace }}/.hf-cache
+      TRANSFORMERS_CACHE: ${{ github.workspace }}/.hf-cache/transformers
+      TOKENIZERS_PARALLELISM: "false"
+      MATH_HANDWRITING_LOCAL_ONLY: "1"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - name: Cache Hugging Face model artifacts
+        uses: actions/cache@v4
+        with:
+          path: .hf-cache
+          key: heavy-ocr-hf-${{ runner.os }}-${{ hashFiles('requirements-heavy-ocr.txt') }}
+          restore-keys: |
+            heavy-ocr-hf-${{ runner.os }}-
+      - name: Install system OCR runtime
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y tesseract-ocr tesseract-ocr-eng tesseract-ocr-fas
+      - name: Install project and heavy OCR dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e ".[dev]"
+          python -m pip install -r requirements-heavy-ocr.txt
+      - name: Run full regression suite
+        run: python -m pytest
+      - name: Prefetch and load TrOCR model
+        run: |
+          python - <<'PY'
+          from transformers import TrOCRProcessor, VisionEncoderDecoderModel
+          model_id = "microsoft/trocr-base-handwritten"
+          TrOCRProcessor.from_pretrained(model_id)
+          VisionEncoderDecoderModel.from_pretrained(model_id)
+          print(f"TrOCR model ready: {model_id}")
+          PY
+      - name: Smoke-test specialized backend imports
+        run: |
+          python - <<'PY'
+          from persian_math.specialized_ocr import Pix2TexMathBackend, TrOCRHandwritingBackend
+          print("TrOCR backend import: OK")
+          print("Pix2Tex backend import: OK")
+          print(f"TrOCR backend available: {TrOCRHandwritingBackend().available()}")
+          print(f"Pix2Tex backend available: {Pix2TexMathBackend().available()}")
+          PY
+      - name: Verify heavyweight runtime is CPU-safe
+        run: |
+          python - <<'PY'
+          import torch
+          print(f"PyTorch: {torch.__version__}")
+          print(f"CUDA available: {torch.cuda.is_available()}")
+          print("Heavy OCR worker is configured for CPU-safe execution on standard GitHub-hosted runners.")
+          PY
