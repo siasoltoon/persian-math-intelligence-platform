@@ -21,6 +21,7 @@ from telegram.ext import (
 )
 
 from .application import ApplicationService
+from .file_intelligence import best_document_text, inspect_document
 from .domain import Difficulty, EducationalLevel
 from .ocr import ImageMetadata, TesseractOcrBackend, reconstruct_math_text, validate_image_bytes
 from .runtime_config import load_runtime_config
@@ -269,6 +270,44 @@ async def text_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
         )
 
 
+async def document_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    if not update.effective_user or not update.message or not update.message.document:
+        return
+    try:
+        document = update.message.document
+        filename = document.file_name or "document"
+        size = document.file_size or 0
+        config = load_runtime_config()
+        if size > config.max_download_bytes:
+            await update.message.reply_text(
+                "حجم فایل بیش از حد مجاز است. لطفاً فایل کوچک‌تری ارسال کن.",
+                reply_markup=MAIN_MENU,
+            )
+            return
+        telegram_file = await document.get_file()
+        data = bytes(await telegram_file.download_as_bytearray())
+        result = inspect_document(data, filename, _OCR)
+        extracted = best_document_text(result).strip()
+        if not extracted:
+            await update.message.reply_text(
+                "از فایل، متن ریاضی قابل اعتماد استخراج نشد. اگر PDF اسکن‌شده است، صفحات واضح‌تر ارسال کن.",
+                reply_markup=MAIN_MENU,
+            )
+            return
+        response = _SERVICE.handle(_text_message(update.effective_user.id, extracted))
+        page_info = f"\nصفحات پردازش‌شده: {len(result.pages)}"
+        await update.message.reply_text(
+            f"متن استخراج‌شده از فایل:{page_info}\n\n{extracted[:6000]}\n\n{response.text_fa}",
+            reply_markup=MAIN_MENU,
+        )
+    except Exception:
+        LOGGER.exception("document request failed")
+        await update.message.reply_text(
+            "فایل قابل پردازش نبود یا محتوای ریاضی آن به‌صورت مطمئن تشخیص داده نشد.",
+            reply_markup=MAIN_MENU,
+        )
+
+
 async def photo_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     if not update.effective_user or not update.message or not update.message.photo:
         return
@@ -314,6 +353,7 @@ def build_application() -> Application[Any, Any, Any, Any, Any, Any]:
     application.add_handler(CommandHandler("menu", menu_command))
     application.add_handler(CallbackQueryHandler(callback_handler))
     application.add_handler(MessageHandler(filters.PHOTO, photo_handler))
+    application.add_handler(MessageHandler(filters.Document.ALL, document_handler))
     application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, text_handler))
     return application
 
