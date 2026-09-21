@@ -29,7 +29,7 @@
 - Implemented: PDF signature validation, byte/page/pixel/text limits, per-page text preservation, page rendering, optional per-page OCR, image-file handling, unified document result model, configurable Tesseract language.
 - OCR hardening: multi-pass image variants and consensus gating; disagreement is rejected rather than guessed.
 - Tests: `tests/test_file_intelligence.py` plus existing OCR/consensus regression suites.
-- CI: #258 green.
+- CI: #265 green on the current verified documentation head.
 - Pending: live multi-page PDF, scanned-PDF, mixed text/image PDF and malformed/adversarial corpus evidence.
 
 ## Phase 19–25 hardening batch
