@@ -19,7 +19,9 @@ class RenderedAnswer:
     direction: str = "rtl"
 
 
-def render_answer(body_fa: str, *, verified: bool, policy: UiPolicy | None = None) -> RenderedAnswer:
+def render_answer(
+    body_fa: str, *, verified: bool, policy: UiPolicy | None = None
+) -> RenderedAnswer:
     active = policy or UiPolicy()
     if not body_fa.strip() or len(body_fa) > active.max_message_chars:
         raise ValueError("answer exceeds UI bounds")
