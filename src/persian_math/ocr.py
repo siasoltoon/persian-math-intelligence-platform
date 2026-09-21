@@ -179,7 +179,7 @@ class TesseractOcrBackend:
                     for psm in (6, 11, 12):
                         try:
                             candidates.append(self._recognize_variant(variant, psm))
-                        except Exception:
+                        except (RuntimeError, ValueError, TypeError, OSError):
                             continue
         except Exception as exc:
             raise RuntimeError("OCR backend unavailable or failed") from exc
