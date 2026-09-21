@@ -24,37 +24,102 @@ class ApplicationService:
             raise ValueError("user id required")
         return self._sessions.setdefault(user_id, AppSession(UserProfile(user_id)))
 
+    def menu(self, user_id: str) -> OutgoingMessage:
+        self.session(user_id)
+        return OutgoingMessage(
+            "سلام! منوی اصلی را انتخاب کن:",
+            ("حل مسئله", "تمرین", "پروفایل", "تاریخچه", "راهنما", "تنظیمات"),
+        )
+
+    def profile(self, user_id: str) -> OutgoingMessage:
+        session = self.session(user_id)
+        level = session.education_mode or session.user.educational_level
+        return OutgoingMessage(
+            f"پروفایل آموزشی\n\nسطح: {level.value}\nزبان: فارسی\n"
+            f"تعداد مسائل ثبت‌شده در این نشست: {len(session.history)}",
+            ("تغییر سطح", "بازگشت"),
+        )
+
+    def settings(self, user_id: str) -> OutgoingMessage:
+        self.session(user_id)
+        return OutgoingMessage(
+            "تنظیمات\n\nزبان فعلی: فارسی\nحالت پاسخ: آموزشی\n\n"
+            "تنظیمات پیشرفته در نسخه‌های بعدی فعال می‌شوند.",
+            ("تغییر سطح", "بازگشت"),
+        )
+
+    def history(self, user_id: str) -> OutgoingMessage:
+        session = self.session(user_id)
+        if not session.history:
+            return OutgoingMessage("هنوز مسئله‌ای در این نشست ثبت نشده است.", ("بازگشت",))
+        items = "\n".join(
+            f"{index}. {item[:120]}" for index, item in enumerate(reversed(session.history), 1)
+        )
+        return OutgoingMessage(f"تاریخچه این نشست:\n\n{items}", ("بازگشت",))
+
+    def set_level(self, user_id: str, value: str) -> OutgoingMessage:
+        session = self.session(user_id)
+        try:
+            level = EducationalLevel(value)
+        except ValueError:
+            return OutgoingMessage("سطح آموزشی معتبر نیست.")
+        self._sessions[user_id] = replace(session, education_mode=level)
+        return OutgoingMessage(f"سطح آموزشی روی «{value}» تنظیم شد.", ("بازگشت",))
+
+    def exercises(
+        self,
+        user_id: str,
+        domain: str = "algebra",
+        difficulty: Difficulty = Difficulty.MEDIUM,
+        count: int = 3,
+    ) -> OutgoingMessage:
+        self.session(user_id)
+        exercises = tuple(
+            e for e in generate(ExerciseSpec(domain, difficulty, count)) if validate_exercise(e)
+        )
+        if not exercises:
+            return OutgoingMessage("تمرین معتبر تولید نشد. لطفاً دوباره تلاش کن.", ("بازگشت",))
+        body = "\n".join(
+            f"{index}. {exercise.prompt}" for index, exercise in enumerate(exercises, 1)
+        )
+        return OutgoingMessage(
+            f"تمرین‌های {domain} — سطح {difficulty.value}:\n\n{body}",
+            ("تمرین جدید", "بازگشت"),
+        )
+
+    def help(self, user_id: str) -> OutgoingMessage:
+        self.session(user_id)
+        return OutgoingMessage(
+            "راهنما\n\n"
+            "• حل مسئله: متن سؤال یا عکس واضح بفرست.\n"
+            "• تمرین: موضوع و سختی را انتخاب کن.\n"
+            "• پروفایل: سطح آموزشی را ببین یا تغییر بده.\n"
+            "• تاریخچه: مسائل همین نشست را ببین.\n"
+            "• تنظیمات: تنظیمات فعلی را مشاهده کن.\n\n"
+            "می‌توانی هر زمان /start یا /menu را هم ارسال کنی.",
+            ("بازگشت",),
+        )
+
     def handle(self, message: IncomingMessage) -> OutgoingMessage:
         validate_incoming(message)
         session = self.session(message.user_id)
         if message.kind != MessageKind.TEXT:
             return OutgoingMessage("فایل دریافت شد. پس از اعتبارسنجی، پردازش آن آغاز می‌شود.")
         text = message.text.strip()
-        if text == "/start":
-            return OutgoingMessage(
-                "سلام! صورت مسئله را بفرست یا از گزینه‌های حل مسئله و تمرین استفاده کن."
-            )
+        if text in {"/start", "/menu"}:
+            return self.menu(message.user_id)
         if text == "/help":
-            return OutgoingMessage(
-                "دستورها: /start، /help، /level <level>، /exercise و ارسال مستقیم صورت مسئله."
-            )
+            return self.help(message.user_id)
         if text.startswith("/level "):
-            value = text.split(maxsplit=1)[1]
-            try:
-                level = EducationalLevel(value)
-            except ValueError:
-                return OutgoingMessage("سطح آموزشی معتبر نیست.")
-            self._sessions[message.user_id] = replace(session, education_mode=level)
-            return OutgoingMessage(f"سطح آموزشی روی «{value}» تنظیم شد.")
+            return self.set_level(message.user_id, text.split(maxsplit=1)[1])
+        if text == "/profile":
+            return self.profile(message.user_id)
+        if text == "/history":
+            return self.history(message.user_id)
+        if text == "/settings":
+            return self.settings(message.user_id)
         if text == "/exercise":
-            exercises = tuple(
-                e
-                for e in generate(ExerciseSpec("algebra", Difficulty.MEDIUM, 3))
-                if validate_exercise(e)
-            )
-            return OutgoingMessage(
-                "تمرین‌های پیشنهادی:\n" + "\n".join(f"• {e.prompt}" for e in exercises)
-            )
+            return self.exercises(message.user_id)
         result = process(text)
         self._sessions[message.user_id] = replace(session, history=(*session.history[-19:], text))
         if not result.solver.success:
