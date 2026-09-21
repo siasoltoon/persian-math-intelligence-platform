@@ -14,6 +14,7 @@ from persian_math.solver import (
 )
 from persian_math.verification import (
     compare_independent_methods,
+    verify_equation_independently,
     verify_equation_solution,
     verify_expression_result,
     verify_solution_set,
@@ -84,3 +85,17 @@ def test_solution_set_verification():
 def test_independent_method_agreement():
     x = sp.Symbol("x")
     assert compare_independent_methods(x + 1, x + 1, 1 + x).verified
+
+
+def test_expression_verification_has_numeric_recheck():
+    expression = sp.Symbol("x") ** 2 + 2 * sp.Symbol("x") + 1
+    result = verify_expression_result(expression, (sp.Symbol("x") + 1) ** 2)
+    assert result.verified
+    assert "independent_numeric_recheck" in result.evidence
+
+
+def test_equation_verification_uses_alternate_solver_path():
+    x = sp.Symbol("x")
+    result = verify_equation_independently(2 * x + 3, 7, x, (sp.Integer(2),))
+    assert result.verified
+    assert "independent_solver_agreement" in result.evidence

@@ -1,3 +1,4 @@
+import pytest
 import sympy as sp
 
 from persian_math.canonical import (
@@ -36,3 +37,13 @@ def test_matrix_and_function_normalization():
     matrix = parse_matrix("[[1, 2], [3, 4]]")
     assert matrix.shape == (2, 2)
     assert normalize_math_text("√(x²) + π") == "sqrt(x**2) + pi"
+
+
+def test_parser_rejects_python_syntax():
+    with pytest.raises(ValueError):
+        parse_expression("__import__('os').system('echo unsafe')")
+
+
+def test_math_input_has_a_resource_bound():
+    with pytest.raises(ValueError):
+        parse_expression("x" * 10001)

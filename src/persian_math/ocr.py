@@ -64,10 +64,21 @@ def preprocess_plan(metadata: ImageMetadata) -> tuple[str, ...]:
         "deskew",
         "scale_up",
         "contrast_normalization",
+        "border_cleanup",
     ]
     if metadata.quality in (ImageQuality.POOR, ImageQuality.UNKNOWN):
         plan.extend(("denoise", "adaptive_threshold"))
-    plan.extend(("multi_pass_ocr", "region_detection", "math_text_segmentation", "consensus"))
+    plan.extend(
+        (
+            "multi_pass_ocr",
+            "line_reconstruction",
+            "math_text_segmentation",
+            "fraction_detection",
+            "superscript_subscript_detection",
+            "matrix_layout_detection",
+            "consensus",
+        )
+    )
     return tuple(plan)
 
 
@@ -94,9 +105,10 @@ def validate_image_bytes(image: bytes) -> None:
 
 def _variants(decoded: Image.Image) -> tuple[Image.Image, ...]:
     base = ImageOps.exif_transpose(decoded).convert("L")
-    scale = max(1.0, min(2.5, 1800 / max(base.width, base.height)))
+    scale = max(1.0, min(2.5, 2200 / max(base.width, base.height)))
     if scale > 1:
         base = base.resize((int(base.width * scale), int(base.height * scale)))
+    base = ImageOps.autocontrast(base)
     contrast = ImageEnhance.Contrast(base).enhance(1.8)
     sharp = contrast.filter(ImageFilter.SHARPEN)
     threshold = sharp.point(lambda p: 255 if p > 175 else 0)
@@ -130,20 +142,78 @@ def validate_ocr_result(result: OcrResult, metadata: ImageMetadata) -> None:
             raise ValueError("OCR bounding box outside image")
 
 
+def _reconstruct_regions(regions: tuple[OcrRegion, ...]) -> str:
+    ordered = sorted(regions, key=lambda r: (r.bbox[1], r.bbox[0]))
+    if not ordered:
+        return ""
+
+    lines: list[list[OcrRegion]] = []
+    for region in ordered:
+        _, y, _, height = region.bbox
+        center = y + height / 2
+        target: list[OcrRegion] | None = None
+        for line in reversed(lines[-3:]):
+            ref = line[-1]
+            ref_center = ref.bbox[1] + ref.bbox[3] / 2
+            ref_height = max(1, ref.bbox[3])
+            if abs(center - ref_center) <= max(height, ref_height) * 0.60:
+                target = line
+                break
+        if target is None:
+            lines.append([region])
+        else:
+            target.append(region)
+
+    rendered: list[str] = []
+    for line in lines:
+        line.sort(key=lambda r: r.bbox[0])
+        tokens: list[str] = []
+        baseline = max(r.bbox[1] + r.bbox[3] for r in line)
+        median_height = sorted(max(1, r.bbox[3]) for r in line)[len(line) // 2]
+        previous_right: int | None = None
+        for region in line:
+            token = region.text.strip()
+            if not token:
+                continue
+            top = region.bbox[1]
+            if top + region.bbox[3] < baseline - 0.35 * median_height and tokens:
+                tokens[-1] = f"{tokens[-1]}**{token}"
+            elif previous_right is not None and region.bbox[0] > previous_right + 8:
+                tokens.append(" " + token)
+            else:
+                tokens.append(token)
+            previous_right = region.bbox[0] + region.bbox[2]
+        rendered.append("".join(tokens).strip())
+    return "\n".join(rendered)
+
+
 def reconstruct_math_text(result: OcrResult, metadata: ImageMetadata) -> str:
     validate_ocr_result(result, metadata)
-    ordered = sorted(result.regions, key=lambda r: (r.bbox[1], r.bbox[0]))
-    return normalize_math_text("\n".join(r.text.strip() for r in ordered if r.text.strip()))
+    if result.confidence < 0.60 or not result.regions:
+        return ""
+    return normalize_math_text(_reconstruct_regions(result.regions))
 
 
 class TesseractOcrBackend:
-    def __init__(self, language: str = "eng") -> None:
-        self.language = language
+    def __init__(self, language: str = "fas+eng") -> None:
+        self.language = language.strip() or "fas+eng"
+
+    def _language(self) -> str:
+        try:
+            available = set(pytesseract.get_languages(config=""))
+        except (RuntimeError, OSError):
+            return self.language
+        requested = tuple(part for part in self.language.split("+") if part)
+        if requested and all(part in available for part in requested):
+            return self.language
+        if "eng" in available:
+            return "eng"
+        return requested[0] if requested and requested[0] in available else "eng"
 
     def _recognize_variant(self, image: Image.Image, psm: int) -> OcrResult:
         data = pytesseract.image_to_data(
             image,
-            lang=self.language,
+            lang=self._language(),
             config=f"--psm {psm}",
             output_type=pytesseract.Output.DICT,
         )
@@ -161,13 +231,14 @@ class TesseractOcrBackend:
                 )
             except (KeyError, IndexError, TypeError, ValueError):
                 continue
-            if text:
+            if text and confidence > 0.05:
                 regions.append(OcrRegion(text, confidence, bbox, "text"))
                 confidences.append(confidence)
+        regions_tuple = tuple(regions)
         return OcrResult(
-            " ".join(r.text for r in regions),
+            _reconstruct_regions(regions_tuple),
             sum(confidences) / len(confidences) if confidences else 0.0,
-            tuple(regions),
+            regions_tuple,
         )
 
     def recognize(self, image: bytes, metadata: ImageMetadata) -> OcrResult:
@@ -175,9 +246,9 @@ class TesseractOcrBackend:
         validate_image_bytes(image)
         try:
             with Image.open(BytesIO(image)) as decoded:
-                candidates = []
+                candidates: list[OcrResult] = []
                 for variant in _variants(decoded):
-                    for psm in (6, 11, 12):
+                    for psm in (6, 11, 12, 13):
                         try:
                             candidates.append(self._recognize_variant(variant, psm))
                         except (RuntimeError, ValueError, TypeError, OSError):
@@ -201,7 +272,10 @@ class TesseractOcrBackend:
             confidence = min(best.confidence, agreement.confidence)
             warnings = ("ocr_disagreement", "ocr_low_confidence")
         result = OcrResult(
-            best.text if agreement.accepted else "", confidence, best.regions, warnings
+            agreement.text if agreement.accepted else "",
+            confidence,
+            best.regions,
+            warnings,
         )
         validate_ocr_result(result, metadata)
         return result
