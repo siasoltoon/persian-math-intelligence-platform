@@ -1,6 +1,6 @@
-# Heavy OCR runtime dependencies.
+# Heavy OCR runtime dependencies excluding PyTorch.
+# Workflows install CPU-only PyTorch explicitly from the official PyTorch wheel index.
 # Kept outside core pyproject so the base application remains lightweight.
-torch>=2.4,<3
 transformers>=4.45,<5
 accelerate>=0.34,<2
 sentencepiece>=0.2,<1
