@@ -98,7 +98,7 @@ def extract_math_payload(text: str) -> str:
     normalized_source = text.translate(PERSIAN_DIGITS).translate(ARABIC_DIGITS)
     candidates: list[str] = []
     for match in _MATH_CANDIDATE_RE.finditer(normalized_source):
-        candidate = match.group(0).strip()
+        candidate = match.group(0).strip().strip(",:;")
         if not candidate:
             continue
         if not (any(ch.isdigit() for ch in candidate) or any(op in candidate for op in "=<>+-*/^√")):
