@@ -22,7 +22,7 @@ def process(text: str, *, symbol_name: str = "x") -> EngineResult:
     problem_input = ProblemInput(text)
     word_result, word_expression, word_kind = solve_word_problem(text)
     if word_result.success and word_expression is not None and word_kind is not None:
-        representation = ProblemRepresentation("expression", word_expression, text)
+        representation = ProblemRepresentation("expression", str(word_expression), text)
     else:
         representation = represent_problem(problem_input)
     classification = classify_problem(problem_input)
