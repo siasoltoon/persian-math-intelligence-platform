@@ -4,14 +4,14 @@
 - Status: IMPLEMENTED / VERIFICATION PENDING
 - Objective: bring the operational behavior of `siasoltoon/vps` into the math repository without propagating its committed credential.
 - Acceptance: Windows runner provisions RDP/Tailscale, installs Python/Tesseract, validates secrets and starts the Telegram process.
-- Tests: runtime configuration tests; CI run 202 green before document-layer expansion.
+- Tests: runtime configuration tests; CI #258 green.
 - Live evidence: pending.
 
 ### VPS-T02 — Telegram execution adapter
 - Status: IMPLEMENTED / VERIFICATION PENDING
 - Objective: run the existing ApplicationService through a real Telegram polling adapter.
 - Acceptance: /start, /help, text problems and validated photo OCR reach the application service and return Persian responses without raw exceptions.
-- Tests: runtime configuration and regression suite.
+- Tests: runtime configuration and regression suite; CI #258 green.
 - Live evidence: pending.
 
 ### TUI-T01 — Interactive Telegram UI
@@ -26,8 +26,10 @@
 - Status: IMPLEMENTED / VERIFICATION PENDING
 - Phase: 21/22/24
 - Objective: extend the Telegram input layer from plain text/photos to bounded PDF and document processing without unsafe execution.
-- Implemented: PDF signature validation, byte/page/pixel/text limits, text extraction, page rendering, optional per-page OCR, image-file handling, unified document result model, configurable Tesseract language.
-- Tests: `tests/test_file_intelligence.py`.
+- Implemented: PDF signature validation, byte/page/pixel/text limits, per-page text preservation, page rendering, optional per-page OCR, image-file handling, unified document result model, configurable Tesseract language.
+- OCR hardening: multi-pass image variants and consensus gating; disagreement is rejected rather than guessed.
+- Tests: `tests/test_file_intelligence.py` plus existing OCR/consensus regression suites.
+- CI: #258 green.
 - Pending: live multi-page PDF, scanned-PDF, mixed text/image PDF and malformed/adversarial corpus evidence.
 
 ## Phase 19–25 hardening batch
