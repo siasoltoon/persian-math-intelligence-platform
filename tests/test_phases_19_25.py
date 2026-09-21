@@ -5,8 +5,14 @@ import sympy as sp
 from persian_math.adversarial import run_adversarial
 from persian_math.benchmark import BenchmarkCase, pass_rate, run_benchmark
 from persian_math.ocr_benchmark import OcrBenchmarkCase, aggregate, score_case
-from persian_math.production import ProductionConfig, RecoveryPlan, validate_config, validate_recovery
-from persian_math.quality import FailurePolicy, TestCase, pass_rate as matrix_rate, retry, run_matrix
+from persian_math.production import (
+    ProductionConfig,
+    RecoveryPlan,
+    validate_config,
+    validate_recovery,
+)
+from persian_math.quality import FailurePolicy, TestCase, retry, run_matrix
+from persian_math.quality import pass_rate as matrix_rate
 from persian_math.release_audit import REQUIRED_AREAS, build_audit
 from persian_math.ux import render_answer
 
