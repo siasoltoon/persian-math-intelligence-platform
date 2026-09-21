@@ -1,5 +1,15 @@
 # Engineering Changelog
 
+## 2026-09-21 — Secure document and OCR hardening
+- Added bounded multi-format document inspection for PDF and image documents.
+- Preserved native PDF text per page instead of using incorrect global-line indexing.
+- Added PDF byte/page/pixel/text resource limits and real PDF regression tests.
+- Added multi-pass OCR preprocessing with scaling, contrast, sharpening and threshold variants.
+- Added OCR consensus gating so disagreeing recognition passes are rejected instead of guessed.
+- Narrowed recoverable per-pass OCR exceptions and fixed static type checking.
+- CI #258 passed Ruff lint, Ruff format, mypy, and pytest on Python 3.11 and 3.12.
+- Live OCR/PDF benchmark evidence remains pending.
+
 ## 2026-09-21 — Interactive Telegram UI
 - Added persistent Persian-first main keyboard.
 - Added callback-driven solve, exercise, profile, history, settings and help navigation.
