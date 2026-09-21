@@ -19,8 +19,8 @@ dependencies = [
 
 [project.optional-dependencies]
 dev = ["pytest>=8,<9", "ruff>=0.6,<1", "mypy>=1.11,<2"]
-handwriting_ocr = ["torch>=2.2,<3", "transformers>=4.40,<5", "safetensors>=0.4,<1]
-math_ocr = ["pix2tex>=0.1.4,<0.2"]
+"handwriting-ocr" = ["torch>=2.2,<3", "transformers>=4.40,<5", "safetensors>=0.4,<1]
+"math-ocr" = ["pix2tex>=0.1.4,<0.2"]
 
 [tool.setuptools.packages.find]
 where = ["src"]
