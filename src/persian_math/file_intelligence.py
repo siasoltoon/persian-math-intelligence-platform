@@ -48,7 +48,7 @@ def _pdf_magic(data: bytes) -> bool:
     return data.startswith(b"%PDF-")
 
 
-def _read_pdf(data: bytes, limits: FileLimits) -> tuple[str, tuple[bytes, ...]]:
+def _read_pdf(data: bytes, limits: FileLimits) -> tuple[tuple[str, ...], tuple[bytes, ...]]:
     if not _pdf_magic(data):
         raise ValueError("invalid PDF signature")
     try:
@@ -74,7 +74,7 @@ def _read_pdf(data: bytes, limits: FileLimits) -> tuple[str, tuple[bytes, ...]]:
             if pix.width * pix.height > limits.max_page_pixels:
                 raise ValueError("PDF page exceeds pixel limit")
             images.append(pix.tobytes("png"))
-        return "\n".join(texts)[:limits.max_text_chars], tuple(images)
+        return tuple(texts), tuple(images)
     finally:
         document.close()
 
@@ -88,7 +88,7 @@ def inspect_document(
     validate_file_bytes(data, limits)
     suffix = PurePosixPath(filename.lower()).suffix
     if suffix == ".pdf" or _pdf_magic(data):
-        text, page_images = _read_pdf(data, limits)
+        page_texts, page_images = _read_pdf(data, limits)
         pages: list[DocumentPage] = []
         warnings: list[str] = []
         for number, image in enumerate(page_images, 1):
@@ -103,9 +103,9 @@ def inspect_document(
                 validate_image_metadata(metadata)
                 ocr_result = ocr_backend.recognize(image, metadata)
             pages.append(DocumentPage(number, page_text, ocr_result))
-        if not text.strip() and not any(p.ocr and p.ocr.text.strip() for p in pages):
+        extracted_text = "\n".join(page_texts)[:limits.max_text_chars].strip()\n        if not extracted_text and not any(p.ocr and p.ocr.text.strip() for p in pages):
             warnings.append("document_text_not_detected")
-        return DocumentResult("application/pdf", tuple(pages), text.strip(), tuple(warnings))
+        return DocumentResult("application/pdf", tuple(pages), extracted_text, tuple(warnings))
 
     validate_image_bytes(data)
     with Image.open(BytesIO(data)) as decoded:
