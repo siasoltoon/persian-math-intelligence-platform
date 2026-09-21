@@ -1,8 +1,9 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
 from collections import Counter
-from .domain import Difficulty, EducationalLevel, UserProfile
+from dataclasses import dataclass
+
+from .domain import Difficulty, UserProfile
 from .education import recommended_difficulty
 
 
@@ -28,9 +29,15 @@ class LearningProfile:
         stats: dict[str, list[bool]] = {}
         for record in self.records:
             stats.setdefault(record.topic, []).append(record.correct)
-        return tuple(sorted(topic for topic, values in stats.items() if sum(values) / len(values) < 0.6))
+        return tuple(
+            sorted(
+                topic
+                for topic, values in stats.items()
+                if sum(values) / len(values) < 0.6
+            )
+        )
 
-    def add(self, record: ProblemRecord) -> "LearningProfile":
+    def add(self, record: ProblemRecord) -> LearningProfile:
         if not record.topic.strip():
             raise ValueError("topic required")
         return LearningProfile(self.user, (*self.records, record), self.privacy_enabled)
@@ -39,7 +46,10 @@ class LearningProfile:
         return recommended_difficulty(self.user, self.accuracy if self.records else None)
 
     def summary_fa(self) -> str:
-        return f"دقت ثبت‌شده: {self.accuracy:.0%}؛ نقاط قابل‌تقویت: {', '.join(self.weak_topics) or 'هنوز داده کافی نداریم'}."
+        return (
+            f"دقت ثبت‌شده: {self.accuracy:.0%}؛ نقاط قابل‌تقویت: "
+            f"{', '.join(self.weak_topics) or 'هنوز داده کافی نداریم'}."
+        )
 
 
 def create_learning_profile(user: UserProfile) -> LearningProfile:
