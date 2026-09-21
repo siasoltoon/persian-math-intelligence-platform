@@ -231,7 +231,6 @@ def solve_matrix(matrix: sp.MatrixBase, operation: str) -> SolverResult:
         return _fail("matrix", exc)
 
 
-
 def solve_word_problem(
     text: str,
 ) -> tuple[SolverResult, sp.Expr | None, str | None]:
@@ -292,6 +291,7 @@ def solve_word_problem(
         None,
         None,
     )
+
 
 def solve(expression_text: str, *, symbol_name: str = "x") -> SolverResult:
     text = expression_text.strip()
