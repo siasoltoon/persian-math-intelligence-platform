@@ -76,3 +76,4 @@ def test_quality_estimator_rejects_blank_low_information_image():
     output = BytesIO()
     Image.new("L", (400, 300), 245).save(output, format="PNG")
     assert estimate_image_quality(output.getvalue()) == ImageQuality.POOR
+    assert "multi_pass_ocr" in preprocess_plan(ImageMetadata(400, 300, 1, ImageQuality.POOR))
