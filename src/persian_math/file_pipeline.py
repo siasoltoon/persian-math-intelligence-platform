@@ -42,6 +42,10 @@ def index_text_pages(pages: tuple[Page, ...]) -> DocumentIndex:
     for page in pages:
         for line in page.text.splitlines():
             stripped = line.strip()
-            if (\n                len(stripped) >= 3\n                and stripped[0].isdigit()\n                and (stripped[1] == "." or stripped[1] == ")")\n            ):
+            if (
+                len(stripped) >= 3
+                and stripped[0].isdigit()
+                and (stripped[1] == "." or stripped[1] == ")")
+            ):
                 questions.append(QuestionSlice(int(stripped[0]), page.number, stripped[2:].strip()))
     return DocumentIndex(pages, tuple(questions))
