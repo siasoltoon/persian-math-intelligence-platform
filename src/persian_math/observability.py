@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from time import perf_counter
-from typing import Any
+from typing import Any, Callable, TypeVar
 
 
 @dataclass(frozen=True)
@@ -30,13 +30,20 @@ class Metrics:
         return tuple(self._items)
 
 
-def timed(name: str):
-    def decorator(func: Any):
+F = TypeVar("F", bound=Callable[..., Any])
+
+
+def timed(name: str, recorder: list[Span] | None = None) -> Callable[[F], F]:
+    def decorator(func: F) -> F:
         def wrapped(*args: Any, **kwargs: Any) -> Any:
             start = perf_counter()
+            success = False
             try:
-                return func(*args, **kwargs)
+                result = func(*args, **kwargs)
+                success = True
+                return result
             finally:
-                _ = Span(name, (perf_counter() - start) * 1000.0, True)
-        return wrapped
+                if recorder is not None:
+                    recorder.append(Span(name, (perf_counter() - start) * 1000.0, success))
+        return wrapped  # type: ignore[return-value]
     return decorator
