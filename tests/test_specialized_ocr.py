@@ -50,9 +50,7 @@ def test_pix2tex_backend_missing_dependency_is_safe(monkeypatch):
     monkeypatch.setattr(builtins, "__import__", blocked)
     from persian_math.specialized_ocr import Pix2TexMathBackend
 
-    result = Pix2TexMathBackend().recognize_math(
-        _image_bytes(), ImageMetadata(100, 100)
-    )
+    result = Pix2TexMathBackend().recognize_math(_image_bytes(), ImageMetadata(100, 100))
     assert result.text == ""
 
 
