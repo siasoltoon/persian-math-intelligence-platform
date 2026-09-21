@@ -54,32 +54,40 @@ def _pdf_magic(data: bytes) -> bool:
     return data.startswith(b"%PDF-")
 
 
-def _read_pdf(data: bytes, limits: FileLimits) -> tuple[tuple[str, ...], tuple[bytes, ...]]:
+def _read_pdf(
+    data: bytes, limits: FileLimits
+) -> tuple[tuple[str, ...], tuple[bytes, ...]]:
     if not _pdf_magic(data):
         raise ValueError("invalid PDF signature")
     try:
         import fitz
+
         document = fitz.open(stream=data, filetype="pdf")
     except Exception as exc:
         raise ValueError("PDF could not be opened") from exc
+
     try:
         if document.page_count < 1:
             raise ValueError("PDF has no pages")
         if document.page_count > limits.max_pages:
             raise ValueError("PDF exceeds page limit")
+
         texts: list[str] = []
         images: list[bytes] = []
         remaining = limits.max_text_chars
+
         for index in range(document.page_count):
             page = document.load_page(index)
             page_text = page.get_text("text") or ""
             clipped = page_text[:remaining]
             texts.append(clipped)
-            remaining -= len(clipped)
+            remaining = max(0, remaining - len(clipped))
+
             pix = page.get_pixmap(matrix=fitz.Matrix(1.5, 1.5), alpha=False)
             if pix.width * pix.height > limits.max_page_pixels:
                 raise ValueError("PDF page exceeds pixel limit")
             images.append(pix.tobytes("png"))
+
         return tuple(texts), tuple(images)
     finally:
         document.close()
@@ -93,33 +101,66 @@ def inspect_document(
 ) -> DocumentResult:
     validate_file_bytes(data, limits)
     suffix = PurePosixPath(filename.lower()).suffix
+
     if suffix == ".pdf" or _pdf_magic(data):
         page_texts, page_images = _read_pdf(data, limits)
         pages: list[DocumentPage] = []
         warnings: list[str] = []
+
         for number, image in enumerate(page_images, 1):
             page_text = page_texts[number - 1]
             ocr_result = None
+
             if ocr_backend is not None:
                 with Image.open(BytesIO(image)) as decoded:
-                    metadata = ImageMetadata(decoded.width, decoded.height, len(decoded.getbands()))
+                    metadata = ImageMetadata(
+                        decoded.width,
+                        decoded.height,
+                        len(decoded.getbands()),
+                    )
                 validate_image_bytes(image)
                 validate_image_metadata(metadata)
                 ocr_result = ocr_backend.recognize(image, metadata)
+
             pages.append(DocumentPage(number, page_text, ocr_result))
-        extracted_text = "\n".join(page_texts)[:limits.max_text_chars].strip()
-        if not extracted_text and not any(p.ocr and p.ocr.text.strip() for p in pages):
+
+        extracted_text = "\n".join(page_texts)[: limits.max_text_chars].strip()
+        if not extracted_text and not any(
+            page.ocr and page.ocr.text.strip() for page in pages
+        ):
             warnings.append("document_text_not_detected")
-        return DocumentResult("application/pdf", tuple(pages), extracted_text, tuple(warnings))
+
+        return DocumentResult(
+            "application/pdf",
+            tuple(pages),
+            extracted_text,
+            tuple(warnings),
+        )
 
     validate_image_bytes(data)
     with Image.open(BytesIO(data)) as decoded:
-        metadata = ImageMetadata(decoded.width, decoded.height, len(decoded.getbands()))
+        metadata = ImageMetadata(
+            decoded.width,
+            decoded.height,
+            len(decoded.getbands()),
+        )
     validate_image_metadata(metadata)
+
     if ocr_backend is None:
-        return DocumentResult("image", (DocumentPage(1, ""),), "", ("ocr_not_requested",))
+        return DocumentResult(
+            "image",
+            (DocumentPage(1, ""),),
+            "",
+            ("ocr_not_requested",),
+        )
+
     ocr_result = ocr_backend.recognize(data, metadata)
-    return DocumentResult("image", (DocumentPage(1, "", ocr_result),), ocr_result.text, ocr_result.warnings)
+    return DocumentResult(
+        "image",
+        (DocumentPage(1, "", ocr_result),),
+        ocr_result.text,
+        ocr_result.warnings,
+    )
 
 
 def best_document_text(result: DocumentResult) -> str:
