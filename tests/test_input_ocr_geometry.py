@@ -10,7 +10,13 @@ from persian_math.geometry import (
     triangle_area,
 )
 from persian_math.input_understanding import detect_ambiguity, detect_intent, understand
-from persian_math.ocr import ImageMetadata, ImageQuality, estimate_image_quality, preprocess_plan, validate_image_metadata
+from persian_math.ocr import (
+    ImageMetadata,
+    ImageQuality,
+    estimate_image_quality,
+    preprocess_plan,
+    validate_image_metadata,
+)
 from persian_math.ocr_consensus import RecognitionCandidate, consensus
 
 
@@ -64,6 +70,7 @@ def test_ocr_plan_includes_extreme_quality_recovery():
 
 def test_quality_estimator_rejects_blank_low_information_image():
     from io import BytesIO
+
     from PIL import Image
 
     output = BytesIO()
