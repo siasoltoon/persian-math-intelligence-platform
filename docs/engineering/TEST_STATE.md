@@ -25,3 +25,9 @@
 7. Send a text PDF, a scanned multi-page PDF, a mixed text/image PDF, an image-as-document and malformed/oversized files.
 8. Run the labeled OCR/handwriting corpus and record character, expression and structural accuracy.
 9. Observe process/job recovery behavior and record the GitHub-hosted runner time limit.
+
+## Specialized OCR evidence
+- CI run #315: Ruff lint ✓, Ruff format ✓, mypy ✓, pytest Python 3.11 ✓, pytest Python 3.12 ✓.
+- Specialized backend tests cover missing optional dependencies, environment defaults, safe formula validation, conflicting formula rejection and matching formula consensus.
+- Model inference itself is intentionally not claimed as verified by CI because heavyweight model artifacts are not downloaded into the repository CI environment.
+- Required next evidence: model-backed benchmark with real handwritten Persian/Latin/math samples, difficult formulas and structural accuracy metrics.
