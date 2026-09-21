@@ -47,7 +47,7 @@ class CompositeOcrBackend:
                 secondary.regions,
                 (*secondary.warnings, "handwriting_backend_only"),
             )
-        from .ocr_consensus import consensus, RecognitionCandidate
+        from .ocr_consensus import RecognitionCandidate, consensus
 
         agreement = consensus((
             RecognitionCandidate(primary.text, primary.confidence, "primary"),
