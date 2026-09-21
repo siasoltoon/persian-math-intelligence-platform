@@ -51,3 +51,10 @@
 - Added safe LaTeX output validation and multi-backend formula consensus.
 - CI run #315 passed all jobs.
 - Pending: deploy/cache model artifacts, run real handwriting/formula corpus, record character/expression/structural metrics, and perform live Telegram validation.
+
+
+## Phase 21 — GitHub-hosted heavy OCR execution
+- Status: IMPLEMENTED / VERIFICATION PENDING
+- Added isolated heavyweight OCR dependency manifest and a GitHub-hosted worker workflow.
+- Workflow provisions Tesseract, PyTorch/Transformers, TrOCR model cache and pix2tex support, then runs regression and runtime smoke checks.
+- Pending: successful workflow run evidence and real labeled OCR/handwriting benchmark evidence.
