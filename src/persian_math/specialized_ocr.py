@@ -1,8 +1,8 @@
 from __future__ import annotations
 
+import os
 from dataclasses import dataclass
 from io import BytesIO
-import os
 from typing import Any
 
 import cv2
@@ -143,7 +143,7 @@ class EnvironmentConfiguredHandwritingBackend(TrOCRHandwritingBackend):
     """Construct a TrOCR backend from environment without hard-coded secrets."""
 
     @classmethod
-    def from_environment(cls) -> "EnvironmentConfiguredHandwritingBackend":
+    def from_environment(cls) -> EnvironmentConfiguredHandwritingBackend:
         return cls(
             model_id=os.getenv("MATH_HANDWRITING_MODEL", "microsoft/trocr-base-handwritten"),
             device=os.getenv("MATH_HANDWRITING_DEVICE", "auto"),
