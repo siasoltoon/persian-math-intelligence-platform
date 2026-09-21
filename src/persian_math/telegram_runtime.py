@@ -29,7 +29,7 @@ from .telegram_adapter import IncomingMessage, MessageKind, OutgoingMessage
 
 LOGGER = logging.getLogger(__name__)
 _SERVICE = ApplicationService()
-_OCR = TesseractOcrBackend(language="eng")
+_OCR = TesseractOcrBackend(language=os.environ.get("TESSERACT_LANG", "eng").strip() or "eng")
 
 MAIN_MENU = ReplyKeyboardMarkup(
     [
