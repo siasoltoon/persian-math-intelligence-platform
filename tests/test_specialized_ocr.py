@@ -61,3 +61,49 @@ def test_specialized_module_has_lazy_backends():
 
     assert hasattr(module, "TrOCRHandwritingBackend")
     assert hasattr(module, "Pix2TexMathBackend")
+
+
+def test_formula_validator_rejects_unsafe_latex():
+    from persian_math.specialized_ocr import validate_latex_formula
+
+    try:
+        validate_latex_formula(r"\write18{rm -rf /}")
+    except ValueError:
+        pass
+    else:
+        raise AssertionError("unsafe LaTeX command was accepted")
+
+
+def test_formula_consensus_rejects_conflicting_predictions():
+    from persian_math.specialized_ocr import CompositeMathFormulaBackend
+
+    class A:
+        def recognize_math(self, image, metadata):
+            return type("R", (), {"text": r"x^2+1", "confidence": 0.95})()
+
+    class B:
+        def recognize_math(self, image, metadata):
+            return type("R", (), {"text": r"x^2-1", "confidence": 0.95})()
+
+    result = CompositeMathFormulaBackend((A(), B())).recognize_math(
+        _image_bytes(), ImageMetadata(100, 100)
+    )
+    assert result.text == ""
+    assert "math_formula_disagreement" in result.warnings
+
+
+def test_formula_consensus_accepts_matching_predictions():
+    from persian_math.specialized_ocr import CompositeMathFormulaBackend
+
+    class A:
+        def recognize_math(self, image, metadata):
+            return type("R", (), {"text": r"\frac{x+1}{2}", "confidence": 0.95})()
+
+    class B:
+        def recognize_math(self, image, metadata):
+            return type("R", (), {"text": r"\frac{x+1}{2}", "confidence": 0.94})()
+
+    result = CompositeMathFormulaBackend((A(), B())).recognize_math(
+        _image_bytes(), ImageMetadata(100, 100)
+    )
+    assert result.text == r"\frac{x+1}{2}"
