@@ -51,3 +51,11 @@
 - Root cause reproduced from live behavior: natural-language Persian wrappers reached the restricted parser instead of first being reduced to a safe mathematical payload.
 - Added regression tests for arithmetic and linear-equation Persian prompts, including independent verification assertions.
 - Current status: code-level regression coverage added; CI/live Telegram execution evidence still required before marking the task VERIFIED.
+
+
+## Plain-text Telegram math input regression — 2026-09-22
+- Root cause reproduced: natural-language Persian wrappers reached the restricted parser instead of first being reduced to a safe mathematical payload.
+- Regression coverage now includes arithmetic and linear-equation Persian prompts, spaced Persian-digit expressions, and concept-only prompts.
+- PR #11 CI run 35656388276 passed: Ruff lint ✓, Ruff format ✓, mypy ✓, pytest Python 3.11 ✓, pytest Python 3.12 ✓, Heavy OCR runtime ✓.
+- PR #11 merged to main as `9fea0f1764a12ed52f70fbdf2b8d2ebae8822406`.
+- Live Telegram execution evidence remains required before claiming end-to-end runtime verification.

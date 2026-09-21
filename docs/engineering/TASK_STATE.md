@@ -88,3 +88,14 @@
 - Implemented: bounded lexical math-fragment extraction, equation preference, sentence-punctuation trimming, solver integration, representation-aware verification, and regression tests for arithmetic/equation prompts.
 - Expected examples: Persian arithmetic prompt → 29; Persian linear-equation prompt → x = 5.
 - Remaining: green CI evidence and live Telegram re-test.
+
+
+### INPUT-T01 — Persian natural-language text math extraction
+- Status: VERIFIED for repository/CI integration / live verification pending
+- Phase: 19/23/24
+- Objective: make ordinary Persian text questions reach the existing safe mathematical parser/solver without weakening parser security or verification gates.
+- Root cause: full Persian prose was being submitted to the restricted parser; valid math embedded in the prompt was never isolated.
+- Implemented: bounded lexical math-fragment extraction, whitespace-safe candidate grammar, equation preference, sentence-punctuation trimming, concept-only representation fallback, structured non-math engine failure, solver integration, and representation-aware verification.
+- Regression coverage: Persian arithmetic, Persian linear equations, spaced Persian-digit expressions, and concept-only prompts.
+- Verification: PR #11 CI run 35656388276 passed Ruff lint/format, mypy, pytest Python 3.11/3.12, and Heavy OCR runtime; merged to main as `9fea0f1764a12ed52f70fbdf2b8d2ebae8822406`.
+- Remaining: live Telegram re-test and real-world corpus evidence.
