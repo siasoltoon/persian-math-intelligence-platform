@@ -69,3 +69,12 @@
 - Objective: temporarily execute heavyweight OCR/model runtime on GitHub Actions until the future PC worker is introduced.
 - Implemented: isolated heavy dependency manifest, Hugging Face model cache, Tesseract provisioning, TrOCR prefetch, pix2tex import smoke test and full regression execution.
 - Remaining: successful workflow execution evidence and real labeled model-accuracy benchmark.
+
+
+### OCR-T05 — GitHub-hosted heavy OCR worker
+- Status: VERIFIED for runtime integration / accuracy verification pending
+- Phase: 21/24
+- Objective: temporarily execute heavyweight OCR/model runtime on GitHub Actions until the future PC worker is introduced.
+- Implemented: isolated heavy dependency manifest, CPU-only PyTorch workflow installation, Hugging Face model cache, Tesseract provisioning, TrOCR prefetch, pix2tex backend smoke test and full regression execution.
+- Verification: Heavy OCR workflow run 35649732688 passed; main CI run 35649997963 passed.
+- Remaining: real labeled model-accuracy benchmark and live Telegram evidence.
