@@ -366,7 +366,7 @@ class TesseractOcrBackend:
             from .math_ocr import analyze_math_structure
 
             structure = analyze_math_structure(result)
-            if structure.kind in {"matrix_or_table", "fractional_expression", "indexed_or_powered_expression"}:
+            if structure.kind in {\n                "matrix_or_table",\n                "fractional_expression",\n                "indexed_or_powered_expression",\n            }:
                 result = OcrResult(
                     result.text,
                     result.confidence,
