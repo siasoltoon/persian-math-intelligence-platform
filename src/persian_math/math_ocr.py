@@ -1,8 +1,8 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
 import re
-from typing import Iterable
+from collections.abc import Iterable
+from dataclasses import dataclass
 
 from .ocr import OcrRegion, OcrResult
 
@@ -67,7 +67,7 @@ def _contains_math(text: str) -> bool:
 
 def _relation(a: OcrRegion, b: OcrRegion) -> str:
     ax, ay, aw, ah = a.bbox
-    bx, by, bw, bh = b.bbox
+    bx, by, _bw, bh = b.bbox
     a_bottom = ay + ah
     b_bottom = by + bh
     if bx < ax + aw * 0.15 or bx > ax + aw * 1.8:
