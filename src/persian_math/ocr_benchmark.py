@@ -26,7 +26,9 @@ def _accuracy(expected: str, actual: str) -> float:
     return matches / max(len(expected), len(actual), 1)
 
 
-def score_case(case: OcrBenchmarkCase, actual_text: str, actual_structure: tuple[str, ...]) -> OcrBenchmarkResult:
+def score_case(
+    case: OcrBenchmarkCase, actual_text: str, actual_structure: tuple[str, ...]
+) -> OcrBenchmarkResult:
     return OcrBenchmarkResult(
         case.case_id,
         _accuracy(case.expected_text, actual_text),
