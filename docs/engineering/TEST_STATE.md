@@ -10,7 +10,7 @@
 - CI #258 / run ID 35629310020 passed all jobs on commit `5e4d37dfc59c82c3a250039b44b00867e71df1a8`.
 - Passed: Ruff lint, Ruff format, mypy, pytest Python 3.11 and pytest Python 3.12.
 - The final cleanup commit `fb4172f9b8a65b12a9af95699849e862f356b108` removed the temporary formatter diagnostic workflow.
-- CI #259 / run ID 356? was the cleanup verification; the current documentation commit CI is tracked separately below.
+- CI #259 / run ID 35629966771 passed all jobs on the cleanup head.
 - CI #262 / run ID 35630145223 passed all jobs on the state-update head.
 - No failed CI run is treated as release evidence.
 
