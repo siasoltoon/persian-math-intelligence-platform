@@ -27,10 +27,10 @@ def process(text: str, *, symbol_name: str = "x") -> EngineResult:
     verification: VerificationResult | None = None
 
     if solver_result.success and representation.kind == "expression":
-        expression = parse_expression(text).expression
+        expression = parse_expression(representation.expression).expression
         verification = verify_expression_result(expression, solver_result.value)
     elif solver_result.success and representation.kind == "equation":
-        lhs, rhs = parse_equation(text)
+        lhs, rhs = parse_equation(representation.expression)
         if isinstance(solver_result.value, tuple):
             verification = verify_equation_independently(
                 lhs, rhs, sp.Symbol(symbol_name), solver_result.value
