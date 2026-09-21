@@ -76,7 +76,11 @@ def _relation(a: OcrRegion, b: OcrRegion) -> str:
         return "superscript"
     if by >= ay + ah * 0.42 and by + bh <= a_bottom + ah * 0.75:
         return "subscript"
-    if by < a_bottom and b_bottom > ay and abs((by + b_bottom) / 2 - (ay + a_bottom) / 2) < max(ah, bh):
+    if (
+        by < a_bottom
+        and b_bottom > ay
+        and abs((by + b_bottom) / 2 - (ay + a_bottom) / 2) < max(ah, bh)
+    ):
         return "inline"
     return "none"
 
@@ -132,8 +136,10 @@ def analyze_math_structure(result: OcrResult) -> MathStructure:
     fractions = _detect_fraction(regions)
     row_values = tuple(tuple(r.text.strip() for r in line) for line in lines)
     columns = max((len(line) for line in lines), default=0)
-    matrix_like = len(lines) >= 2 and columns >= 2 and all(
-        abs(len(line) - columns) <= 1 for line in lines
+    matrix_like = (
+        len(lines) >= 2
+        and columns >= 2
+        and all(abs(len(line) - columns) <= 1 for line in lines)
     )
     math_density = sum(_contains_math(r.text) for r in regions) / len(regions)
     warnings: list[str] = []
