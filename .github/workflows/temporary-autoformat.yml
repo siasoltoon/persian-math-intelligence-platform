@@ -26,7 +26,9 @@ jobs:
       - name: Format
         run: |
           python -m ruff format .
+          python -m ruff format --check . > ruff-format-report.txt 2>&1 || true
           python -m ruff check . --fix > ruff-report.txt 2>&1 || true
+          cat ruff-format-report.txt
           cat ruff-report.txt
       - name: Upload ruff report
         uses: actions/upload-artifact@v4
