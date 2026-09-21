@@ -1,0 +1,7 @@
+# Heavy OCR runtime dependencies.
+# Kept outside core pyproject so the base application remains lightweight.
+torch>=2.4,<3
+transformers>=4.45,<5
+accelerate>=0.34,<2
+sentencepiece>=0.2,<1
+pix2tex==0.1.4
