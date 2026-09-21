@@ -14,3 +14,10 @@ def test_application_handles_file_transport():
     app = ApplicationService()
     result = app.handle(IncomingMessage("u", MessageKind.IMAGE, payload=b"image"))
     assert "فایل" in result.text_fa
+
+
+def test_application_renders_equation_solution_set_cleanly():
+    service = ApplicationService()
+    response = service.handle(IncomingMessage("u", MessageKind.TEXT, "2x² - 7x + 3 = 0"))
+    assert "پاسخ: {" in response.text_fa
+    assert "نتیجه مستقل تأیید شد." in response.text_fa

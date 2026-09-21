@@ -5,7 +5,13 @@ from dataclasses import dataclass
 import sympy as sp
 
 from .canonical import parse_equation, parse_expression
-from .domain import ConfidenceLevel, Problem, ProblemInput, VerificationResult
+from .domain import (
+    ConfidenceLevel,
+    Problem,
+    ProblemInput,
+    ProblemRepresentation,
+    VerificationResult,
+)
 from .solver import SolverResult, solve, solve_word_problem
 from .understanding import classify_problem, represent_problem
 from .verification import verify_equation_independently, verify_expression_result
@@ -22,7 +28,7 @@ def process(text: str, *, symbol_name: str = "x") -> EngineResult:
     problem_input = ProblemInput(text)
     word_result, word_expression, word_kind = solve_word_problem(text)
     if word_result.success and word_expression is not None and word_kind is not None:
-        representation = ProblemRepresentation("expression", word_expression, text)
+        representation = ProblemRepresentation("expression", str(word_expression), text)
     else:
         representation = represent_problem(problem_input)
     classification = classify_problem(problem_input)

@@ -129,7 +129,9 @@ class ApplicationService:
         verified = result.verification.verified if result.verification else False
         suffix = "نتیجه مستقل تأیید شد." if verified else "نتیجه هنوز تأیید مستقل کامل ندارد."
         value = result.solver.value
-        rendered = "{" + ", ".join(str(item) for item in value) + "}" if isinstance(value, tuple) else str(value)
-        if result.problem.representation and result.problem.representation.kind == "equation":
-            rendered = f"x = {rendered}" if not rendered.startswith("{") else rendered
+        rendered = (
+            "{" + ", ".join(str(item) for item in value) + "}"
+            if isinstance(value, tuple)
+            else str(value)
+        )
         return OutgoingMessage(f"پاسخ: {rendered}\n\n{suffix}")
