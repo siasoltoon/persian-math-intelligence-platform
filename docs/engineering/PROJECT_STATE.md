@@ -73,3 +73,13 @@ Execute the live Windows/Tailscale/Telegram E2E matrix and build the real labele
 - Added .github/workflows/heavy-ocr-worker.yml with Tesseract installation, dependency installation, Hugging Face cache, TrOCR model prefetch, specialized backend smoke checks and full regression tests.
 - Heavy model weights remain outside Git and are cached by the workflow.
 - This proves runtime readiness only; real OCR accuracy remains evidence-gated by a labeled benchmark corpus.
+
+
+## GitHub-hosted heavy OCR worker — 2026-09-21
+- Heavy OCR runtime execution is temporarily assigned to GitHub Actions rather than requiring the future PC worker.
+- Added isolated requirements-heavy-ocr.txt with Transformers, Accelerate, SentencePiece and pix2tex; CPU-only PyTorch is installed explicitly by workflow from the official PyTorch wheel index.
+- Added .github/workflows/heavy-ocr-worker.yml with Tesseract installation, Hugging Face caching, TrOCR model prefetch, specialized backend smoke checks and full regression tests.
+- PR #10 merged to main as e69b71dab0a05848b46f8f798d1604abd85775c8.
+- Heavy OCR workflow run 35649732688 passed all steps, including model loading and backend smoke checks.
+- Main CI run 35649997963 passed Ruff, format, mypy, Python 3.11/3.12 pytest and the Heavy OCR runtime job.
+- This proves runtime readiness only; real OCR accuracy remains evidence-gated by a labeled benchmark corpus.
