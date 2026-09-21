@@ -153,11 +153,17 @@ def _variants(decoded: Image.Image) -> tuple[Image.Image, ...]:
     gray = np.asarray(ImageOps.exif_transpose(decoded).convert("L"), dtype=np.uint8)
     if max(gray.shape) < 1800:
         scale = min(3.0, 2200 / max(gray.shape))
-        gray = cv2.resize(gray, None, fx=scale, fy=scale, interpolation=cv2.INTER_CUBIC)
+        gray = np.asarray(
+            cv2.resize(gray, None, fx=scale, fy=scale, interpolation=cv2.INTER_CUBIC),
+            dtype=np.uint8,
+        )
     gray = _crop_content(_deskew(gray))
     denoised = cv2.fastNlMeansDenoising(gray, None, 7, 7, 21)
     clahe = cv2.createCLAHE(clipLimit=2.2, tileGridSize=(8, 8)).apply(denoised)
-    normalized = np.asarray(cv2.normalize(clahe, None, 0, 255, cv2.NORM_MINMAX), dtype=np.uint8)
+    normalized = np.asarray(
+        cv2.normalize(clahe, None, 0, 255, cv2.NORM_MINMAX),  # type: ignore[call-overload]
+        dtype=np.uint8,
+    )
     smooth = cv2.GaussianBlur(normalized, (3, 3), 0)
     unsharp = cv2.addWeighted(normalized, 1.65, smooth, -0.65, 0)
     adaptive = cv2.adaptiveThreshold(
