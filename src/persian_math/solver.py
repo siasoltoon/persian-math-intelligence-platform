@@ -267,7 +267,7 @@ def solve_word_problem(text: str) -> tuple[SolverResult, sp.Expr | None, str | N
         re.DOTALL,
     )
     if arithmetic:
-        n, a1, a2, a3 = map(sp.Rational, arithmetic.groups())
+        n, a1, a2, _a3 = map(sp.Rational, arithmetic.groups())
         d = a2 - a1
         expression = sp.simplify(n * (2 * a1 + (n - 1) * d) / 2)
         return _ok(expression, "arithmetic_sequence_sum", n=n, first=a1, difference=d), expression, "arithmetic_sequence"
