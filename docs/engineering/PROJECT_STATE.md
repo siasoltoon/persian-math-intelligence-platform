@@ -91,3 +91,12 @@ Execute the live Windows/Tailscale/Telegram E2E matrix and build the real labele
 - Updated problem representation, solver routing and verification to operate on the extracted canonical mathematical payload.
 - Added regression coverage for Persian natural-language arithmetic and equation prompts.
 - Verification status: implementation complete; repository CI/live Telegram re-test pending.
+
+
+## Plain-text Telegram math input hardening — 2026-09-22
+- Root cause identified: the Telegram application passed the entire Persian natural-language prompt directly into the restricted mathematical parser.
+- Implemented a bounded lexical math-fragment extractor that accepts whitespace around safe mathematical tokens, prefers valid equations, and preserves the parser's restricted grammar.
+- Problem understanding now represents concept-only prompts without fabricating a mathematical payload; the engine returns a structured non-mathematical-input failure instead of raising an internal exception.
+- Added regression coverage for Persian natural-language arithmetic/equation prompts, spaced Persian-digit expressions, and concept-only prompts.
+- Verification: PR #11 CI run 35656388276 passed Ruff lint, Ruff format, mypy, pytest on Python 3.11/3.12, and Heavy OCR runtime; PR #11 was merged to main as `9fea0f1764a12ed52f70fbdf2b8d2ebae8822406`.
+- Live Telegram re-test remains pending; production accuracy claims remain evidence-gated.
