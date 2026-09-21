@@ -2,16 +2,19 @@
 - Missing Telegram credential is rejected.
 - Provided Telegram credential is loaded.
 - Interactive Telegram UI application flows are covered: menu, profile/level, history, exercises, help and settings.
-- Secure document validation is covered for image payloads, empty payloads, file-size limits, PDF signature rejection, real PDF text extraction and page limits.
+- Secure document validation is covered for image payloads, empty payloads, file-size limits, PDF signature rejection, encrypted PDF rejection, real PDF text extraction, page limits and pixel limits.
+- Document regression coverage now includes a scanned-like PDF whose native text layer contains only `Scanned by CamScanner`; accepted OCR replaces that sparse/watermark-only layer instead of being concatenated with it.
+- Low-confidence OCR is rejected as problem text rather than promoted to a solver input.
 - OCR regression coverage includes preprocessing plans, reconstruction, consensus rejection and existing OCR safety contracts.
+- Mathematical parser security coverage rejects Python-expression syntax and oversized mathematical inputs.
+- Verification coverage includes deterministic numeric re-evaluation and an alternate `solveset` equation verification path.
 - Existing mathematical/OCR/adversarial/phase acceptance suites remain the regression baseline.
 
 ## CI evidence
-- CI #258 / run ID 35629310020 passed all jobs on commit `5e4d37dfc59c82c3a250039b44b00867e71df1a8`.
+- CI #278 / run ID 35634158094 passed all jobs on commit `46c4d7552122398e32bc25b997d15ba1481c1d92`.
 - Passed: Ruff lint, Ruff format, mypy, pytest Python 3.11 and pytest Python 3.12.
-- The final cleanup commit `fb4172f9b8a65b12a9af95699849e862f356b108` removed the temporary formatter diagnostic workflow.
-- CI #259 / run ID 35629966771 passed all jobs on the cleanup head.
-- CI #262 / run ID 35630145223 passed all jobs on the state-update head.
+- The hardening branch was merged to main as `b573f1078edc8f864a7e9371fb4492fd8dbef729`.
+- Earlier failed CI runs #271–#277 were diagnosis iterations and are not release evidence.
 - No failed CI run is treated as release evidence.
 
 ## Required live validation

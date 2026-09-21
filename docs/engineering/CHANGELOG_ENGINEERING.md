@@ -1,5 +1,21 @@
 # Engineering Changelog
 
+## 2026-09-21 — Production document/OCR and verification hardening
+- Replaced deprecated `fitz` document imports with `pymupdf`.
+- Added adaptive PDF page rendering constrained by a pixel budget.
+- Added encrypted-PDF rejection.
+- Added page-level native-text versus OCR source selection for scanned and mixed PDFs.
+- Added explicit handling for scanner-watermark-only text such as `Scanned by CamScanner`.
+- Added confidence-gated image/document OCR and no-guess rejection behavior.
+- Strengthened OCR reconstruction with line ordering and layout-aware superscript handling.
+- Defaulted the Telegram OCR language to `fas+eng` with runtime fallback to available Tesseract languages.
+- Hardened SymPy parsing with bounded input, a restricted grammar and disabled builtins.
+- Strengthened mathematical verification with deterministic numeric re-evaluation and an alternate `solveset` equation path.
+- Added regression tests for scanned-like PDFs, low-confidence OCR, parser injection/resource bounds and verification.
+- CI #278 / run ID 35634158094 passed Ruff lint, Ruff format, mypy and pytest on Python 3.11/3.12.
+- Merged to main as `b573f1078edc8f864a7e9371fb4492fd8dbef729`.
+- Live OCR corpus, live Telegram/VPS execution, production load and operational evidence remain pending.
+
 ## 2026-09-21 — Secure document and OCR hardening
 - Added bounded multi-format document inspection for PDF and image documents.
 - Preserved native PDF text per page instead of using incorrect global-line indexing.
