@@ -83,7 +83,7 @@ def normalize_math_text(text: str) -> str:
 
 
 _MATH_CANDIDATE_RE = re.compile(
-    r"[A-Za-z0-9_+\\-*/^().,\\[\\]{}<>=|:;\\s×÷−–—√π⁰¹²³⁴⁵⁶⁷⁸⁹⁻⁺]+"
+    r"[A-Za-z0-9_+*/^().,\\[\\]{}<>=|:;\\s×÷−–—√π⁰¹²³⁴⁵⁶⁷⁸⁹⁻⁺-]+"
 )
 
 
