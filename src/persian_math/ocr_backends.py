@@ -49,10 +49,13 @@ class CompositeOcrBackend:
             )
         from .ocr_consensus import RecognitionCandidate, consensus
 
-        agreement = consensus((
-            RecognitionCandidate(primary.text, primary.confidence, "primary"),
-            RecognitionCandidate(secondary.text, secondary.confidence, "handwriting"),
-        ), threshold=0.78)
+        agreement = consensus(
+            (
+                RecognitionCandidate(primary.text, primary.confidence, "primary"),
+                RecognitionCandidate(secondary.text, secondary.confidence, "handwriting"),
+            ),
+            threshold=0.96,
+        )
         if not agreement.accepted:
             return OcrResult(
                 "",
