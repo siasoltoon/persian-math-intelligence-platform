@@ -29,7 +29,9 @@ class LearningProfile:
         stats: dict[str, list[bool]] = {}
         for record in self.records:
             stats.setdefault(record.topic, []).append(record.correct)
-        return tuple(\n            sorted(topic for topic, values in stats.items() if sum(values) / len(values) < 0.6)\n        )
+        return tuple(
+            sorted(topic for topic, values in stats.items() if sum(values) / len(values) < 0.6)
+        )
 
     def add(self, record: ProblemRecord) -> LearningProfile:
         if not record.topic.strip():
