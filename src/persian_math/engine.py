@@ -6,7 +6,7 @@ import sympy as sp
 
 from .canonical import parse_equation, parse_expression
 from .domain import ConfidenceLevel, Problem, ProblemInput, VerificationResult
-from .solver import SolverResult, solve
+from .solver import SolverResult, solve, solve_word_problem
 from .understanding import classify_problem, represent_problem
 from .verification import verify_equation_independently, verify_expression_result
 
@@ -20,10 +20,16 @@ class EngineResult:
 
 def process(text: str, *, symbol_name: str = "x") -> EngineResult:
     problem_input = ProblemInput(text)
-    representation = represent_problem(problem_input)
+    word_result, word_expression, word_kind = solve_word_problem(text)
+    if word_result.success and word_expression is not None and word_kind is not None:
+        representation = ProblemRepresentation(word_kind, word_expression, text)
+    else:
+        representation = represent_problem(problem_input)
     classification = classify_problem(problem_input)
     problem = Problem(problem_input, representation, classification)
-    if representation.kind == "concept":
+    if word_result.success:
+        solver_result = word_result
+    elif representation.kind == "concept":
         solver_result = SolverResult(
             False,
             None,
