@@ -57,7 +57,10 @@ def _text_message(user_id: int, text: str) -> IncomingMessage:
 
 def _inline(rows: list[list[tuple[str, str]]]) -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup(
-        [[InlineKeyboardButton(label, callback_data=data) for label, data in row] for row in rows]
+        [
+            [InlineKeyboardButton(label, callback_data=data) for label, data in row]
+            for row in rows
+        ]
     )
 
 
@@ -71,7 +74,9 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     if update.effective_user and update.message:
         response = _SERVICE.menu(str(update.effective_user.id))
         await update.message.reply_text(
-            "سلام! به دستیار ریاضی خوش آمدی.\n\n" + response.text_fa,
+            "سلام! به دستیار ریاضی خوش آمدی.
+
+" + response.text_fa,
             reply_markup=MAIN_MENU,
         )
 
@@ -122,8 +127,7 @@ async def _level_menu(update: Update) -> None:
     await update.callback_query.edit_message_text(
         "سطح آموزشی را انتخاب کن:",
         reply_markup=_inline(
-            [[(label, f"level:{value}")] for label, value in LEVELS]
-            + [[("بازگشت", "menu")]]
+            [[(label, f"level:{value}")] for label, value in LEVELS] + [[("بازگشت", "menu")]]
         ),
     )
 
@@ -188,9 +192,7 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -
             response = _SERVICE.profile(user_id)
             await query.edit_message_text(
                 response.text_fa,
-                reply_markup=_inline(
-                    [[("تغییر سطح", "level_menu"), ("منوی اصلی", "menu")]]
-                ),
+                reply_markup=_inline([[("تغییر سطح", "level_menu"), ("منوی اصلی", "menu")]]),
             )
             return
         if data == "level_menu":
@@ -300,7 +302,10 @@ async def photo_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
             return
         response = _SERVICE.handle(_text_message(update.effective_user.id, text))
         await update.message.reply_text(
-            f"متن تشخیص‌داده‌شده:\n{text}\n\n{response.text_fa}",
+            f"متن تشخیص‌داده‌شده:
+{text}
+
+{response.text_fa}",
             reply_markup=MAIN_MENU,
         )
     except Exception:
