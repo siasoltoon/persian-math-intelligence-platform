@@ -149,7 +149,7 @@ def _reconstruct_regions(regions: tuple[OcrRegion, ...]) -> str:
 
     lines: list[list[OcrRegion]] = []
     for region in ordered:
-        x, y, width, height = region.bbox
+        _, y, _, height = region.bbox
         center = y + height / 2
         target: list[OcrRegion] | None = None
         for line in reversed(lines[-3:]):
@@ -170,6 +170,7 @@ def _reconstruct_regions(regions: tuple[OcrRegion, ...]) -> str:
         tokens: list[str] = []
         baseline = max(r.bbox[1] + r.bbox[3] for r in line)
         median_height = sorted(max(1, r.bbox[3]) for r in line)[len(line) // 2]
+        previous_right: int | None = None
         for region in line:
             token = region.text.strip()
             if not token:
@@ -177,10 +178,11 @@ def _reconstruct_regions(regions: tuple[OcrRegion, ...]) -> str:
             top = region.bbox[1]
             if top + region.bbox[3] < baseline - 0.35 * median_height and tokens:
                 tokens[-1] = f"{tokens[-1]}**{token}"
-            elif tokens and region.bbox[0] > line[line.index(region) - 1].bbox[0] + line[line.index(region) - 1].bbox[2] + 8:
+            elif previous_right is not None and region.bbox[0] > previous_right + 8:
                 tokens.append(" " + token)
             else:
                 tokens.append(token)
+            previous_right = region.bbox[0] + region.bbox[2]
         rendered.append("".join(tokens).strip())
     return "\n".join(rendered)
 

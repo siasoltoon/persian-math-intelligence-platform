@@ -30,7 +30,9 @@ from .telegram_adapter import IncomingMessage, MessageKind, OutgoingMessage
 
 LOGGER = logging.getLogger(__name__)
 _SERVICE = ApplicationService()
-_OCR = TesseractOcrBackend(language=os.environ.get("TESSERACT_LANG", "fas+eng").strip() or "fas+eng")
+_OCR = TesseractOcrBackend(
+    language=os.environ.get("TESSERACT_LANG", "fas+eng").strip() or "fas+eng"
+)
 
 MAIN_MENU = ReplyKeyboardMarkup(
     [
@@ -301,7 +303,7 @@ async def document_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -
         if result.warnings:
             warning_info = "\nهشدار پردازش: بخشی از متن فایل با اطمینان کافی تشخیص داده نشد."
         await update.message.reply_text(
-            f"متن بازسازی‌شده از فایل:{page_info}\n\n{extracted[:6000]}\n{warning_info}\n\n{response.text_fa}",
+            f"متن بازسازی‌شده از فایل:{page_info}\n\n{extracted[:6000]}{warning_info}\n\n{response.text_fa}",
             reply_markup=MAIN_MENU,
         )
     except Exception:

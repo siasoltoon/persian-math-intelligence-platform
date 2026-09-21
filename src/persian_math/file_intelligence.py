@@ -1,9 +1,9 @@
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass
 from io import BytesIO
 from pathlib import PurePosixPath
-import re
 from typing import Any
 
 from PIL import Image
@@ -20,7 +20,7 @@ MAX_FILE_BYTES = 20 * 1024 * 1024
 MAX_PDF_PAGES = 20
 MAX_PDF_TEXT_CHARS = 80_000
 MAX_PAGE_PIXELS = 30_000_000
-MIN_NATIVE_TEXT_CHARS = 12
+MIN_NATIVE_TEXT_CHARS = 8
 _SCANNER_WATERMARKS = (
     re.compile(r"^scanned by camscanner$", re.IGNORECASE),
     re.compile(r"^camscanner$", re.IGNORECASE),
@@ -67,17 +67,18 @@ def _pdf_magic(data: bytes) -> bool:
 def _render_scale(page: Any, max_pixels: int) -> float:
     rect = page.rect
     base_pixels = max(1.0, float(rect.width) * float(rect.height))
-    return min(2.5, max(1.0, (max_pixels / base_pixels) ** 0.5))
+    return float(min(2.5, max(1.0, (max_pixels / base_pixels) ** 0.5)))
 
 
-def _read_pdf(
-    data: bytes, limits: FileLimits
-) -> tuple[tuple[str, ...], tuple[bytes, ...]]:
+def _read_pdf(data: bytes, limits: FileLimits) -> tuple[tuple[str, ...], tuple[bytes, ...]]:
     if not _pdf_magic(data):
         raise ValueError("invalid PDF signature")
     try:
         import pymupdf
-        document = pymupdf.open(stream=data, filetype="pdf")
+
+        document = pymupdf.open(  # type: ignore[no-untyped-call]
+            stream=data, filetype="pdf"
+        )
     except Exception as exc:
         raise ValueError("PDF could not be opened") from exc
 
@@ -94,21 +95,23 @@ def _read_pdf(
         remaining = limits.max_text_chars
 
         for index in range(document.page_count):
-            page = document.load_page(index)
+            page = document.load_page(index)  # type: ignore[no-untyped-call]
             page_text = page.get_text("text") or ""
             clipped = page_text[:remaining]
             texts.append(clipped)
             remaining = max(0, remaining - len(clipped))
 
             scale = _render_scale(page, limits.max_page_pixels)
-            pix = page.get_pixmap(matrix=pymupdf.Matrix(scale, scale), alpha=False)
+            pix = page.get_pixmap(  # type: ignore[no-untyped-call]
+                matrix=pymupdf.Matrix(scale, scale), alpha=False
+            )
             if pix.width * pix.height > limits.max_page_pixels:
                 raise ValueError("PDF page exceeds pixel limit")
             images.append(pix.tobytes("png"))
 
         return tuple(texts), tuple(images)
     finally:
-        document.close()
+        document.close()  # type: ignore[no-untyped-call]
 
 
 def _image_metadata(image: bytes) -> ImageMetadata:
@@ -124,7 +127,11 @@ def _image_metadata(image: bytes) -> ImageMetadata:
 
 def _strip_known_watermarks(text: str) -> str:
     lines = [line.strip() for line in text.splitlines() if line.strip()]
-    kept = [line for line in lines if not any(pattern.fullmatch(line) for pattern in _SCANNER_WATERMARKS)]
+    kept = [
+        line
+        for line in lines
+        if not any(pattern.fullmatch(line) for pattern in _SCANNER_WATERMARKS)
+    ]
     return "\n".join(kept).strip()
 
 
@@ -225,20 +232,22 @@ def inspect_document(
 
     ocr_result = ocr_backend.recognize(data, metadata)
     text = ocr_result.text.strip() if ocr_result.confidence >= 0.60 else ""
-    warnings = ocr_result.warnings if text else (*ocr_result.warnings, "ocr_not_accepted")
+    image_warnings = (
+        ocr_result.warnings
+        if text
+        else (*ocr_result.warnings, "ocr_not_accepted")
+    )
     return DocumentResult(
         "image",
-        (DocumentPage(1, "", ocr_result, "ocr" if text else "none", warnings),),
+        (DocumentPage(1, "", ocr_result, "ocr" if text else "none", image_warnings),),
         text,
-        tuple(dict.fromkeys(warnings)),
+        tuple(dict.fromkeys(image_warnings)),
     )
 
 
 def best_document_text(result: DocumentResult) -> str:
     chunks = [
-        page.ocr.text.strip()
-        if page.selected_source == "ocr" and page.ocr
-        else page.text.strip()
+        page.ocr.text.strip() if page.selected_source == "ocr" and page.ocr else page.text.strip()
         for page in result.pages
     ]
     return "\n".join(chunk for chunk in chunks if chunk)[:MAX_PDF_TEXT_CHARS]
