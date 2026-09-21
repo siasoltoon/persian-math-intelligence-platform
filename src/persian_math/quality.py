@@ -2,7 +2,8 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from time import monotonic
-from typing import Callable, TypeVar
+from collections.abc import Callable
+from typing import TypeVar
 
 
 @dataclass(frozen=True)
@@ -30,7 +31,7 @@ def run_matrix(cases: tuple[TestCase, ...]) -> tuple[TestResult, ...]:
     for case in cases:
         try:
             results.append(TestResult(case.case_id, case.category, bool(case.run())))
-        except Exception:
+        except (ArithmeticError, RuntimeError, TypeError, ValueError):
             results.append(TestResult(case.case_id, case.category, False))
     return tuple(results)
 
@@ -52,7 +53,7 @@ def retry(operation: Callable[[], T], policy: FailurePolicy) -> T:
             break
         try:
             return operation()
-        except Exception as exc:
+        except (ArithmeticError, RuntimeError, TypeError, ValueError) as exc:
             last = exc
     if last is not None:
         raise last
