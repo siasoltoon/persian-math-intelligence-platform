@@ -4,10 +4,11 @@
 - `siasoltoon/vps` operational behavior is integrated through `.github/workflows/windows-math-vps.yml`.
 - RDP and Tailscale remain infrastructure concerns; credentials are supplied through GitHub Secrets.
 - `src/persian_math/telegram_runtime.py` is the transport adapter and delegates mathematical work to `ApplicationService`.
+- Telegram UI uses a persistent Persian-first reply keyboard for top-level navigation and inline callback keyboards for contextual flows.
+- UI routes cover solve, exercise topic/difficulty, profile/educational level, history, settings, help and menu/back navigation.
 - Photo input is validated, OCR-processed and confidence-gated before entering the application service.
 - The mathematical Core remains Telegram-independent.
 - GitHub-hosted Windows runners are ephemeral and time-limited; this runtime is not a guaranteed 24/7 VPS.
-
 
 ## Phase 19–25 additions
 - quality.py — failure matrix and bounded retry contract
