@@ -255,7 +255,9 @@ def solve(expression_text: str, *, symbol_name: str = "x") -> SolverResult:
         if text.count("=") == 1:
             lhs, rhs = parse_equation(text)
             return solve_equation(lhs, rhs, symbol)
-        expression = parse_expression(text).expression
+        expression = sp.simplify(parse_expression(text).expression)
+        if not expression.free_symbols:
+            return solve_expression(expression)
         if expression.free_symbols:
             if expression.has(sp.sin, sp.cos, sp.tan, sp.cot, sp.sec, sp.csc):
                 return solve_trigonometric(expression, symbol)
