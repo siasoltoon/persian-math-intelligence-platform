@@ -5,6 +5,8 @@ from io import BytesIO
 import pytest
 from PIL import Image
 
+import fitz
+
 from persian_math.file_intelligence import FileLimits, inspect_document, validate_file_bytes
 
 
@@ -34,3 +36,30 @@ def test_pdf_signature_is_checked() -> None:
 def test_empty_file_rejected() -> None:
     with pytest.raises(ValueError):
         validate_file_bytes(b"")
+
+
+def _pdf() -> bytes:
+    document = fitz.open()
+    page = document.new_page()
+    page.insert_text((72, 72), "x + 2 = 5")
+    data = document.tobytes()
+    document.close()
+    return data
+
+
+def test_text_pdf_preserves_page_text() -> None:
+    result = inspect_document(_pdf(), "question.pdf")
+    assert result.media_type == "application/pdf"
+    assert len(result.pages) == 1
+    assert "x + 2 = 5" in result.pages[0].text
+    assert "x + 2 = 5" in result.extracted_text
+
+
+def test_pdf_page_limit_is_enforced() -> None:
+    document = fitz.open()
+    for _ in range(2):
+        document.new_page()
+    data = document.tobytes()
+    document.close()
+    with pytest.raises(ValueError, match="page limit"):
+        inspect_document(data, "many.pdf", limits=FileLimits(max_pages=1))
