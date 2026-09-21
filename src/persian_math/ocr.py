@@ -3,10 +3,12 @@ from __future__ import annotations
 from dataclasses import dataclass
 from enum import Enum
 from io import BytesIO
-from typing import Protocol
+from typing import Any, Protocol
 
+import cv2
+import numpy as np
 import pytesseract
-from PIL import Image, ImageEnhance, ImageFilter, ImageOps
+from PIL import Image, ImageOps
 
 from .canonical import normalize_math_text
 from .ocr_consensus import RecognitionCandidate, consensus
@@ -56,6 +58,20 @@ def validate_image_metadata(metadata: ImageMetadata) -> None:
         raise ValueError("image exceeds resource limit")
 
 
+def estimate_image_quality(image: bytes) -> ImageQuality:
+    """Classify source quality from measurable sharpness/contrast signals."""
+    validate_image_bytes(image)
+    with Image.open(BytesIO(image)) as decoded:
+        gray = np.asarray(ImageOps.exif_transpose(decoded).convert("L"), dtype=np.uint8)
+    variance = float(cv2.Laplacian(gray, cv2.CV_64F).var())
+    contrast = float(gray.std())
+    if variance < 45 or contrast < 18:
+        return ImageQuality.POOR
+    if variance < 110 or contrast < 28:
+        return ImageQuality.ACCEPTABLE
+    return ImageQuality.GOOD
+
+
 def preprocess_plan(metadata: ImageMetadata) -> tuple[str, ...]:
     validate_image_metadata(metadata)
     plan = [
@@ -103,16 +119,62 @@ def validate_image_bytes(image: bytes) -> None:
         raise ValueError("invalid image data") from exc
 
 
+def _deskew(gray: np.ndarray[Any, Any]) -> np.ndarray[Any, Any]:
+    mask = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)[1]
+    points = cv2.findNonZero(mask)
+    if points is None or len(points) < 20:
+        return gray
+    angle = cv2.minAreaRect(points)[-1]
+    if angle < -45:
+        angle = 90 + angle
+    if abs(angle) < 0.7:
+        return gray
+    h, w = gray.shape[:2]
+    matrix = cv2.getRotationMatrix2D((w / 2, h / 2), angle, 1.0)
+    return cv2.warpAffine(
+        gray, matrix, (w, h), flags=cv2.INTER_CUBIC, borderMode=cv2.BORDER_REPLICATE
+    )
+
+
+def _crop_content(gray: np.ndarray[Any, Any]) -> np.ndarray[Any, Any]:
+    mask = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)[1]
+    coords = cv2.findNonZero(mask)
+    if coords is None:
+        return gray
+    x, y, w, h = cv2.boundingRect(coords)
+    pad = max(12, int(0.025 * max(w, h)))
+    return gray[
+        max(0, y - pad) : min(gray.shape[0], y + h + pad),
+        max(0, x - pad) : min(gray.shape[1], x + w + pad),
+    ]
+
+
 def _variants(decoded: Image.Image) -> tuple[Image.Image, ...]:
-    base = ImageOps.exif_transpose(decoded).convert("L")
-    scale = max(1.0, min(2.5, 2200 / max(base.width, base.height)))
-    if scale > 1:
-        base = base.resize((int(base.width * scale), int(base.height * scale)))
-    base = ImageOps.autocontrast(base)
-    contrast = ImageEnhance.Contrast(base).enhance(1.8)
-    sharp = contrast.filter(ImageFilter.SHARPEN)
-    threshold = sharp.point(lambda p: 255 if p > 175 else 0)
-    return (base, contrast, sharp, threshold)
+    gray = np.asarray(ImageOps.exif_transpose(decoded).convert("L"), dtype=np.uint8)
+    if max(gray.shape) < 1800:
+        scale = min(3.0, 2200 / max(gray.shape))
+        gray = np.asarray(
+            cv2.resize(gray, None, fx=scale, fy=scale, interpolation=cv2.INTER_CUBIC),
+            dtype=np.uint8,
+        )
+    gray = _crop_content(_deskew(gray))
+    denoised = cv2.fastNlMeansDenoising(gray, None, 7, 7, 21)
+    clahe = cv2.createCLAHE(clipLimit=2.2, tileGridSize=(8, 8)).apply(denoised)
+    normalized = np.asarray(
+        cv2.normalize(clahe, None, 0, 255, cv2.NORM_MINMAX),  # type: ignore[call-overload]
+        dtype=np.uint8,
+    )
+    smooth = cv2.GaussianBlur(normalized, (3, 3), 0)
+    unsharp = cv2.addWeighted(normalized, 1.65, smooth, -0.65, 0)
+    adaptive = cv2.adaptiveThreshold(
+        unsharp, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 31, 9
+    )
+    otsu = cv2.threshold(unsharp, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)[1]
+    kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (2, 2))
+    closed = cv2.morphologyEx(adaptive, cv2.MORPH_CLOSE, kernel, iterations=1)
+    return tuple(
+        Image.fromarray(item) for item in (gray, normalized, unsharp, adaptive, closed, otsu)
+    )
 
 
 def preprocess_image(image: bytes, metadata: ImageMetadata) -> bytes:
@@ -214,7 +276,7 @@ class TesseractOcrBackend:
         data = pytesseract.image_to_data(
             image,
             lang=self._language(),
-            config=f"--psm {psm}",
+            config=f"--oem 1 --psm {psm}",
             output_type=pytesseract.Output.DICT,
         )
         regions = []
@@ -248,7 +310,7 @@ class TesseractOcrBackend:
             with Image.open(BytesIO(image)) as decoded:
                 candidates: list[OcrResult] = []
                 for variant in _variants(decoded):
-                    for psm in (6, 11, 12, 13):
+                    for psm in (3, 4, 6, 11, 12, 13):
                         try:
                             candidates.append(self._recognize_variant(variant, psm))
                         except (RuntimeError, ValueError, TypeError, OSError):
@@ -259,6 +321,10 @@ class TesseractOcrBackend:
             return OcrResult("", 0.0, (), ("ocr_no_candidate",))
 
         ranked = sorted(candidates, key=lambda r: (r.confidence, len(r.text)), reverse=True)
+        source_quality = estimate_image_quality(image)
+        quality_warning = (
+            ("source_image_poor_quality",) if source_quality == ImageQuality.POOR else ()
+        )
         candidate_set = tuple(
             RecognitionCandidate(item.text, item.confidence, f"pass-{index}")
             for index, item in enumerate(ranked)
@@ -267,10 +333,12 @@ class TesseractOcrBackend:
         best = ranked[0]
         if agreement.accepted:
             confidence = min(1.0, max(best.confidence, agreement.confidence))
-            warnings: tuple[str, ...] = ("ocr_low_confidence",) if confidence < 0.60 else ()
+            warnings: tuple[str, ...] = (
+                ("ocr_low_confidence",) if confidence < 0.60 else ()
+            ) + quality_warning
         else:
             confidence = min(best.confidence, agreement.confidence)
-            warnings = ("ocr_disagreement", "ocr_low_confidence")
+            warnings = ("ocr_disagreement", "ocr_low_confidence") + quality_warning
         result = OcrResult(
             agreement.text if agreement.accepted else "",
             confidence,
