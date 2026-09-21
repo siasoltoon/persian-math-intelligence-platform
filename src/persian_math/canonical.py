@@ -14,11 +14,7 @@ from sympy.parsing.sympy_parser import (
 PERSIAN_DIGITS = str.maketrans("۰۱۲۳۴۵۶۷۸۹", "0123456789")
 ARABIC_DIGITS = str.maketrans("٠١٢٣٤٥٦٧٨٩", "0123456789")
 SUPERSCRIPT_DIGITS = str.maketrans("⁰¹²³⁴⁵⁶⁷⁸⁹⁻⁺", "0123456789-+")
-_SUBSCRIPT_DIGITS = str.maketrans("₀₁₂₃₄₅₆₇₈₉", "0123456789")
-_TRANSFORMATIONS = standard_transformations + (
-    implicit_multiplication_application,
-    convert_xor,
-)
+_TRANSFORMATIONS = standard_transformations + (implicit_multiplication_application, convert_xor)
 _LOCALS = {
     "pi": sp.pi,
     "e": sp.E,
@@ -26,12 +22,6 @@ _LOCALS = {
     "sin": sp.sin,
     "cos": sp.cos,
     "tan": sp.tan,
-    "cot": sp.cot,
-    "sec": sp.sec,
-    "csc": sp.csc,
-    "asin": sp.asin,
-    "acos": sp.acos,
-    "atan": sp.atan,
     "log": sp.log,
     "ln": sp.log,
     "exp": sp.exp,
@@ -60,21 +50,13 @@ class CanonicalExpression:
 
 def normalize_math_text(text: str) -> str:
     value = text.translate(PERSIAN_DIGITS).translate(ARABIC_DIGITS)
-    value = value.replace("\u200c", " ").replace("\u200f", "").replace("\u200e", "")
     value = re.sub(
         r"([A-Za-z0-9_)]+)([⁰¹²³⁴⁵⁶⁷⁸⁹⁻⁺]+)",
-        lambda m: m.group(1) + "**" + m.group(2).translate(SUPERSCRIPT_DIGITS),
-        value,
-    )
-    value = re.sub(
-        r"([A-Za-z])([₀₁₂₃₄₅₆₇₈₉]+)",
-        lambda m: m.group(1) + "_" + m.group(2).translate(_SUBSCRIPT_DIGITS),
+        lambda match: match.group(1) + "**" + match.group(2).translate(SUPERSCRIPT_DIGITS),
         value,
     )
     replacements = {
         "×": "*",
-        "⋅": "*",
-        "·": "*",
         "÷": "/",
         "−": "-",
         "–": "-",
@@ -83,27 +65,14 @@ def normalize_math_text(text: str) -> str:
         "π": "pi",
         "∞": "oo",
         "∑": "sum",
-        "∏": "prod",
         "∫": "integral",
         "≤": "<=",
         "≥": ">=",
-        "≠": "!=",
-        "（": "(",
-        "）": ")",
-        "［": "[",
-        "］": "]",
-        "｛": "{",
-        "｝": "}",
     }
     for source, target in replacements.items():
         value = value.replace(source, target)
-    value = value.replace("٫", ".").replace("٬", ",").replace("،", ",")
-    value = re.sub(r"\b(سین)\b", "sin", value)
-    value = re.sub(r"\b(کسینوس)\b", "cos", value)
-    value = re.sub(r"\b(تانژانت)\b", "tan", value)
-    value = re.sub(r"\b(لگاریتم)\b", "log", value)
-    value = re.sub(r"\s*=\s*=", "==", value)
-    value = re.sub(r"[ \t]+", " ", value)
+    value = value.replace("٫", ".").replace("،", ",")
+    value = re.sub(r"[^\S\n]+", " ", value)
     value = re.sub(r" *\n *", "\n", value)
     return value.strip()
 
@@ -129,7 +98,8 @@ def parse_expression(text: str) -> CanonicalExpression:
 
 
 def parse_equation(text: str) -> tuple[sp.Expr, sp.Expr]:
-    parts = normalize_math_text(text).split("=")
+    normalized = normalize_math_text(text)
+    parts = normalized.split("=")
     if len(parts) != 2 or not all(part.strip() for part in parts):
         raise ValueError("an equation must contain exactly one '='")
     return _parse(parts[0]), _parse(parts[1])
@@ -141,18 +111,12 @@ def parse_inequality(text: str) -> tuple[sp.Expr, str, sp.Expr]:
     if len(matches) != 1:
         raise ValueError("an inequality must contain exactly one comparison operator")
     match = matches[0]
-    return (
-        _parse(normalized[: match.start()]),
-        match.group(),
-        _parse(normalized[match.end() :]),
-    )
+    return _parse(normalized[: match.start()]), match.group(), _parse(normalized[match.end() :])
 
 
 def parse_system(text: str) -> tuple[tuple[sp.Expr, sp.Expr], ...]:
     equations = tuple(
-        line.strip()
-        for line in re.split(r"[\n;]+", normalize_math_text(text))
-        if line.strip()
+        line.strip() for line in re.split(r"[\n;]+", normalize_math_text(text)) if line.strip()
     )
     if not equations or any(line.count("=") != 1 for line in equations):
         raise ValueError("a system must contain one equation per line")
@@ -163,30 +127,16 @@ def parse_matrix(text: str) -> sp.MatrixBase:
     normalized = normalize_math_text(text).strip()
     if not (normalized.startswith("[") and normalized.endswith("]")):
         raise ValueError("matrix must use bracket notation")
-    inner = normalized[1:-1].strip()
-    rows = [
-        r.strip()
-        for r in re.split(r";|\]\s*,\s*\[", inner.strip("[]"))
-        if r.strip()
-    ]
+    rows = normalized[1:-1].replace("], [", "];[").split(";")
     try:
-        matrix_rows = [
-            [
-                _parse(item.strip())
-                for item in re.split(r",|\s+", row.strip(" []"))
-                if item.strip()
-            ]
-            for row in rows
-        ]
-        if not matrix_rows or any(len(row) != len(matrix_rows[0]) for row in matrix_rows):
-            raise ValueError("matrix rows must have equal length")
-        return sp.Matrix(matrix_rows)
+        return sp.Matrix([[_parse(item) for item in row.strip(" []").split(",")] for row in rows])
     except (TypeError, ValueError) as exc:
         raise ValueError("invalid matrix") from exc
 
 
 def parse_fraction(text: str) -> sp.Expr:
-    parts = normalize_math_text(text).split("/")
+    normalized = normalize_math_text(text)
+    parts = normalized.split("/")
     if len(parts) != 2:
         raise ValueError("fraction must contain exactly one '/'")
     return sp.cancel(_parse(parts[0]) / _parse(parts[1]))
