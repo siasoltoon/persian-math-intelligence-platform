@@ -16,9 +16,10 @@
 
 ## Phase 21 — OCR BENCHMARK
 - Status: IMPLEMENTED / VERIFICATION PENDING
-- Added: character/expression/structure metrics, benchmark case model, bounded page rendering, sparse/scanned-page OCR fallback, page-level source selection, and extreme-degradation preprocessing.
-- OCR hardening now includes deskew, content cropping, adaptive upscaling, denoising, CLAHE, normalization, unsharp recovery, adaptive/OTSU thresholding, morphology and multiple recognition passes.
-- Pending: real labeled image corpus covering printed/degraded/rotated/cropped/handwriting/fractions/superscripts/nested expressions/matrices/diagrams.
+- Added: character/expression/structure metrics, bounded page rendering, sparse/scanned-page OCR fallback, page-level source selection, extreme-degradation preprocessing, expanded preprocessing variants/PSM coverage, and structural math OCR analysis.
+- Added structural recognition for fractions, superscripts/subscripts and matrix/table-like layouts.
+- Added pluggable handwriting recognition contract with strict cross-backend corroboration.
+- Pending: real labeled image/handwriting corpus and a concrete handwriting-specific recognition backend.
 
 ## Phase 22 — ADVERSARIAL / FAILURE TESTING
 - Status: IMPLEMENTED / VERIFICATION PENDING
