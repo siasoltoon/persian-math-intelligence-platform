@@ -3,48 +3,41 @@
 ## Phase 1–10 established suites
 - Canonical representation
 - Solver and verification
-- Integrated core engine
 - Input understanding
-- OCR validation, preprocessing and consensus
+- OCR validation/preprocessing/consensus
 - Geometry and visual scene contracts
 - Persian explanation
-- Education, tutor and exercise foundations
-- Phase acceptance/regression suite
+- Education and acceptance regression
+
+## Phase 11–20 suites
+- Interactive tutor progression/hints/checking
+- Multi-domain exercise validation
+- Learning profile accuracy/weak-topic/privacy behavior
+- Telegram/application message contracts
+- PDF signature/size validation and question indexing
+- Job lifecycle/retry/cancellation
+- Text/path/URL security baseline
+- Metrics observation
+- Benchmark execution and pass-rate calculation
+- Application command/history/file transport integration
 
 ## CI gates
-- Python 3.11
-- Python 3.12
-- Ruff lint
-- Ruff format
-- mypy
-- pytest
+- Python 3.11: PASS
+- Python 3.12: PASS
+- Ruff lint: PASS
+- Ruff format: PASS
+- mypy: PASS
+- pytest: PASS
 
 ## Current evidence
-- Full CI GREEN on workflow run 35545050264.
-- Commit under test: a79306d22da0555440c4ad4c5c1c4f0bf87e2a6b.
-- Previous full CI GREEN on workflow run 35545046438.
-- All current unit, integration and phase-acceptance tests pass on Python 3.11 and 3.12.
+- Full CI GREEN on workflow run 35573378971.
+- Commit under test: e0616a742448ddad90af72eeb39b4b792a1905d0.
 
-## Security validation included
-- Image byte-size bounding
-- Image dimension/channel bounding
-- Decode/verify before OCR
-- OCR confidence bounds
-- OCR bounding-box bounds
-- Controlled backend failure
-- No execution of uploaded image contents
-
-## Regression validation included
-- Existing Phase 0–10 test suite
-- New phase acceptance tests
-- Persian input normalization and typed understanding contract
-- Independent equation verification
-
-## Future dedicated suites
-- Production OCR accuracy benchmark — Phase 21
-- Visual/diagram benchmark — Phase 21
-- Full E2E — Phase 19
-- Dedicated security suite — Phase 19/17
-- Performance/load — Phase 19/24
-- Mathematical benchmark — Phase 20
-- Adversarial/failure corpus — Phase 22
+## Remaining extended validation
+- Real Telegram SDK/webhook E2E
+- Real multi-page PDF extraction and OCR reconstruction
+- Distributed queue/worker concurrency and cancellation
+- SSRF DNS-rebinding and cloud-metadata test corpus
+- Load/performance testing
+- Full mathematical benchmark corpus across roadmap domains
+- Adversarial/failure-recovery matrix
