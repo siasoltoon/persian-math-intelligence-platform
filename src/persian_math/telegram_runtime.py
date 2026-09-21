@@ -57,10 +57,7 @@ def _text_message(user_id: int, text: str) -> IncomingMessage:
 
 def _inline(rows: list[list[tuple[str, str]]]) -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup(
-        [
-            [InlineKeyboardButton(label, callback_data=data) for label, data in row]
-            for row in rows
-        ]
+        [[InlineKeyboardButton(label, callback_data=data) for label, data in row] for row in rows]
     )
 
 
