@@ -6,7 +6,13 @@ from pathlib import PurePosixPath
 
 from PIL import Image
 
-from .ocr import ImageMetadata, OcrBackend, OcrResult, validate_image_bytes, validate_image_metadata
+from .ocr import (
+    ImageMetadata,
+    OcrBackend,
+    OcrResult,
+    validate_image_bytes,
+    validate_image_metadata,
+)
 
 MAX_FILE_BYTES = 20 * 1024 * 1024
 MAX_PDF_PAGES = 20
@@ -92,9 +98,7 @@ def inspect_document(
         pages: list[DocumentPage] = []
         warnings: list[str] = []
         for number, image in enumerate(page_images, 1):
-            page_text = ""
-            if number <= len(text.split("\n")):
-                page_text = text.split("\n")[number - 1]
+            page_text = page_texts[number - 1]
             ocr_result = None
             if ocr_backend is not None:
                 with Image.open(BytesIO(image)) as decoded:
@@ -103,7 +107,8 @@ def inspect_document(
                 validate_image_metadata(metadata)
                 ocr_result = ocr_backend.recognize(image, metadata)
             pages.append(DocumentPage(number, page_text, ocr_result))
-        extracted_text = "\n".join(page_texts)[:limits.max_text_chars].strip()\n        if not extracted_text and not any(p.ocr and p.ocr.text.strip() for p in pages):
+        extracted_text = "\n".join(page_texts)[:limits.max_text_chars].strip()
+        if not extracted_text and not any(p.ocr and p.ocr.text.strip() for p in pages):
             warnings.append("document_text_not_detected")
         return DocumentResult("application/pdf", tuple(pages), extracted_text, tuple(warnings))
 
