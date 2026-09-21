@@ -172,8 +172,22 @@ def _variants(decoded: Image.Image) -> tuple[Image.Image, ...]:
     otsu = cv2.threshold(unsharp, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)[1]
     kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (2, 2))
     closed = cv2.morphologyEx(adaptive, cv2.MORPH_CLOSE, kernel, iterations=1)
+    opened = cv2.morphologyEx(otsu, cv2.MORPH_OPEN, kernel, iterations=1)
+    bilateral = cv2.bilateralFilter(normalized, 7, 45, 45)
+    inverted = cv2.bitwise_not(adaptive)
     return tuple(
-        Image.fromarray(item) for item in (gray, normalized, unsharp, adaptive, closed, otsu)
+        Image.fromarray(item)
+        for item in (
+            gray,
+            normalized,
+            unsharp,
+            adaptive,
+            closed,
+            otsu,
+            opened,
+            bilateral,
+            inverted,
+        )
     )
 
 
@@ -310,7 +324,7 @@ class TesseractOcrBackend:
             with Image.open(BytesIO(image)) as decoded:
                 candidates: list[OcrResult] = []
                 for variant in _variants(decoded):
-                    for psm in (3, 4, 6, 11, 12, 13):
+                    for psm in (3, 4, 6, 7, 11, 12, 13):
                         try:
                             candidates.append(self._recognize_variant(variant, psm))
                         except (RuntimeError, ValueError, TypeError, OSError):
@@ -346,4 +360,21 @@ class TesseractOcrBackend:
             warnings,
         )
         validate_ocr_result(result, metadata)
+        if result.text:
+            # Structural analysis is advisory: it may identify complex layouts,
+            # but it never invents symbols or bypasses the OCR consensus gate.
+            from .math_ocr import analyze_math_structure
+
+            structure = analyze_math_structure(result)
+            if structure.kind in {
+                "matrix_or_table",
+                "fractional_expression",
+                "indexed_or_powered_expression",
+            }:
+                result = OcrResult(
+                    result.text,
+                    result.confidence,
+                    result.regions,
+                    tuple(dict.fromkeys((*result.warnings, f"math_structure:{structure.kind}"))),
+                )
         return result
