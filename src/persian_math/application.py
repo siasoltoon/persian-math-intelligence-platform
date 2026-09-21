@@ -31,9 +31,13 @@ class ApplicationService:
             return OutgoingMessage("فایل دریافت شد. پس از اعتبارسنجی، پردازش آن آغاز می‌شود.")
         text = message.text.strip()
         if text == "/start":
-            return OutgoingMessage("سلام! صورت مسئله را بفرست یا از گزینه‌های حل مسئله و تمرین استفاده کن.")
+            return OutgoingMessage(
+                "سلام! صورت مسئله را بفرست یا از گزینه‌های حل مسئله و تمرین استفاده کن."
+            )
         if text == "/help":
-            return OutgoingMessage("دستورها: /start، /help، /level <level>، /exercise و ارسال مستقیم صورت مسئله.")
+            return OutgoingMessage(
+                "دستورها: /start، /help، /level <level>، /exercise و ارسال مستقیم صورت مسئله."
+            )
         if text.startswith("/level "):
             value = text.split(maxsplit=1)[1]
             try:
@@ -54,7 +58,9 @@ class ApplicationService:
         result = process(text)
         self._sessions[message.user_id] = replace(session, history=(*session.history[-19:], text))
         if not result.solver.success:
-            return OutgoingMessage("این مسئله فعلاً با اطمینان کافی قابل حل نیست. لطفاً صورت سؤال را واضح‌تر ارسال کن.")
+            return OutgoingMessage(
+                "این مسئله فعلاً با اطمینان کافی قابل حل نیست. لطفاً صورت سؤال را واضح‌تر ارسال کن."
+            )
         verified = result.verification.verified if result.verification else False
         suffix = "نتیجه مستقل تأیید شد." if verified else "نتیجه هنوز تأیید مستقل کامل ندارد."
         return OutgoingMessage(f"پاسخ: {result.solver.value}\n\n{suffix}")
