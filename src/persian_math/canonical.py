@@ -99,7 +99,10 @@ def extract_math_payload(text: str) -> str:
         candidate = match.group(0).strip().strip(",:;")
         if not candidate:
             continue
-        if not (any(ch.isdigit() for ch in candidate) or any(op in candidate for op in "=<>+-*/^√")):
+        if not (
+            any(ch.isdigit() for ch in candidate)
+            or any(op in candidate for op in "=<>+-*/^√")
+        ):
             continue
         try:
             normalized = normalize_math_text(candidate)
