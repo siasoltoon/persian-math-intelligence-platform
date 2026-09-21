@@ -10,7 +10,7 @@ from persian_math.geometry import (
     triangle_area,
 )
 from persian_math.input_understanding import detect_ambiguity, detect_intent, understand
-from persian_math.ocr import ImageMetadata, ImageQuality, preprocess_plan, validate_image_metadata
+from persian_math.ocr import ImageMetadata, ImageQuality, estimate_image_quality, preprocess_plan, validate_image_metadata
 from persian_math.ocr_consensus import RecognitionCandidate, consensus
 
 
@@ -50,3 +50,22 @@ def test_geometry_primitives():
     assert triangle_area(Triangle(a, b, c)).value == 6
     assert circle_area(Circle(a, 2)).value == 4 * 3.141592653589793
     assert round(angle_degrees(a, b, c).value) == 90
+
+
+def test_ocr_plan_includes_extreme_quality_recovery():
+    metadata = ImageMetadata(2400, 1800, 3, ImageQuality.POOR)
+    plan = preprocess_plan(metadata)
+    assert "deskew" in plan
+    assert "scale_up" in plan
+    assert "denoise" in plan
+    assert "adaptive_threshold" in plan
+    assert "multi_pass_ocr" in plan
+
+
+def test_quality_estimator_rejects_blank_low_information_image():
+    from io import BytesIO
+    from PIL import Image
+
+    output = BytesIO()
+    Image.new("L", (400, 300), 245).save(output, format="PNG")
+    assert estimate_image_quality(output.getvalue()) == ImageQuality.POOR
