@@ -4,34 +4,34 @@
 - Project: Production-Grade Persian Mathematical Intelligence & Tutoring Platform
 - Repository: siasoltoon/persian-math-intelligence-platform
 - Current execution date: 2026-09-21
-- Current Phase target: Phase 11–20 batch implemented
-- Status: Phase 11–18 VERIFIED; Phase 19–20 IMPLEMENTED BASELINE / EXTENDED VALIDATION PENDING
-- Last VERIFIED Task: P18-T01
+- Current target: Phase 19–25 hardening/release audit
+- Status: Repository-level hardening implemented; external-environment evidence remains required for full release verification
+- Last CI-tested commit: e84744b85941c46298c3221f4288c51d3919ed31
 
-## Verified implementation coverage
-- P1–P10 previously VERIFIED
-- P11 interactive tutoring session, hints, answer checking, re-explanation and progressive practice
-- P12 validated multi-domain exercise generation for algebra/arithmetic/calculus
-- P13 privacy-aware learning profile, accuracy, weak-topic detection and adaptive difficulty
-- P14 transport-neutral Telegram/application adapter and Persian command/error contracts
-- P15 bounded PDF validation and question indexing foundation
-- P16 bounded in-memory job lifecycle with retry/cancel states
-- P17 input/file/URL security baseline including path traversal and private-IP rejection
-- P18 metrics and timing/span instrumentation primitives
+## Phase 19–25 implementation
+- P19 quality matrix, retry/failure contracts and acceptance suite added.
+- P20 benchmark result execution and representative corpus tests retained.
+- P21 OCR benchmark metrics added for character/expression/structure scoring.
+- P22 adversarial mathematical cases added with no-crash behavior tests.
+- P23 Persian RTL/UI policy and verified/unverified answer rendering added.
+- P24 production configuration, resource limits and recovery-policy contracts added.
+- P25 release-audit gate and production verification runbook added.
 
-## Extended validation baseline
-- P19 acceptance/regression tests added for tutor, exercises, profile, interface, PDF, jobs, security, observability and benchmark execution.
-- P20 benchmark runner and pass-rate measurement added.
-- Latest successful GitHub Actions run: 35573378971
-- Commit: e0616a742448ddad90af72eeb39b4b792a1905d0
-- Ruff lint: PASS
-- Ruff format: PASS
-- mypy: PASS
-- pytest Python 3.11: PASS
-- pytest Python 3.12: PASS
+## Current verification evidence
+- CI run 35574264424 reached: Ruff lint PASS, mypy PASS, pytest 3.11 PASS, pytest 3.12 PASS.
+- Ruff format failed on the run because two final formatting commits landed after that run's tested SHA.
+- Therefore the repository is NOT marked fully VERIFIED yet.
 
-## Verification scope note
-The current CI gate proves the implemented contracts and regression suite. It does not by itself prove the full production Telegram integration, multi-page real PDF/OCR extraction, distributed worker semantics, exhaustive security suite, load testing, full E2E, or the comprehensive mathematical benchmark corpus described by the roadmap. Those require the dedicated validation work in the corresponding quality/hardening scope. No such gaps are being silently marked VERIFIED.
+## External evidence still required by the fixed roadmap
+- Real labeled OCR image corpus and measured OCR accuracy
+- Live Telegram/webhook integration test
+- Distributed worker/concurrency/load evidence
+- Full SSRF/DNS-rebinding/security/dependency audit
+- Production-like performance/load measurements
+- Backup/restore and rollback execution evidence
+- Comprehensive real mathematical benchmark across every roadmap solver family
+
+No evidence is fabricated. These items require the corresponding runtime environment or labeled data.
 
 ## Next action
-Close the remaining P19/P20 extended validation gaps, then proceed to Phase 21.
+Run CI on the latest HEAD after the final formatting changes, then close only the evidence-backed P19–25 gates.
