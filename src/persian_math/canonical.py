@@ -82,6 +82,39 @@ def normalize_math_text(text: str) -> str:
     return value.strip()
 
 
+_MATH_CANDIDATE_RE = re.compile(
+    r"[A-Za-z0-9_+\\-*/^().,\\[\\]{}<>=|:;\\s×÷−–—√π⁰¹²³⁴⁵⁶⁷⁸⁹⁻⁺]+"
+)
+
+
+def extract_math_payload(text: str) -> str:
+    """Extract a bounded mathematical fragment from a natural-language wrapper.
+
+    This is deliberately lexical rather than semantic: only characters already
+    accepted by the safe math parser may be promoted to a solver input.
+    """
+    if not isinstance(text, str) or not text.strip():
+        raise ValueError("empty mathematical input")
+    normalized_source = text.translate(PERSIAN_DIGITS).translate(ARABIC_DIGITS)
+    candidates: list[str] = []
+    for match in _MATH_CANDIDATE_RE.finditer(normalized_source):
+        candidate = match.group(0).strip()
+        if not candidate:
+            continue
+        if not (any(ch.isdigit() for ch in candidate) or any(op in candidate for op in "=<>+-*/^√")):
+            continue
+        try:
+            normalized = normalize_math_text(candidate)
+            _validate_parse_source(normalized)
+        except ValueError:
+            continue
+        candidates.append(normalized)
+    if not candidates:
+        raise ValueError("no mathematical expression found")
+    equations = [item for item in candidates if item.count("=") == 1]
+    return max(equations or candidates, key=len)
+
+
 def _validate_parse_source(text: str) -> None:
     if not text:
         raise ValueError("empty mathematical expression")
