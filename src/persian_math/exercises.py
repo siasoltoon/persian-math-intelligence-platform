@@ -44,7 +44,9 @@ def generate(spec: ExerciseSpec) -> tuple[Exercise, ...]:
     if not 1 <= spec.count <= 100:
         raise ValueError("count out of allowed range")
     generators = {
-        "algebra": _linear if spec.difficulty in {Difficulty.EASY, Difficulty.MEDIUM} else _quadratic,
+        "algebra": _linear
+        if spec.difficulty in {Difficulty.EASY, Difficulty.MEDIUM}
+        else _quadratic,
         "arithmetic": _arithmetic,
         "calculus": _calculus,
     }
