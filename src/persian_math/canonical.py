@@ -28,6 +28,7 @@ _LOCALS = {
     "abs": sp.Abs,
 }
 _SAFE_GLOBALS = {
+    "__builtins__": {},
     "Integer": sp.Integer,
     "Float": sp.Float,
     "Rational": sp.Rational,
@@ -39,6 +40,8 @@ _SAFE_GLOBALS = {
     "pi": sp.pi,
     "E": sp.E,
 }
+_MAX_MATH_INPUT_CHARS = 10_000
+_ALLOWED_MATH_CHARS = re.compile(r"^[A-Za-z0-9_+\-*/^().,\[\]{}<>=|:;\s]*$")
 
 
 @dataclass(frozen=True)
@@ -49,6 +52,8 @@ class CanonicalExpression:
 
 
 def normalize_math_text(text: str) -> str:
+    if len(text) > _MAX_MATH_INPUT_CHARS:
+        raise ValueError("mathematical input is too long")
     value = text.translate(PERSIAN_DIGITS).translate(ARABIC_DIGITS)
     value = re.sub(
         r"([A-Za-z0-9_)]+)([⁰¹²³⁴⁵⁶⁷⁸⁹⁻⁺]+)",
@@ -77,7 +82,19 @@ def normalize_math_text(text: str) -> str:
     return value.strip()
 
 
+def _validate_parse_source(text: str) -> None:
+    if not text:
+        raise ValueError("empty mathematical expression")
+    if len(text) > _MAX_MATH_INPUT_CHARS:
+        raise ValueError("mathematical input is too long")
+    if not _ALLOWED_MATH_CHARS.fullmatch(text):
+        raise ValueError("unsupported mathematical characters")
+    if "__" in text or "lambda" in text.lower():
+        raise ValueError("unsafe mathematical expression")
+
+
 def _parse(text: str) -> sp.Expr:
+    _validate_parse_source(text)
     try:
         return parse_expr(
             text,

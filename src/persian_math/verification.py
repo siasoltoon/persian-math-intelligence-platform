@@ -28,27 +28,45 @@ def _domain_safe(expression: sp.Expr, symbol: sp.Symbol, candidate: Any) -> bool
         return False
 
 
+def _numeric_expression_recheck(expression: sp.Expr, claimed: Any) -> bool:
+    symbols = sorted(expression.free_symbols, key=str)
+    if not symbols:
+        return _numeric_equal(expression, claimed)
+    points = (sp.Rational(1, 3), sp.Rational(2, 3), sp.Rational(5, 3))
+    for point in points:
+        substitutions = {symbol: point for symbol in symbols}
+        try:
+            expected_value = sp.N(expression.subs(substitutions), 30)
+            claimed_value = sp.N(claimed.subs(substitutions), 30)
+        except (AttributeError, TypeError, ValueError):
+            return False
+        if not _numeric_equal(expected_value, claimed_value, tolerance=1e-8):
+            return False
+    return True
+
+
 def verify_expression_result(expression: sp.Expr, claimed: Any) -> VerificationResult:
     try:
         expected = sp.simplify(expression)
-        if sp.simplify(expected - claimed) == 0:
+        symbolic_match = sp.simplify(expected - claimed) == 0
+        if symbolic_match and _numeric_expression_recheck(expression, claimed):
             return VerificationResult(
                 True,
                 ConfidenceLevel.HIGH,
-                ("symbolic_equivalence", "independent_simplification"),
+                ("symbolic_equivalence", "independent_numeric_recheck"),
                 (expected,),
             )
-        if _numeric_equal(expected, claimed):
+        if _numeric_expression_recheck(expression, claimed):
             return VerificationResult(
                 True,
                 ConfidenceLevel.MEDIUM,
-                ("numerical_equivalence", "independent_simplification"),
+                ("independent_numeric_recheck",),
                 (expected,),
             )
         return VerificationResult(
             False,
             ConfidenceLevel.HIGH,
-            ("symbolic_mismatch",),
+            ("verification_mismatch",),
             (expected, claimed),
         )
     except (TypeError, ValueError, NotImplementedError):
@@ -78,7 +96,7 @@ def verify_equation_solution(
             return VerificationResult(
                 True,
                 ConfidenceLevel.MEDIUM,
-                ("numerical_residual_check", "domain_checked"),
+                ("numeric_residual_check", "domain_checked"),
                 (candidate,),
             )
         return VerificationResult(False, ConfidenceLevel.HIGH, ("nonzero_residual",), (candidate,))
@@ -105,7 +123,6 @@ def verify_solution_set(
 def compare_independent_methods(
     expression: sp.Expr, claimed: Any, alternate: Any
 ) -> VerificationResult:
-    del expression
     try:
         equivalent = sp.simplify(claimed - alternate) == 0
     except (TypeError, ValueError):
@@ -129,7 +146,7 @@ def verify_equation_independently(
     lhs: sp.Expr, rhs: sp.Expr, symbol: sp.Symbol, candidates: tuple[Any, ...]
 ) -> VerificationResult:
     try:
-        expected = tuple(sp.solve(sp.Eq(lhs, rhs), symbol, dict=False))
+        expected = tuple(sp.solveset(sp.Eq(lhs, rhs), symbol, domain=sp.S.Reals))
         actual = tuple(candidates)
         expected_set = {sp.simplify(item) for item in expected}
         actual_set = {sp.simplify(item) for item in actual}
