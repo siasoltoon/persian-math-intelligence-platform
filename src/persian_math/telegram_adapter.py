@@ -49,4 +49,4 @@ def localize_error(code: str) -> OutgoingMessage:
         "temporary_failure": "پردازش موقتاً ناموفق بود. لطفاً دوباره تلاش کن.",
         "uncertain": "اطمینان کافی برای پاسخ قطعی وجود ندارد؛ لطفاً ورودی را واضح‌تر ارسال کن.",
     }
-    return OutgoingMessage(messages.get(code, "در پردازش مسئله مشکلی پیش آمد؛ لطفاً دوباره تلاش کن."))
+    return OutgoingMessage(\n        messages.get(code, "در پردازش مسئله مشکلی پیش آمد؛ لطفاً دوباره تلاش کن.")\n    )
