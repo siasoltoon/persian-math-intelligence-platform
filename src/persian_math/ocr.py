@@ -196,7 +196,7 @@ class TesseractOcrBackend:
         best = ranked[0]
         if agreement.accepted:
             confidence = min(1.0, max(best.confidence, agreement.confidence))
-            warnings = ("ocr_low_confidence",) if confidence < 0.60 else ()
+            warnings: tuple[str, ...] = ("ocr_low_confidence",) if confidence < 0.60 else ()
         else:
             confidence = min(best.confidence, agreement.confidence)
             warnings = ("ocr_disagreement", "ocr_low_confidence")
