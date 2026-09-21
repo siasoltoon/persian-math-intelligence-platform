@@ -31,3 +31,10 @@
 - Specialized backend tests cover missing optional dependencies, environment defaults, safe formula validation, conflicting formula rejection and matching formula consensus.
 - Model inference itself is intentionally not claimed as verified by CI because heavyweight model artifacts are not downloaded into the repository CI environment.
 - Required next evidence: model-backed benchmark with real handwritten Persian/Latin/math samples, difficult formulas and structural accuracy metrics.
+
+
+## GitHub-hosted heavy OCR evidence
+- Added .github/workflows/heavy-ocr-worker.yml for heavyweight runtime installation and smoke verification.
+- The workflow caches Hugging Face artifacts and preloads microsoft/trocr-base-handwritten without committing model weights.
+- It runs the complete regression suite before heavyweight backend checks.
+- Pending evidence: the first successful heavy workflow run and measured real-world OCR/handwriting/formula benchmark metrics.
