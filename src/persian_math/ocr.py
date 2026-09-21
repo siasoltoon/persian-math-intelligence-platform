@@ -9,6 +9,7 @@ import pytesseract
 from PIL import Image, ImageEnhance, ImageFilter, ImageOps
 
 from .canonical import normalize_math_text
+from .ocr_consensus import RecognitionCandidate, consensus
 
 
 class ImageQuality(str, Enum):
@@ -185,9 +186,20 @@ class TesseractOcrBackend:
             raise RuntimeError("OCR backend unavailable or failed") from exc
         if not candidates:
             return OcrResult("", 0.0, (), ("ocr_no_candidate",))
-        candidates.sort(key=lambda r: (r.confidence, len(r.text)), reverse=True)
-        best = candidates[0]
-        warnings = ("ocr_low_confidence",) if best.confidence < 0.60 else ()
-        result = OcrResult(best.text, best.confidence, best.regions, warnings)
+
+        ranked = sorted(candidates, key=lambda r: (r.confidence, len(r.text)), reverse=True)
+        candidate_set = tuple(
+            RecognitionCandidate(item.text, item.confidence, f"pass-{index}")
+            for index, item in enumerate(ranked)
+        )
+        agreement = consensus(candidate_set)
+        best = ranked[0]
+        if agreement.accepted:
+            confidence = min(1.0, max(best.confidence, agreement.confidence))
+            warnings = ("ocr_low_confidence",) if confidence < 0.60 else ()
+        else:
+            confidence = min(best.confidence, agreement.confidence)
+            warnings = ("ocr_disagreement", "ocr_low_confidence")
+        result = OcrResult(best.text if agreement.accepted else "", confidence, best.regions, warnings)
         validate_ocr_result(result, metadata)
         return result
