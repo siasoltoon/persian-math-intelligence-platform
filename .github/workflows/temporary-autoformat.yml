@@ -25,6 +25,7 @@ jobs:
         run: python -m pip install --upgrade pip && python -m pip install -e ".[dev]"
       - name: Format
         run: python -m ruff format .
+          python -m ruff check . --fix
       - name: Commit formatting changes
         run: |
           if git diff --quiet; then
