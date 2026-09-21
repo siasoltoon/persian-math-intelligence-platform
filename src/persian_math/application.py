@@ -35,14 +35,25 @@ class ApplicationService:
         session = self.session(user_id)
         level = session.education_mode or session.user.educational_level
         return OutgoingMessage(
-            f"پروفایل آموزشی\n\nسطح: {level.value}\nزبان: فارسی\nتعداد مسائل ثبت‌شده در این نشست: {len(session.history)}",
+            f"پروفایل آموزشی
+
+سطح: {level.value}
+زبان: فارسی
+"
+            f"تعداد مسائل ثبت‌شده در این نشست: {len(session.history)}",
             ("تغییر سطح", "بازگشت"),
         )
 
     def settings(self, user_id: str) -> OutgoingMessage:
         self.session(user_id)
         return OutgoingMessage(
-            "تنظیمات\n\nزبان فعلی: فارسی\nحالت پاسخ: آموزشی\n\nتنظیمات پیشرفته در نسخه‌های بعدی فعال می‌شوند.",
+            "تنظیمات
+
+زبان فعلی: فارسی
+حالت پاسخ: آموزشی
+
+"
+            "تنظیمات پیشرفته در نسخه‌های بعدی فعال می‌شوند.",
             ("تغییر سطح", "بازگشت"),
         )
 
@@ -50,10 +61,13 @@ class ApplicationService:
         session = self.session(user_id)
         if not session.history:
             return OutgoingMessage("هنوز مسئله‌ای در این نشست ثبت نشده است.", ("بازگشت",))
-        items = "\n".join(
+        items = "
+".join(
             f"{index}. {item[:120]}" for index, item in enumerate(reversed(session.history), 1)
         )
-        return OutgoingMessage(f"تاریخچه این نشست:\n\n{items}", ("بازگشت",))
+        return OutgoingMessage(f"تاریخچه این نشست:
+
+{items}", ("بازگشت",))
 
     def set_level(self, user_id: str, value: str) -> OutgoingMessage:
         session = self.session(user_id)
@@ -73,29 +87,38 @@ class ApplicationService:
     ) -> OutgoingMessage:
         self.session(user_id)
         exercises = tuple(
-            e
-            for e in generate(ExerciseSpec(domain, difficulty, count))
-            if validate_exercise(e)
+            e for e in generate(ExerciseSpec(domain, difficulty, count)) if validate_exercise(e)
         )
         if not exercises:
             return OutgoingMessage("تمرین معتبر تولید نشد. لطفاً دوباره تلاش کن.", ("بازگشت",))
-        body = "\n".join(
+        body = "
+".join(
             f"{index}. {exercise.prompt}" for index, exercise in enumerate(exercises, 1)
         )
         return OutgoingMessage(
-            f"تمرین‌های {domain} — سطح {difficulty.value}:\n\n{body}",
+            f"تمرین‌های {domain} — سطح {difficulty.value}:
+
+{body}",
             ("تمرین جدید", "بازگشت"),
         )
 
     def help(self, user_id: str) -> OutgoingMessage:
         self.session(user_id)
         return OutgoingMessage(
-            "راهنما\n\n"
-            "• حل مسئله: متن سؤال یا عکس واضح بفرست.\n"
-            "• تمرین: موضوع و سختی را انتخاب کن.\n"
-            "• پروفایل: سطح آموزشی را ببین یا تغییر بده.\n"
-            "• تاریخچه: مسائل همین نشست را ببین.\n"
-            "• تنظیمات: تنظیمات فعلی را مشاهده کن.\n\n"
+            "راهنما
+
+"
+            "• حل مسئله: متن سؤال یا عکس واضح بفرست.
+"
+            "• تمرین: موضوع و سختی را انتخاب کن.
+"
+            "• پروفایل: سطح آموزشی را ببین یا تغییر بده.
+"
+            "• تاریخچه: مسائل همین نشست را ببین.
+"
+            "• تنظیمات: تنظیمات فعلی را مشاهده کن.
+
+"
             "می‌توانی هر زمان /start یا /menu را هم ارسال کنی.",
             ("بازگشت",),
         )
@@ -130,4 +153,6 @@ class ApplicationService:
             )
         verified = result.verification.verified if result.verification else False
         suffix = "نتیجه مستقل تأیید شد." if verified else "نتیجه هنوز تأیید مستقل کامل ندارد."
-        return OutgoingMessage(f"پاسخ: {result.solver.value}\n\n{suffix}")
+        return OutgoingMessage(f"پاسخ: {result.solver.value}
+
+{suffix}")
