@@ -1,16 +1,14 @@
 # Engineering Changelog
 
-## 2026-09-21 — Phase 11–20 batch
-- Added stateful interactive tutoring with hints, answer checking, re-explanation and progressive practice.
-- Expanded exercise generation/validation beyond the initial algebra-only path.
-- Added privacy-aware learning profile and weak-topic analysis.
-- Added transport-neutral Telegram/application contracts and command/session handling.
-- Added bounded PDF validation and question indexing foundation.
-- Added bounded job lifecycle with retry/cancel states.
-- Added security validation for text, filenames, URLs and private IP addresses.
-- Added metrics and timing/span instrumentation.
-- Added benchmark execution/result/pass-rate primitives.
-- Added Phase 11–20 acceptance/regression coverage.
-- Fixed strict typing and Ruff lint/format issues through iterative CI validation.
-- Latest green CI: workflow 35573378971 on commit e0616a742448ddad90af72eeb39b4b792a1905d0.
-- Important: P19/P20 are marked COMPLETED at foundation level, not falsely VERIFIED as exhaustive production benchmark/quality gates.
+## 2026-09-21 — Phase 19–25 hardening batch
+- Added quality/failure matrix and bounded retry contracts.
+- Added OCR benchmark metrics for character/expression/structure accuracy.
+- Added adversarial mathematical input coverage.
+- Added Persian-first RTL answer rendering policy.
+- Added production configuration/resource/recovery contracts.
+- Added release-audit gate and production verification runbook.
+- Added P19–P25 acceptance tests.
+- Fixed Ruff/mypy issues during CI iterations.
+- CI evidence currently exists for commit e84744b85941c46298c3221f4288c51d3919ed31: lint/type/tests passed; format failed on that earlier SHA.
+- Subsequent formatting fixes and state documentation were committed after that run; a fresh CI run on the final HEAD is required before any VERIFIED claim.
+- No external production/OCR/load/security evidence has been fabricated.
