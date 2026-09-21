@@ -22,8 +22,8 @@ from telegram.ext import (
 )
 
 from .application import ApplicationService
-from .file_intelligence import best_document_text, inspect_document
 from .domain import Difficulty, EducationalLevel
+from .file_intelligence import best_document_text, inspect_document
 from .ocr import ImageMetadata, TesseractOcrBackend, reconstruct_math_text, validate_image_bytes
 from .runtime_config import load_runtime_config
 from .telegram_adapter import IncomingMessage, MessageKind, OutgoingMessage

@@ -2,10 +2,9 @@ from __future__ import annotations
 
 from io import BytesIO
 
+import fitz
 import pytest
 from PIL import Image
-
-import fitz
 
 from persian_math.file_intelligence import FileLimits, inspect_document, validate_file_bytes
 
