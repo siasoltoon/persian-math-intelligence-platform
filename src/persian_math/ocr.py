@@ -200,6 +200,8 @@ class TesseractOcrBackend:
         else:
             confidence = min(best.confidence, agreement.confidence)
             warnings = ("ocr_disagreement", "ocr_low_confidence")
-        result = OcrResult(best.text if agreement.accepted else "", confidence, best.regions, warnings)
+        result = OcrResult(
+            best.text if agreement.accepted else "", confidence, best.regions, warnings
+        )
         validate_ocr_result(result, metadata)
         return result
