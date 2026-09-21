@@ -58,3 +58,11 @@
 - Added isolated heavyweight OCR dependency manifest and a GitHub-hosted worker workflow.
 - Workflow provisions Tesseract, PyTorch/Transformers, TrOCR model cache and pix2tex support, then runs regression and runtime smoke checks.
 - Pending: successful workflow run evidence and real labeled OCR/handwriting benchmark evidence.
+
+
+## Phase 21 — GitHub-hosted heavy OCR execution
+- Status: IMPLEMENTED / VERIFICATION PENDING
+- Added isolated heavyweight OCR dependency manifest and a GitHub-hosted worker workflow.
+- Heavy OCR workflow run 35649732688 passed all steps.
+- Main CI run 35649997963 passed all jobs, including the Heavy OCR runtime.
+- Pending: real labeled OCR/handwriting/formula benchmark evidence.
