@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from ipaddress import ip_address
 from pathlib import PurePosixPath
 from urllib.parse import urlparse
 
@@ -28,6 +29,11 @@ def validate_url(url: str, policy: SecurityPolicy = SecurityPolicy()) -> None:
     parsed = urlparse(url)
     if parsed.scheme not in policy.allowed_schemes or not parsed.hostname:
         raise ValueError("unsupported URL")
-    host = parsed.hostname.lower()
-    if host in {"localhost", "127.0.0.1", "::1"} or host.startswith("10.") or host.startswith("192.168."):
+    try:
+        address = ip_address(parsed.hostname)
+    except ValueError:
+        address = None
+    if address is not None and (
+        address.is_private or address.is_loopback or address.is_link_local or address.is_reserved
+    ):
         raise ValueError("private network URL rejected")
