@@ -10,6 +10,7 @@ import numpy as np
 from PIL import Image
 
 from .ocr import ImageMetadata, OcrResult, validate_image_bytes, validate_image_metadata
+from .ocr_consensus import RecognitionCandidate, consensus
 
 
 @dataclass(frozen=True)
@@ -147,4 +148,64 @@ class EnvironmentConfiguredHandwritingBackend(TrOCRHandwritingBackend):
             model_id=os.getenv("MATH_HANDWRITING_MODEL", "microsoft/trocr-base-handwritten"),
             device=os.getenv("MATH_HANDWRITING_DEVICE", "auto"),
             local_files_only=os.getenv("MATH_HANDWRITING_LOCAL_ONLY", "1") != "0",
+        )
+
+
+@dataclass(frozen=True)
+class MathFormulaCandidate:
+    latex: str
+    confidence: float
+    source: str
+
+
+def validate_latex_formula(latex: str) -> str:
+    value = latex.strip()
+    if not value or len(value) > 12000:
+        raise ValueError("formula output exceeds safety limits")
+    if value.count("{") != value.count("}"):
+        raise ValueError("unbalanced formula braces")
+    if value.count("\\\\") > 800:
+        raise ValueError("formula command density exceeds safety limits")
+    blocked = ("\\write18", "\\input", "\\include", "\\openout", "\\read")
+    if any(command in value for command in blocked):
+        raise ValueError("unsafe formula command")
+    return value
+
+
+class CompositeMathFormulaBackend:
+    """Accept formula OCR only when independent formula recognizers agree."""
+
+    def __init__(self, backends: tuple[Any, ...], threshold: float = 0.90) -> None:
+        self.backends = backends
+        self.threshold = threshold
+
+    def recognize_math(self, image: bytes, metadata: ImageMetadata) -> OcrResult:
+        candidates: list[RecognitionCandidate] = []
+        warnings: list[str] = []
+        for index, backend in enumerate(self.backends):
+            try:
+                result = backend.recognize_math(image, metadata)
+                latex = validate_latex_formula(result.text)
+            except (RuntimeError, OSError, ValueError, TypeError) as exc:
+                warnings.append(f"formula_backend_{index}_failed:{type(exc).__name__}")
+                continue
+            if latex:
+                candidates.append(
+                    RecognitionCandidate(latex, result.confidence, f"formula-{index}")
+                )
+        if not candidates:
+            return OcrResult("", 0.0, (), tuple(warnings) or ("math_formula_no_candidate",))
+        agreement = consensus(tuple(candidates), threshold=self.threshold)
+        if not agreement.accepted:
+            return OcrResult(
+                "",
+                agreement.confidence,
+                (),
+                tuple(dict.fromkeys((*warnings, "math_formula_disagreement"))),
+            )
+        return OcrResult(
+            agreement.text,
+            agreement.confidence,
+            (),
+            tuple(dict.fromkeys((*warnings, "math_formula_consensus"))),
         )
