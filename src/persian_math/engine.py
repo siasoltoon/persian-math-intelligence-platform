@@ -5,7 +5,13 @@ from dataclasses import dataclass
 import sympy as sp
 
 from .canonical import parse_equation, parse_expression
-from .domain import ConfidenceLevel, Problem, ProblemInput, ProblemRepresentation, VerificationResult
+from .domain import (
+    ConfidenceLevel,
+    Problem,
+    ProblemInput,
+    ProblemRepresentation,
+    VerificationResult,
+)
 from .solver import SolverResult, solve, solve_word_problem
 from .understanding import classify_problem, represent_problem
 from .verification import verify_equation_independently, verify_expression_result
