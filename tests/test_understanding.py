@@ -16,7 +16,6 @@ def test_represents_equation():
     assert result.kind == "equation"
 
 
-
 def test_represents_expression_with_whitespace_and_persian_digits():
     result = represent_problem(ProblemInput("۲ + ۳ × ۴"))
     assert result.kind == "expression"
