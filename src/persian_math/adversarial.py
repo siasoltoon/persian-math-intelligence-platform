@@ -25,9 +25,7 @@ CASES = (
 def safe_parse(case: AdversarialCase) -> bool:
     try:
         expression = sp.sympify(case.expression)
-        if expression in (sp.zoo, sp.nan):
-            return False
-        return True
+        return expression not in (sp.zoo, sp.nan)
     except (TypeError, ValueError, SyntaxError, sp.SympifyError):
         return False
 
