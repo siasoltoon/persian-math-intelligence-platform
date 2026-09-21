@@ -1,8 +1,9 @@
 from __future__ import annotations
 
+from collections.abc import Callable
 from dataclasses import dataclass
 from time import perf_counter
-from typing import Any, Callable, TypeVar
+from typing import Any, TypeVar
 
 
 @dataclass(frozen=True)
@@ -45,5 +46,7 @@ def timed(name: str, recorder: list[Span] | None = None) -> Callable[[F], F]:
             finally:
                 if recorder is not None:
                     recorder.append(Span(name, (perf_counter() - start) * 1000.0, success))
+
         return wrapped  # type: ignore[return-value]
+
     return decorator
