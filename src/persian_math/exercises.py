@@ -37,29 +37,20 @@ def _arithmetic(index: int, difficulty: Difficulty) -> Exercise:
 def _calculus(index: int, difficulty: Difficulty) -> Exercise:
     x = sp.Symbol("x")
     power = index + 2
-    return Exercise(
-        f"d/dx x^{power}", difficulty, "calculus", power * x ** (power - 1)
-    )
+    return Exercise(f"d/dx x^{power}", difficulty, "calculus", power * x ** (power - 1))
 
 
 def generate(spec: ExerciseSpec) -> tuple[Exercise, ...]:
     if not 1 <= spec.count <= 100:
         raise ValueError("count out of allowed range")
     generators = {
-        "algebra": (
-            _linear
-            if spec.difficulty in {Difficulty.EASY, Difficulty.MEDIUM}
-            else _quadratic
-        ),
+        "algebra": _linear if spec.difficulty in {Difficulty.EASY, Difficulty.MEDIUM} else _quadratic,
         "arithmetic": _arithmetic,
         "calculus": _calculus,
     }
     if spec.domain not in generators:
         raise ValueError("unsupported exercise domain")
-    return tuple(
-        generators[spec.domain](spec.seed + i, spec.difficulty)
-        for i in range(spec.count)
-    )
+    return tuple(generators[spec.domain](spec.seed + i, spec.difficulty) for i in range(spec.count))
 
 
 def validate_exercise(exercise: Exercise) -> bool:
