@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from collections.abc import Callable
+import re
 from dataclasses import dataclass
 from typing import Any
 
@@ -229,6 +230,48 @@ def solve_matrix(matrix: sp.MatrixBase, operation: str) -> SolverResult:
     except (TypeError, ValueError, sp.NonInvertibleMatrixError) as exc:
         return _fail("matrix", exc)
 
+
+
+def solve_word_problem(text: str) -> tuple[SolverResult, sp.Expr | None, str | None]:
+    normalized = text.translate(str.maketrans("۰۱۲۳۴۵۶۷۸۹", "0123456789")).translate(
+        str.maketrans("٠١٢٣٤٥٦٧٨٩", "0123456789")
+    )
+    rectangle = re.search(
+        r"مساحت.*?مستطیل.*?طول\s*([0-9]+(?:\.\d+)?)\s*(?:سانتی.?متر|متر)?.*?"
+        r"عرض\s*([0-9]+(?:\.\d+)?)",
+        normalized,
+        re.DOTALL,
+    )
+    if rectangle:
+        length, width = map(sp.Rational, rectangle.groups())
+        expression = length * width
+        return _ok(expression, "geometry_rectangle_area", length=length, width=width), expression, "rectangle_area"
+    function = re.search(
+        r"f\s*\(\s*x\s*\)\s*=\s*([^،,.\n]+).*?f\s*\(\s*([-+]?\d+(?:\.\d+)?)\s*\)",
+        normalized,
+        re.DOTALL,
+    )
+    if function:
+        definition, point_text = function.groups()
+        point = sp.Rational(point_text)
+        try:
+            parsed = parse_expression(definition).expression
+            value = sp.simplify(parsed.subs(sp.Symbol("x"), point))
+            return _ok(value, "function_evaluation", point=point), value, "function_evaluation"
+        except (TypeError, ValueError):
+            pass
+    arithmetic = re.search(
+        r"مجموع\s+(\d+)\s+جمله.*?دنباله\s+حسابی.*?([0-9]+(?:\.\d+)?)\s*,\s*"
+        r"([0-9]+(?:\.\d+)?)\s*,\s*([0-9]+(?:\.\d+)?)",
+        normalized,
+        re.DOTALL,
+    )
+    if arithmetic:
+        n, a1, a2 = map(sp.Rational, arithmetic.groups())
+        d = a2 - a1
+        expression = sp.simplify(n * (2 * a1 + (n - 1) * d) / 2)
+        return _ok(expression, "arithmetic_sequence_sum", n=n, first=a1, difference=d), expression, "arithmetic_sequence"
+    return SolverResult(False, None, "word_problem_router", "no supported structured word problem"), None, None
 
 def solve(expression_text: str, *, symbol_name: str = "x") -> SolverResult:
     text = expression_text.strip()
