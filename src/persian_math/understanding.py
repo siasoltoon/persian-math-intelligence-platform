@@ -28,7 +28,7 @@ def classify_problem(problem: ProblemInput) -> ProblemClassification:
 
 
 def represent_problem(problem: ProblemInput) -> ProblemRepresentation:
-    text = normalize_math_text(problem.text)
+    text = extract_math_payload(problem.text)
     if any(op in text for op in ("<", ">", "<=", ">=")):
         kind = "inequality"
     elif text.count("=") == 1:
