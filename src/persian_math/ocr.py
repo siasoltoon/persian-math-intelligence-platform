@@ -3,7 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from enum import Enum
 from io import BytesIO
-from typing import Protocol
+from typing import Any, Protocol
 
 import cv2
 import numpy as np
@@ -119,7 +119,7 @@ def validate_image_bytes(image: bytes) -> None:
         raise ValueError("invalid image data") from exc
 
 
-def _deskew(gray: np.ndarray) -> np.ndarray:
+def _deskew(gray: np.ndarray[Any, Any]) -> np.ndarray[Any, Any]:
     mask = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)[1]
     points = cv2.findNonZero(mask)
     if points is None or len(points) < 20:
@@ -136,7 +136,7 @@ def _deskew(gray: np.ndarray) -> np.ndarray:
     )
 
 
-def _crop_content(gray: np.ndarray) -> np.ndarray:
+def _crop_content(gray: np.ndarray[Any, Any]) -> np.ndarray[Any, Any]:
     mask = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)[1]
     coords = cv2.findNonZero(mask)
     if coords is None:
@@ -148,6 +148,7 @@ def _crop_content(gray: np.ndarray) -> np.ndarray:
         max(0, x - pad) : min(gray.shape[1], x + w + pad),
     ]
 
+
 def _variants(decoded: Image.Image) -> tuple[Image.Image, ...]:
     gray = np.asarray(ImageOps.exif_transpose(decoded).convert("L"), dtype=np.uint8)
     if max(gray.shape) < 1800:
@@ -156,7 +157,7 @@ def _variants(decoded: Image.Image) -> tuple[Image.Image, ...]:
     gray = _crop_content(_deskew(gray))
     denoised = cv2.fastNlMeansDenoising(gray, None, 7, 7, 21)
     clahe = cv2.createCLAHE(clipLimit=2.2, tileGridSize=(8, 8)).apply(denoised)
-    normalized = cv2.normalize(clahe, None, 0, 255, cv2.NORM_MINMAX)
+    normalized = np.asarray(cv2.normalize(clahe, None, 0, 255, cv2.NORM_MINMAX), dtype=np.uint8)
     smooth = cv2.GaussianBlur(normalized, (3, 3), 0)
     unsharp = cv2.addWeighted(normalized, 1.65, smooth, -0.65, 0)
     adaptive = cv2.adaptiveThreshold(
@@ -168,6 +169,7 @@ def _variants(decoded: Image.Image) -> tuple[Image.Image, ...]:
     return tuple(
         Image.fromarray(item) for item in (gray, normalized, unsharp, adaptive, closed, otsu)
     )
+
 
 def preprocess_image(image: bytes, metadata: ImageMetadata) -> bytes:
     validate_image_metadata(metadata)
