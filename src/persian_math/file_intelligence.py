@@ -134,9 +134,7 @@ def _strip_known_watermarks(text: str) -> str:
     return "\n".join(kept).strip()
 
 
-def _select_page_text(
-    native_text: str, ocr: OcrResult | None
-) -> tuple[str, str, tuple[str, ...]]:
+def _select_page_text(native_text: str, ocr: OcrResult | None) -> tuple[str, str, tuple[str, ...]]:
     native = native_text.strip()
     content_text = _strip_known_watermarks(native)
     ocr_text = ocr.text.strip() if ocr else ""
@@ -231,11 +229,7 @@ def inspect_document(
 
     ocr_result = ocr_backend.recognize(data, metadata)
     text = ocr_result.text.strip() if ocr_result.confidence >= 0.60 else ""
-    image_warnings = (
-        ocr_result.warnings
-        if text
-        else (*ocr_result.warnings, "ocr_not_accepted")
-    )
+    image_warnings = ocr_result.warnings if text else (*ocr_result.warnings, "ocr_not_accepted")
     return DocumentResult(
         "image",
         (DocumentPage(1, "", ocr_result, "ocr" if text else "none", image_warnings),),
