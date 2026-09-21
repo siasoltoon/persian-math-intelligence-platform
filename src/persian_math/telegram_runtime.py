@@ -72,7 +72,7 @@ async def photo_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
         await update.message.reply_text("تصویر قابل پردازش نبود؛ لطفاً عکس واضح‌تری ارسال کن.")
 
 
-def build_application() -> Application[Any, Any, Any, Any, Any]:
+def build_application() -> Application[Any, Any, Any, Any, Any, Any]:
     config = load_runtime_config()
     application = Application.builder().token(config.telegram_bot_token).build()
     application.add_handler(CommandHandler("start", start))
