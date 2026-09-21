@@ -83,3 +83,11 @@ Execute the live Windows/Tailscale/Telegram E2E matrix and build the real labele
 - Heavy OCR workflow run 35649732688 passed all steps, including model loading and backend smoke checks.
 - Main CI run 35649997963 passed Ruff, format, mypy, Python 3.11/3.12 pytest and the Heavy OCR runtime job.
 - This proves runtime readiness only; real OCR accuracy remains evidence-gated by a labeled benchmark corpus.
+
+
+## Plain-text Telegram math input hardening — 2026-09-22
+- Root cause identified: the Telegram application passed the entire Persian natural-language prompt directly into the restricted mathematical parser. The parser correctly rejected Persian prose as unsupported mathematical syntax, so valid questions were reported as insufficiently reliable.
+- Implemented a bounded lexical math-fragment extractor that promotes only parser-allowed mathematical characters from natural-language wrappers; parser safety boundaries and confidence/verification gates remain intact.
+- Updated problem representation, solver routing and verification to operate on the extracted canonical mathematical payload.
+- Added regression coverage for Persian natural-language arithmetic and equation prompts.
+- Verification status: implementation complete; repository CI/live Telegram re-test pending.
