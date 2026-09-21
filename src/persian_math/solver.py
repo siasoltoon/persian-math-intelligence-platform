@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-from collections.abc import Callable
 import re
+from collections.abc import Callable
 from dataclasses import dataclass
 from typing import Any
 
@@ -247,7 +247,7 @@ def solve_word_problem(text: str) -> tuple[SolverResult, sp.Expr | None, str | N
         expression = length * width
         return _ok(expression, "geometry_rectangle_area", length=length, width=width), expression, "rectangle_area"
     function = re.search(
-        r"f\s*\(\s*x\s*\)\s*=\s*([^،,.\n]+).*?f\s*\(\s*([-+]?\d+(?:\.\d+)?)\s*\)",
+        r"f\s*\(\s*x\s*\)\s*=\s*([^،,.\n]+?).*?f\s*\(\s*([-+]?\d+(?:\.\d+)?)\s*\)",
         normalized,
         re.DOTALL,
     )
@@ -267,7 +267,7 @@ def solve_word_problem(text: str) -> tuple[SolverResult, sp.Expr | None, str | N
         re.DOTALL,
     )
     if arithmetic:
-        n, a1, a2 = map(sp.Rational, arithmetic.groups())
+        n, a1, a2, a3 = map(sp.Rational, arithmetic.groups())
         d = a2 - a1
         expression = sp.simplify(n * (2 * a1 + (n - 1) * d) / 2)
         return _ok(expression, "arithmetic_sequence_sum", n=n, first=a1, difference=d), expression, "arithmetic_sequence"
