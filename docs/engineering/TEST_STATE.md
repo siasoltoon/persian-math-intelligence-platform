@@ -59,3 +59,10 @@
 - PR #11 CI run 35656388276 passed: Ruff lint ✓, Ruff format ✓, mypy ✓, pytest Python 3.11 ✓, pytest Python 3.12 ✓, Heavy OCR runtime ✓.
 - PR #11 merged to main as `9fea0f1764a12ed52f70fbdf2b8d2ebae8822406`.
 - Live Telegram execution evidence remains required before claiming end-to-end runtime verification.
+
+
+## Structured Persian word-problem regression — 2026-09-22
+- Added regression coverage for rectangle area, function evaluation and arithmetic-sequence sum prompts.
+- Added application-level coverage for clean solution-set rendering.
+- CI run 35659054757: Ruff lint ✓, Ruff format ✓, mypy ✓, pytest Python 3.11 ✓, pytest Python 3.12 ✓, Heavy OCR runtime ✓.
+- Live re-test is still required after deployment/restart; the observed pre-fix Telegram failures are not treated as production verification evidence.
