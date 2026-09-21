@@ -23,7 +23,15 @@ def process(text: str, *, symbol_name: str = "x") -> EngineResult:
     representation = represent_problem(problem_input)
     classification = classify_problem(problem_input)
     problem = Problem(problem_input, representation, classification)
-    solver_result = solve(representation.expression, symbol_name=symbol_name)
+    if representation.kind == "concept":
+        solver_result = SolverResult(
+            False,
+            None,
+            "understanding",
+            "mathematical expression required",
+        )
+    else:
+        solver_result = solve(representation.expression, symbol_name=symbol_name)
     verification: VerificationResult | None = None
 
     if solver_result.success and representation.kind == "expression":
