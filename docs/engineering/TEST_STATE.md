@@ -38,3 +38,10 @@
 - The workflow caches Hugging Face artifacts and preloads microsoft/trocr-base-handwritten without committing model weights.
 - It runs the complete regression suite before heavyweight backend checks.
 - Pending evidence: the first successful heavy workflow run and measured real-world OCR/handwriting/formula benchmark metrics.
+
+
+## GitHub-hosted heavy OCR evidence
+- Heavy OCR workflow run 35649732688: success. Regression suite: 95 passed; TrOCR model load: success; specialized backend construction: success; CPU-safe runtime check: success.
+- Main CI run 35649997963: success. Ruff lint, Ruff format, mypy, pytest Python 3.11, pytest Python 3.12 and Heavy OCR runtime all passed.
+- First heavy run 35649274960 failed because the workflow smoke test referenced a nonexistent available() method; the check was corrected and replacement run 35649732688 passed.
+- Heavy runtime is verified as installable/model-loadable on GitHub-hosted Actions; production accuracy is still not claimed.
