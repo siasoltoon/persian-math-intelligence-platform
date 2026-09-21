@@ -66,3 +66,11 @@
 - Heavy OCR workflow run 35649732688 passed all steps.
 - Main CI run 35649997963 passed all jobs, including the Heavy OCR runtime.
 - Pending: real labeled OCR/handwriting/formula benchmark evidence.
+
+
+## Phase 19/23/24 — Persian natural-language math input hardening
+- Status: VERIFIED for repository/CI integration; live Telegram verification pending.
+- Added bounded lexical extraction of safe mathematical payloads from Persian natural-language prompts, including whitespace handling and equation preference.
+- Added concept-only representation fallback and structured engine failure for prompts without a mathematical payload.
+- PR #11 CI run 35656388276 passed all required jobs, including both Python versions and Heavy OCR runtime.
+- Remaining evidence: live Telegram text-input validation and broader real-user corpus coverage.
