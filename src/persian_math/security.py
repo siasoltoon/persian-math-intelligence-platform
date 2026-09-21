@@ -13,21 +13,32 @@ class SecurityPolicy:
     allowed_schemes: tuple[str, ...] = ("https",)
 
 
-def validate_text(text: str, policy: SecurityPolicy = SecurityPolicy()) -> str:
-    if not isinstance(text, str) or not text.strip() or len(text) > policy.max_text_chars:
+_DEFAULT_POLICY = SecurityPolicy()
+
+
+def validate_text(text: str, policy: SecurityPolicy | None = None) -> str:
+    active = policy or _DEFAULT_POLICY
+    if not isinstance(text, str) or not text.strip() or len(text) > active.max_text_chars:
         raise ValueError("invalid text input")
     return text.strip()
 
 
 def safe_filename(name: str) -> str:
-    if not name or name in {".", ".."} or "/" in name or "\\" in name or PurePosixPath(name).name != name:
+    if (
+        not name
+        or name in {".", ".."}
+        or "/" in name
+        or "\\" in name
+        or PurePosixPath(name).name != name
+    ):
         raise ValueError("unsafe filename")
     return name
 
 
-def validate_url(url: str, policy: SecurityPolicy = SecurityPolicy()) -> None:
+def validate_url(url: str, policy: SecurityPolicy | None = None) -> None:
+    active = policy or _DEFAULT_POLICY
     parsed = urlparse(url)
-    if parsed.scheme not in policy.allowed_schemes or not parsed.hostname:
+    if parsed.scheme not in active.allowed_schemes or not parsed.hostname:
         raise ValueError("unsupported URL")
     try:
         address = ip_address(parsed.hostname)
