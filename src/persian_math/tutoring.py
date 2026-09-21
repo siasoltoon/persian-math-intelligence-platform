@@ -76,9 +76,7 @@ def check(session: TutorSession, answer: Any) -> tuple[TutorSession, TutorRespon
     correct = False
     try:
         if step.expected is not None:
-            correct = bool(
-                sp.simplify(sp.sympify(answer) - sp.sympify(step.expected)) == 0
-            )
+            correct = bool(sp.simplify(sp.sympify(answer) - sp.sympify(step.expected)) == 0)
     except (TypeError, ValueError):
         correct = answer == step.expected
     if not correct:
@@ -121,9 +119,7 @@ def reexplain(session: TutorSession) -> TutorResponse:
     )
 
 
-def progressive_practice(
-    user: UserProfile, topic: str, count: int = 3
-) -> tuple[str, ...]:
+def progressive_practice(user: UserProfile, topic: str, count: int = 3) -> tuple[str, ...]:
     if not 1 <= count <= 20:
         raise ValueError("count out of range")
     return tuple(
