@@ -12,3 +12,10 @@
 - CI evidence currently exists for commit e84744b85941c46298c3221f4288c51d3919ed31: lint/type/tests passed; format failed on that earlier SHA.
 - Subsequent formatting fixes and state documentation were committed after that run; a fresh CI run on the final HEAD is required before any VERIFIED claim.
 - No external production/OCR/load/security evidence has been fabricated.
+
+## 2026-09-21 — Windows VPS / Telegram runtime integration
+- Added `vps/` runtime reference and a secret-backed Windows workflow.
+- Added a real Telegram polling entrypoint using the existing ApplicationService.
+- Added photo OCR handling with validation and confidence gating.
+- Added Telegram runtime dependency and configuration tests.
+- Added explicit security and operational limitations to engineering state.
