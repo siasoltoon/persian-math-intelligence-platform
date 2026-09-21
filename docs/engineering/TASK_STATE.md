@@ -99,3 +99,13 @@
 - Regression coverage: Persian arithmetic, Persian linear equations, spaced Persian-digit expressions, and concept-only prompts.
 - Verification: PR #11 CI run 35656388276 passed Ruff lint/format, mypy, pytest Python 3.11/3.12, and Heavy OCR runtime; merged to main as `9fea0f1764a12ed52f70fbdf2b8d2ebae8822406`.
 - Remaining: live Telegram re-test and real-world corpus evidence.
+
+
+### INPUT-T02 — Persian structured word-problem routing
+- Status: VERIFIED for repository/CI integration / live re-test pending
+- Phase: 19/20/23/24
+- Objective: correctly solve common Persian natural-language problems that cannot be represented safely as a bare mathematical fragment.
+- Live failure classes addressed: rectangle-area wording returned only the first numeric token; function-evaluation wording was misrouted as an equation in the auxiliary function symbol; arithmetic-sequence sum wording was not recognized; equation solution tuples were rendered as raw Python tuples.
+- Implemented: bounded structured handlers for rectangle area, function evaluation and arithmetic-sequence sums; independent verification through canonical expression representation; user-facing solution-set rendering; regression coverage.
+- CI verification: run 35659054757 passed Ruff lint, Ruff format, mypy, pytest Python 3.11/3.12 and Heavy OCR runtime.
+- Remaining: repeat the Telegram live matrix with these exact cases and expand the labeled real-world benchmark.

@@ -100,3 +100,12 @@ Execute the live Windows/Tailscale/Telegram E2E matrix and build the real labele
 - Added regression coverage for Persian natural-language arithmetic/equation prompts, spaced Persian-digit expressions, and concept-only prompts.
 - Verification: PR #11 CI run 35656388276 passed Ruff lint, Ruff format, mypy, pytest on Python 3.11/3.12, and Heavy OCR runtime; PR #11 was merged to main as `9fea0f1764a12ed52f70fbdf2b8d2ebae8822406`.
 - Live Telegram re-test remains pending; production accuracy claims remain evidence-gated.
+
+
+## Structured Persian word-problem hardening — 2026-09-22
+- Live Telegram testing exposed three parser-routing gaps: geometry wording lost semantic context and returned a raw numeric token; function-evaluation wording was misclassified as an equation; arithmetic-sequence wording was not supported.
+- Added bounded structured handlers for rectangle area, function evaluation and arithmetic-sequence sums.
+- Structured results are converted to canonical mathematical expressions before independent verification, preserving the existing no-guess/verification gates.
+- Equation solution tuples are rendered as mathematical solution sets rather than Python tuple syntax.
+- CI run 35659054757 passed Ruff lint, Ruff format, mypy, pytest Python 3.11/3.12 and Heavy OCR runtime.
+- Live Telegram re-test after this fix remains pending; no claim of production-wide natural-language coverage is made.
