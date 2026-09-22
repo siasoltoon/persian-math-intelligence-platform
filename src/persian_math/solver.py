@@ -176,7 +176,7 @@ def solve_complex(expression: sp.Expr, symbol: sp.Symbol) -> SolverResult:
 def solve_number_theory(expression: sp.Expr) -> SolverResult:
     try:
         value = sp.factorint(int(expression))
-        return _ok(value, "integer_factorization")
+        return _ok(value, "number_theory")
     except (TypeError, ValueError, sp.SympifyError) as exc:
         return _fail("integer_factorization", exc)
 
