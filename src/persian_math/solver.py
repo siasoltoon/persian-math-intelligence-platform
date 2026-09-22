@@ -306,9 +306,9 @@ def _solve_extended_word_problem(
     x = sp.Symbol("x")
 
     higher_derivative = re.search(
-        r"(?:مشتق|دیفرانسیل)\s+مرتبه\s*(\d+)\s+.*?"
-        r"(?:f\s*\(\s*x\s*\)\s*=\s*)?(.+?)"
-        r"(?:\s+را\s+به\s+دست\s+آورید\s*\.?|\s*$)",
+        r"(?:مشتق|دیفرانسیل)\s+مرتبه\s*(\d+)\s+"
+        r"(?:تابع\s+)?(?:f\s*\(\s*x\s*\)\s*=\s*)"
+        r"(.+?)\s+را\s+به\s+دست\s+آورید\s*\.?$",
         normalized,
         re.DOTALL,
     )
@@ -393,8 +393,8 @@ def _solve_extended_word_problem(
 
     series_match = re.search(
         r"(?:سری|بسط تیلور|بسط مک.?لورین).*?"
-        r"(?:f\s*\(\s*x\s*\)\s*=\s*)?(.+?)"
-        r".*?(?:در\s*x\s*=\s*([-+]?\d+(?:\.\d+)?)|حول\s*x\s*=\s*([-+]?\d+(?:\.\d+)?))"
+        r"f\s*\(\s*x\s*\)\s*=\s*(.+?)\s+"
+        r"(?:در\s*x\s*=\s*([-+]?\d+(?:\.\d+)?)|حول\s*x\s*=\s*([-+]?\d+(?:\.\d+)?))"
         r".*?(?:مرتبه|تا)\s*(\d+)",
         normalized,
         re.DOTALL,
@@ -418,7 +418,7 @@ def _solve_extended_word_problem(
             pass
 
     sum_match = re.search(
-        r"(?:مجموع|sum).*?([0-9]+)\s*(?:تا|to)\s*([0-9]+).*?:?\s*(.+)$",
+        r"(?:مجموع|sum)\s*(?:از\s*)?([0-9]+)\s*(?:تا|to)\s*([0-9]+)\s*[:：]?\s*(.+)$",
         normalized,
         re.DOTALL | re.IGNORECASE,
     )
@@ -566,7 +566,12 @@ def _solve_extended_word_problem(
     trig = re.search(r"(?:معادله مثلثاتی|مثلثاتی).*?:?\s*(.+)$", normalized, re.DOTALL)
     if trig:
         try:
-            expression = _parse_math_fragment(trig.group(1).strip())
+            source = trig.group(1).strip()
+            if source.count("=") == 1:
+                lhs, rhs = parse_equation(source)
+                expression = lhs - rhs
+            else:
+                expression = _parse_math_fragment(source)
             result = solve_trigonometric(expression, x)
             if result.success:
                 result = SolverResult(
