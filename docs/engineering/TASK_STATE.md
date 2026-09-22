@@ -153,3 +153,11 @@
 - Validation: CI run 431 / 35712792646 fully green; Python 3.11 = 125 passed; Python 3.12 = 125 passed; Ruff lint/format ✓; mypy ✓; Heavy OCR runtime ✓.
 - Known issue: live Telegram execution evidence remains pending.
 - Next Action: perform live Telegram E2E matrix including one-message multi-problem text, mixed supported domains, one intentionally unsupported problem, and long aggregate responses.
+
+### INPUT-T04 — Telegram 12-problem batch live-regression hardening
+- Status: VERIFIED for repository/CI integration / live Telegram verification pending
+- Phase: 19/20/23/24
+- Objective: make the exact 12-question Persian batch robust in the real Telegram application path without weakening mathematical verification.
+- Implemented: matrix parsing hardening; correct SymPy matrix exception import; per-question failure isolation; Persian ordinal derivative parsing; natural Taylor wording; arithmetic-sequence ellipsis routing; periodic trigonometric rendering; exact 12-question regression test.
+- Validation: branch run 450 / 35718713885 green; merged to main as `1dc0bb81e7078ca39033e90b4d26fc754ce5389b`; main run 451 / 35718844173 green.
+- Next action: execute Windows Math VPS Runtime on current main, verify deployment, then repeat the exact 12-question Telegram test.
