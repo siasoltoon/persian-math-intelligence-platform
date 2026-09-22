@@ -294,7 +294,6 @@ def _solve_function_analysis(expression: sp.Expr, symbol: sp.Symbol) -> dict[str
     }
 
 
-
 def _parse_math_fragment(text: str) -> sp.Expr:
     value = text.strip().replace("،", ",").replace("؛", ";")
     value = value.replace("ln(", "log(")
@@ -368,9 +367,7 @@ def _solve_extended_word_problem(
     if limit_match:
         point_text, expression_text = limit_match.groups()
         try:
-            expression = _parse_math_fragment(
-                expression_text.replace("[", "(").replace("]", ")")
-            )
+            expression = _parse_math_fragment(expression_text.replace("[", "(").replace("]", ")"))
             result = limit(expression, x, sp.Rational(point_text))
             if result.success:
                 return result, result.value, "expression"
