@@ -214,7 +214,14 @@ def verify_structured_result(
 ) -> VerificationResult:
     metadata = metadata or {}
     try:
-        if method == "finite_sum":
+        if method == "series_expansion":
+            expected = sp.series(
+                metadata["expression"],
+                metadata["symbol"],
+                metadata["point"],
+                metadata["order"],
+            )
+        elif method == "finite_sum":
             expected = sp.summation(
                 metadata["expression"],
                 (metadata["variable"], metadata["lower"], metadata["upper"]),
