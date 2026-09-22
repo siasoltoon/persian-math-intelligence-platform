@@ -253,7 +253,9 @@ def _normalize_problem_digits(text: str) -> str:
     super_map = str.maketrans(superscript, "0123456789")
     value = re.sub(
         r"∫\s*([₀₁₂₃₄₅₆₇₈₉0-9]+)\s*([⁰¹²³⁴⁵⁶⁷⁸⁹0-9]+)",
-        lambda match: "∫" + match.group(1).translate(sub_map) + " " + match.group(2).translate(super_map),
+        lambda match: (
+            "∫" + match.group(1).translate(sub_map) + " " + match.group(2).translate(super_map)
+        ),
         value,
     )
     return value
@@ -277,9 +279,7 @@ def _solve_function_analysis(expression: sp.Expr, symbol: sp.Symbol) -> dict[str
         classification = (
             "max" if second_value < 0 else "min" if second_value > 0 else "inconclusive"
         )
-        critical_points.append(
-            (point, sp.simplify(expression.subs(symbol, point)), classification)
-        )
+        critical_points.append((point, sp.simplify(expression.subs(symbol, point)), classification))
     increasing = sp.solve_univariate_inequality(first > 0, symbol)
     decreasing = sp.solve_univariate_inequality(first < 0, symbol)
     inflection_x = tuple(sp.solve(second, symbol))
