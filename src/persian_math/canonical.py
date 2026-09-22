@@ -18,6 +18,15 @@ _TRANSFORMATIONS = standard_transformations + (implicit_multiplication_applicati
 _LOCALS = {
     "pi": sp.pi,
     "e": sp.E,
+    "oo": sp.oo,
+    "I": sp.I,
+    "re": sp.re,
+    "im": sp.im,
+    "conjugate": sp.conjugate,
+    "arg": sp.arg,
+    "sign": sp.sign,
+    "Min": sp.Min,
+    "Max": sp.Max,
     "sqrt": sp.sqrt,
     "sin": sp.sin,
     "cos": sp.cos,
@@ -26,6 +35,20 @@ _LOCALS = {
     "ln": sp.log,
     "exp": sp.exp,
     "abs": sp.Abs,
+    "asin": sp.asin,
+    "acos": sp.acos,
+    "atan": sp.atan,
+    "sinh": sp.sinh,
+    "cosh": sp.cosh,
+    "tanh": sp.tanh,
+    "asinh": sp.asinh,
+    "acosh": sp.acosh,
+    "atanh": sp.atanh,
+    "factorial": sp.factorial,
+    "gamma": sp.gamma,
+    "erf": sp.erf,
+    "floor": sp.floor,
+    "ceiling": sp.ceiling,
 }
 _SAFE_GLOBALS = {
     "__builtins__": {},
@@ -39,6 +62,8 @@ _SAFE_GLOBALS = {
     "Function": sp.Function,
     "pi": sp.pi,
     "E": sp.E,
+    "oo": sp.oo,
+    "I": sp.I,
 }
 _MAX_MATH_INPUT_CHARS = 10_000
 _ALLOWED_MATH_CHARS = re.compile(r"^[A-Za-z0-9_+\-*/^().,\[\]{}<>=|:;\s]*$")

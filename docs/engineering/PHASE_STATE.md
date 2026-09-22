@@ -90,3 +90,29 @@
 - Added regression tests for the exact advanced failures observed during live Telegram testing.
 - CI run 35700711582 passed all required jobs, including Heavy OCR runtime.
 - Remaining evidence: live Telegram re-test and broader labeled mathematical benchmark coverage. Universal mathematical mastery is not claimed from this extension alone.
+
+
+## CI / advanced mathematical coverage hardening — 2026-09-22
+- Status: IMPLEMENTED / VERIFICATION PENDING
+- Fixed independent verification for higher-order derivatives and Taylor series.
+- Fixed matrix routing when operation text precedes the matrix.
+- Normalized number-theory solver method naming for verification dispatch.
+- Isolated Heavy OCR CI from duplicate full-suite execution.
+- Fresh CI run required before VERIFIED.
+
+
+## Phase 19–24 — CI regression hardening
+- Status: VERIFIED for repository/CI integration.
+- Final CI run 422 / 35709968535: Ruff lint ✓, Ruff format ✓, mypy ✓, pytest Python 3.11 ✓, pytest Python 3.12 ✓, Heavy OCR runtime ✓.
+- Advanced regression failures and the trigonometric timeout were fixed without removing coverage or weakening verification.
+- Remaining evidence gates are live Telegram validation and broader real-world mathematical/OCR benchmarks.
+
+
+## Phase 19/23/24 — Multi-problem Telegram input
+- Status: VERIFIED for repository/CI integration; live Telegram verification pending.
+- Added bounded batch parsing for up to 12 independently delimited mathematical problems in one text message.
+- Preserved multiline systems and multi-part analysis as single problems.
+- Added independent per-problem solving/verification and combined Persian response rendering.
+- Added Telegram-safe response chunking for the Bot API text limit.
+- CI run 431 / 35712792646 passed Ruff lint, Ruff format, mypy, pytest 3.11, pytest 3.12 and Heavy OCR runtime.
+- Remaining evidence: live Telegram batch E2E and broader real-world mathematical benchmark coverage.

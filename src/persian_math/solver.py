@@ -147,7 +147,7 @@ def limit(
 def solve_trigonometric(expression: sp.Expr, symbol: sp.Symbol) -> SolverResult:
     try:
         return _ok(
-            tuple(sp.solveset(expression, symbol, domain=sp.S.Reals)),
+            sp.solveset(expression, symbol, domain=sp.S.Reals),
             "trigonometric",
             symbol=str(symbol),
         )
@@ -176,7 +176,7 @@ def solve_complex(expression: sp.Expr, symbol: sp.Symbol) -> SolverResult:
 def solve_number_theory(expression: sp.Expr) -> SolverResult:
     try:
         value = sp.factorint(int(expression))
-        return _ok(value, "integer_factorization")
+        return _ok(value, "number_theory")
     except (TypeError, ValueError, sp.SympifyError) as exc:
         return _fail("integer_factorization", exc)
 
@@ -294,10 +294,335 @@ def _solve_function_analysis(expression: sp.Expr, symbol: sp.Symbol) -> dict[str
     }
 
 
+def _parse_math_fragment(text: str) -> sp.Expr:
+    value = text.strip().replace("،", ",").replace("؛", ";")
+    value = value.replace("ln(", "log(")
+    return parse_expression(value).expression
+
+
+def _solve_extended_word_problem(
+    normalized: str,
+) -> tuple[SolverResult, Any | None, str | None]:
+    x = sp.Symbol("x")
+
+    higher_derivative = re.search(
+        r"(?:مشتق|دیفرانسیل)\s+مرتبه\s*(\d+)\s+"
+        r"(?:تابع\s+)?(?:f\s*\(\s*x\s*\)\s*=\s*)"
+        r"(.+?)\s+را\s+به\s+دست\s+آورید\s*\.?$",
+        normalized,
+        re.DOTALL,
+    )
+    if higher_derivative:
+        order_text, source = higher_derivative.groups()
+        try:
+            expression = _parse_math_fragment(source.strip())
+            result = differentiate(expression, x, int(order_text))
+            if result.success:
+                return result, result.value, "expression"
+        except (TypeError, ValueError):
+            pass
+
+    derivative = re.search(
+        r"(?:مشتق|دیفرانسیل).*?(?:مرتبه\s*(\d+))?.*?"
+        r"(?:f\s*\(\s*x\s*\)\s*=\s*)?(.+?)(?:\s*باشد|\s*$)",
+        normalized,
+        re.DOTALL,
+    )
+    if derivative:
+        order_text = derivative.group(1)
+        source = derivative.group(2).strip().rstrip(".")
+        try:
+            expression = _parse_math_fragment(source)
+            order = int(order_text) if order_text else 1
+            result = differentiate(expression, x, order)
+            if result.success:
+                return result, result.value, "expression"
+        except (TypeError, ValueError):
+            pass
+
+    partial = re.search(
+        r"(?:مشتق جزئی|partial).*?(?:نسبت به|با توجه به)\s*([A-Za-z]).*?"
+        r"(?:f\s*\([^)]*\)\s*=\s*)?(.+?)(?:\s*باشد|\s*$)",
+        normalized,
+        re.DOTALL | re.IGNORECASE,
+    )
+    if partial:
+        symbol = sp.Symbol(partial.group(1))
+        try:
+            expression = _parse_math_fragment(partial.group(2).strip())
+            result = _ok(sp.diff(expression, symbol), "partial_derivative", symbol=str(symbol))
+            return result, result.value, "expression"
+        except (TypeError, ValueError):
+            pass
+
+    integral = re.search(
+        r"(?:انتگرال|∫).*?(?:از\s*([0-9.+-]+)\s*تا\s*([0-9.+-]+)\s*)?"
+        r"(?:[:：]\s*)?(.*?)(?:\s*d\s*([A-Za-z]))?$",
+        normalized,
+        re.DOTALL,
+    )
+    if integral and "انتگرال" in normalized:
+        lower_text, upper_text, body, symbol_text = integral.groups()
+        try:
+            symbol = sp.Symbol(symbol_text or "x")
+            body = body.replace("∫", "").strip()
+            expression = _parse_math_fragment(body)
+            lower = sp.Rational(lower_text) if lower_text else None
+            upper = sp.Rational(upper_text) if upper_text else None
+            result = integrate(expression, symbol, lower, upper)
+            if result.success:
+                return result, result.value, "expression"
+        except (TypeError, ValueError):
+            pass
+
+    limit_match = re.search(
+        r"(?:حد|lim).*?(?:x\s*(?:→|->))\s*([-+]?\d+(?:\.\d+)?)\s*"
+        r"(?:\)|\])?\s*(?:=|:)?\s*(.+)$",
+        normalized,
+        re.DOTALL | re.IGNORECASE,
+    )
+    if limit_match:
+        point_text, expression_text = limit_match.groups()
+        try:
+            expression = _parse_math_fragment(expression_text.replace("[", "(").replace("]", ")"))
+            result = limit(expression, x, sp.Rational(point_text))
+            if result.success:
+                return result, result.value, "expression"
+        except (TypeError, ValueError):
+            pass
+
+    series_match = re.search(
+        r"(?:سری|بسط تیلور|بسط مک.?لورین).*?"
+        r"f\s*\(\s*x\s*\)\s*=\s*(.+?)\s+"
+        r"(?:در\s*x\s*=\s*([-+]?\d+(?:\.\d+)?)|حول\s*x\s*=\s*([-+]?\d+(?:\.\d+)?))"
+        r".*?(?:مرتبه|تا)\s*(\d+)",
+        normalized,
+        re.DOTALL,
+    )
+    if series_match:
+        source, point_a, point_b, order_text = series_match.groups()
+        try:
+            point = sp.Rational(point_a or point_b)
+            expression = _parse_math_fragment(source.strip())
+            value = sp.series(expression, x, point, int(order_text))
+            result = _ok(
+                value,
+                "series_expansion",
+                expression=expression,
+                symbol=x,
+                point=point,
+                order=int(order_text),
+            )
+            return result, value, "expression"
+        except (TypeError, ValueError):
+            pass
+
+    sum_match = re.search(
+        r"(?:مجموع|sum)\s*(?:از\s*)?([0-9]+)\s*(?:تا|to)\s*([0-9]+)\s*[:：]?\s*(.+)$",
+        normalized,
+        re.DOTALL | re.IGNORECASE,
+    )
+    if sum_match:
+        lower, upper, body = sum_match.groups()
+        try:
+            n = sp.Symbol("n", integer=True)
+            expression = _parse_math_fragment(body).xreplace({sp.Symbol("n"): n})
+            value = sp.summation(expression, (n, int(lower), int(upper)))
+            result = _ok(
+                value,
+                "finite_sum",
+                expression=expression,
+                variable=n,
+                lower=int(lower),
+                upper=int(upper),
+            )
+            return result, value, "expression"
+        except (TypeError, ValueError):
+            pass
+
+    product_match = re.search(
+        r"(?:حاصل.?ضرب|product).*?([0-9]+)\s*(?:تا|to)\s*([0-9]+).*?:?\s*(.+)$",
+        normalized,
+        re.DOTALL | re.IGNORECASE,
+    )
+    if product_match:
+        lower, upper, body = product_match.groups()
+        try:
+            n = sp.Symbol("n", integer=True)
+            expression = _parse_math_fragment(body).xreplace({sp.Symbol("n"): n})
+            value = sp.product(expression, (n, int(lower), int(upper)))
+            result = _ok(
+                value,
+                "finite_product",
+                expression=expression,
+                variable=n,
+                lower=int(lower),
+                upper=int(upper),
+            )
+            return result, value, "expression"
+        except (TypeError, ValueError):
+            pass
+
+    matrix_match = re.search(r"(\[\[.*?\]\])", normalized, re.DOTALL)
+    has_matrix_operation = bool(
+        re.search(
+            r"(?:دترمینان|determinant|det|معکوس|inverse|رتبه|rank|ترانهاده|transpose)",
+            normalized,
+            re.IGNORECASE,
+        )
+    )
+    if matrix_match and has_matrix_operation:
+        try:
+            rows = matrix_match.group(1).strip("[]").split("],[")
+            matrix = sp.Matrix(
+                [[_parse_math_fragment(item) for item in row.split(",")] for row in rows]
+            )
+            operation = (
+                "det"
+                if "دترمینان" in normalized or "det" in normalized.lower()
+                else "inv"
+                if "معکوس" in normalized or "inverse" in normalized.lower()
+                else "rank"
+                if "رتبه" in normalized or "rank" in normalized.lower()
+                else "transpose"
+            )
+            result = solve_matrix(matrix, operation)
+            if result.success:
+                result = SolverResult(
+                    True,
+                    result.value,
+                    result.method,
+                    metadata={**(result.metadata or {}), "matrix": matrix},
+                )
+                return result, result.value, "matrix"
+        except (TypeError, ValueError, sp.NonInvertibleMatrixError):
+            pass
+
+    stat_match = re.search(
+        r"(?:میانگین|میانه|واریانس|انحراف معیار|آمار).*?[:：]?\s*"
+        r"([0-9]+(?:\s*[,،]\s*[0-9]+)+)",
+        normalized,
+    )
+    if stat_match:
+        try:
+            values = [sp.Rational(item.strip()) for item in re.split(r"[,،]", stat_match.group(1))]
+            result = solve_statistics(values)
+            if result.success:
+                result = SolverResult(
+                    True, result.value, result.method, metadata={"values": values}
+                )
+                return result, result.value, "statistics"
+        except (TypeError, ValueError):
+            pass
+
+    combinatorics = re.search(r"(?:ترکیب|انتخاب)\s*(\d+)\s*(?:از|از بین)\s*(\d+)", normalized)
+    if combinatorics:
+        r_value, n_value = map(int, combinatorics.groups())
+        if 0 <= r_value <= n_value:
+            value = sp.binomial(n_value, r_value)
+            return _ok(value, "combinations", n=n_value, r=r_value), value, "expression"
+
+    permutation = re.search(r"(?:جایگشت|permutation)\s*(\d+)", normalized, re.IGNORECASE)
+    if permutation:
+        value = sp.factorial(int(permutation.group(1)))
+        return _ok(value, "permutation", n=int(permutation.group(1))), value, "expression"
+
+    number_theory = re.search(
+        r"(?:تجزیه به عوامل اول|فاکتورگیری عدد|prime factorization).*?(\d+)",
+        normalized,
+        re.IGNORECASE,
+    )
+    if number_theory:
+        result = solve_number_theory(sp.Integer(number_theory.group(1)))
+        if result.success:
+            result = SolverResult(
+                True,
+                result.value,
+                result.method,
+                metadata={"number": sp.Integer(number_theory.group(1))},
+            )
+            return result, result.value, "number_theory"
+
+    gcd_match = re.search(
+        r"(?:ب\.م\.م|gcd|بزرگترین مقسوم علیه).*?(\d+).*?(\d+)",
+        normalized,
+        re.IGNORECASE,
+    )
+    if gcd_match:
+        a, b = map(int, gcd_match.groups())
+        value = sp.gcd(a, b)
+        return _ok(value, "gcd", a=a, b=b), value, "expression"
+
+    lcm_match = re.search(
+        r"(?:ک\.م\.م|lcm|کوچکترین مضرب مشترک).*?(\d+).*?(\d+)",
+        normalized,
+        re.IGNORECASE,
+    )
+    if lcm_match:
+        a, b = map(int, lcm_match.groups())
+        value = sp.ilcm(a, b)
+        return _ok(value, "lcm", a=a, b=b), value, "expression"
+
+    trig = re.search(r"(?:معادله مثلثاتی|مثلثاتی).*?:?\s*(.+)$", normalized, re.DOTALL)
+    if trig:
+        try:
+            source = trig.group(1).strip()
+            if source.count("=") == 1:
+                lhs, rhs = parse_equation(source)
+                expression = lhs - rhs
+            else:
+                expression = _parse_math_fragment(source)
+            result = solve_trigonometric(expression, x)
+            if result.success:
+                result = SolverResult(
+                    True,
+                    result.value,
+                    result.method,
+                    metadata={"expression": expression, "symbol": x},
+                )
+                return result, result.value, "trigonometric"
+        except (TypeError, ValueError):
+            pass
+
+    optimize_match = re.search(
+        r"(?:بهینه|بیشینه|کمینه|ماکزیمم|مینیمم).*?"
+        r"(?:f\s*\(\s*x\s*\)\s*=\s*)?(.+)$",
+        normalized,
+        re.DOTALL,
+    )
+    if optimize_match:
+        try:
+            expression = _parse_math_fragment(optimize_match.group(1).strip())
+            result = optimize(expression, x)
+            if result.success:
+                return result, result.value, "optimization"
+        except (TypeError, ValueError):
+            pass
+
+    geometry = re.search(
+        r"(?:مساحت|محیط|طول|شعاع).*?(?:دایره|مربع).*?([0-9]+(?:\.\d+)?)",
+        normalized,
+        re.DOTALL,
+    )
+    if geometry:
+        number = sp.Rational(geometry.group(1))
+        if "دایره" in normalized:
+            value = sp.pi * number**2 if "مساحت" in normalized else 2 * sp.pi * number
+            return _ok(value, "geometry_circle"), value, "expression"
+        value = number**2 if "مساحت" in normalized else 4 * number
+        return _ok(value, "geometry_square"), value, "expression"
+
+    return SolverResult(False, None, "extended_router", "no supported extended problem"), None, None
+
+
 def solve_word_problem(
     text: str,
 ) -> tuple[SolverResult, Any | None, str | None]:
     normalized = _normalize_problem_digits(text)
+
+    extended_result, extended_value, extended_kind = _solve_extended_word_problem(normalized)
+    if extended_result.success:
+        return extended_result, extended_value, extended_kind
 
     rectangle = re.search(
         r"مساحت.*?مستطیل.*?طول\s*([0-9]+(?:\.\d+)?)\s*(?:سانتی.?متر|متر)?.*?"

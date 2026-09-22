@@ -120,3 +120,36 @@
 - Regression coverage: all reported advanced cases, including real radical equation preservation, now pass in pytest on Python 3.11/3.12.
 - CI verification: run 35700711582 passed Ruff lint, Ruff format, mypy, pytest Python 3.11/3.12 and Heavy OCR runtime.
 - Remaining: live Telegram re-test and expansion of the labeled mathematical benchmark across additional domains. This task does not claim universal mathematical coverage.
+
+
+### CI-T01 — Regression failure isolation and advanced verification fixes
+- Status: IN_PROGRESS / CI verification pending
+- Phase: 19–25 hardening / CI reliability
+- Resolved higher-order derivative verification semantics, Taylor-series verification dispatch/metadata, matrix operation routing, and number-theory verification method alignment.
+- Heavy OCR CI now runs OCR/document-focused regression tests instead of duplicating the complete mathematical suite.
+- Fresh CI evidence is required before VERIFIED.
+
+
+### CI-T01 — Regression failure isolation and advanced verification fixes
+- Status: VERIFIED
+- Phase: 19–25 hardening / CI reliability
+- Objective: eliminate deterministic advanced-test failures/timeouts while preserving full regression coverage and independent verification.
+- Implementation: higher-order derivative parsing/verification; Taylor-series metadata/verification; matrix routing; number-theory method alignment; finite-sum variable-assumption preservation; periodic trigonometric union verification without infinite set iteration; Heavy OCR suite isolation; per-test pytest timeout.
+- Tests: full pytest on Python 3.11 and 3.12; Ruff lint/format; mypy; Heavy OCR runtime.
+- Validation: GitHub Actions run 422 (35709968535) fully green.
+- Integration: both standard Python suites and Heavy OCR runtime passed.
+- Documentation/state: updated after final green verification.
+- Known issues: live Telegram and real-world benchmark evidence remain external gates.
+- Next Action: proceed to live Telegram/E2E and benchmark evidence; do not infer production-wide mathematical accuracy from CI alone.
+
+
+### INPUT-T04 — Multi-problem Telegram batch solving
+- Status: VERIFIED for repository/CI integration / live Telegram verification pending
+- Phase: 19/23/24
+- Objective: allow a user to send multiple mathematical problems in one Telegram text message and receive all independently solved/verified results together.
+- Acceptance: bounded parsing, no accidental splitting of multiline systems or multi-part analysis, independent per-problem processing, combined Persian response, safe resource limits and Telegram message-length handling.
+- Implementation: new batch module; application-level handle_batch; explicit «سؤال N» and numbered delimiters; maximum 12 problems and 12000 input characters; per-problem history recording; ordered response chunking at the Telegram text limit.
+- Tests: batch splitting, false-positive prevention, aggregate response, independent history entries and item limits.
+- Validation: CI run 431 / 35712792646 fully green; Python 3.11 = 125 passed; Python 3.12 = 125 passed; Ruff lint/format ✓; mypy ✓; Heavy OCR runtime ✓.
+- Known issue: live Telegram execution evidence remains pending.
+- Next Action: perform live Telegram E2E matrix including one-message multi-problem text, mixed supported domains, one intentionally unsupported problem, and long aggregate responses.

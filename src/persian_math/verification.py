@@ -173,10 +173,12 @@ def verify_equation_independently(
 
 
 def verify_derivative_result(
-    expression: sp.Expr, symbol: sp.Symbol, claimed: Any
+    expression: sp.Expr, symbol: sp.Symbol, claimed: Any, order: int = 1
 ) -> VerificationResult:
     try:
-        expected = sp.diff(expression, symbol)
+        if order < 1:
+            raise ValueError("derivative order must be positive")
+        expected = sp.diff(expression, symbol, order)
         return verify_expression_result(expected, claimed)
     except (TypeError, ValueError, NotImplementedError):
         return VerificationResult(
@@ -205,6 +207,142 @@ def verify_antiderivative_result(
         )
     except (TypeError, ValueError, NotImplementedError):
         return VerificationResult(False, ConfidenceLevel.LOW, ("integral_verification_failed",), ())
+
+
+def verify_structured_result(
+    method: str, claimed: Any, metadata: dict[str, Any] | None = None
+) -> VerificationResult:
+    metadata = metadata or {}
+    try:
+        if method == "series_expansion":
+            expected = sp.series(
+                metadata["expression"],
+                metadata["symbol"],
+                metadata["point"],
+                metadata["order"],
+            )
+        elif method == "finite_sum":
+            expected = sp.summation(
+                metadata["expression"],
+                (metadata["variable"], metadata["lower"], metadata["upper"]),
+            )
+        elif method == "finite_product":
+            expected = sp.product(
+                metadata["expression"],
+                (metadata["variable"], metadata["lower"], metadata["upper"]),
+            )
+        elif method == "matrix_det":
+            expected = metadata["matrix"].det()
+        elif method == "matrix_inv":
+            expected = metadata["matrix"].inv()
+        elif method == "matrix_rank":
+            expected = metadata["matrix"].rank()
+        elif method == "matrix_transpose":
+            expected = metadata["matrix"].T
+        elif method == "number_theory":
+            expected = sp.factorint(int(metadata["number"]))
+        elif method == "statistics":
+            values = metadata["values"]
+            count = len(values)
+            mean = sp.Rational(sum(values), count)
+            ordered = sorted(values, key=lambda item: float(item))
+            middle = count // 2
+            median = ordered[middle] if count % 2 else (ordered[middle - 1] + ordered[middle]) / 2
+            variance = sp.Rational(sum((item - mean) ** 2 for item in values), count)
+            expected = {"mean": mean, "median": median, "variance": variance}
+        elif method == "gcd":
+            expected = sp.gcd(metadata["a"], metadata["b"])
+        elif method == "lcm":
+            expected = sp.ilcm(metadata["a"], metadata["b"])
+        elif method == "combinations":
+            expected = sp.binomial(metadata["n"], metadata["r"])
+        elif method == "permutation":
+            expected = sp.factorial(metadata["n"])
+        elif method == "trigonometric":
+            expression = metadata["expression"]
+            symbol = metadata["symbol"]
+            # Avoid re-running solveset here: periodic solution sets such as
+            # sin(x)=0 can be represented as ImageSet and iterating/expanding
+            # them may be unbounded. Independently validate the claimed
+            # parameterization instead.
+            image_sets = claimed.args if isinstance(claimed, sp.Union) else (claimed,)
+            if all(isinstance(item, sp.ImageSet) for item in image_sets):
+                for image_set in image_sets:
+                    lam = image_set.lamda
+                    if image_set.base_set != sp.S.Integers:
+                        return VerificationResult(
+                            False,
+                            ConfidenceLevel.HIGH,
+                            ("unsupported_trigonometric_parameter_domain",),
+                            (claimed,),
+                        )
+                    generated = sp.expand_trig(expression.subs(symbol, lam.expr))
+                    if sp.simplify(generated) != 0:
+                        return VerificationResult(
+                            False,
+                            ConfidenceLevel.HIGH,
+                            ("trigonometric_identity_mismatch",),
+                            (claimed,),
+                        )
+                return VerificationResult(
+                    True,
+                    ConfidenceLevel.HIGH,
+                    ("independent_trigonometric_identity_recheck",),
+                    (claimed,),
+                )
+            if isinstance(claimed, sp.FiniteSet):
+                elements = tuple(claimed)
+                if all(sp.simplify(expression.subs(symbol, item)) == 0 for item in elements):
+                    return VerificationResult(
+                        True,
+                        ConfidenceLevel.HIGH,
+                        ("independent_trigonometric_element_recheck",),
+                        (claimed,),
+                    )
+            return VerificationResult(
+                False,
+                ConfidenceLevel.HIGH,
+                ("trigonometric_solution_mismatch",),
+                (claimed,),
+            )
+        elif method == "complex_equation":
+            expected = sp.solveset(metadata["expression"], metadata["symbol"], domain=sp.Complexes)
+            if sp.simplify(expected - claimed) == sp.EmptySet:
+                return VerificationResult(
+                    True,
+                    ConfidenceLevel.HIGH,
+                    ("independent_complex_recheck",),
+                    (expected,),
+                )
+            return VerificationResult(
+                False,
+                ConfidenceLevel.HIGH,
+                ("complex_solution_mismatch",),
+                (expected, claimed),
+            )
+        else:
+            return VerificationResult(
+                False, ConfidenceLevel.LOW, ("unsupported_structured_method",), ()
+            )
+        if expected == claimed:
+            return VerificationResult(
+                True, ConfidenceLevel.HIGH, ("independent_structured_recheck",), (expected,)
+            )
+        try:
+            equivalent = sp.simplify(expected - claimed) == 0
+        except (TypeError, ValueError):
+            equivalent = False
+        if equivalent:
+            return VerificationResult(
+                True, ConfidenceLevel.HIGH, ("independent_structured_recheck",), (expected,)
+            )
+        return VerificationResult(
+            False, ConfidenceLevel.HIGH, ("structured_result_mismatch",), (expected, claimed)
+        )
+    except (KeyError, TypeError, ValueError, NotImplementedError, sp.NonInvertibleMatrixError):
+        return VerificationResult(
+            False, ConfidenceLevel.LOW, ("structured_verification_failed",), ()
+        )
 
 
 def verify_definite_integral_result(

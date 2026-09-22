@@ -74,3 +74,30 @@
 - Independent verification covers derivative re-differentiation, antiderivative re-differentiation, definite-integral symbolic comparison, limit recomputation, linear-system solver/substitution, and independent calculus-analysis recomputation.
 - CI run 35700711582: Ruff lint ✓, Ruff format ✓, mypy ✓, pytest Python 3.11 ✓, pytest Python 3.12 ✓, Heavy OCR runtime ✓.
 - Live Telegram evidence is still required after the branch is merged/deployed; broader mathematical coverage remains benchmark-gated.
+
+
+## CI regression failure isolation — 2026-09-22
+- Run 410 (35707233250) exposed five failing advanced tests while pytest continued: second derivative, Taylor series, finite sum, matrix determinant and number theory.
+- Implemented fixes for higher-order derivative verification, Taylor-series verification, matrix natural-language routing and number-theory method alignment.
+- Heavy OCR CI no longer repeats the full regression suite; it targets OCR/document tests after the standard Python 3.11/3.12 full suites.
+- Verification pending fresh CI evidence.
+
+
+## CI regression hardening verification — 2026-09-22
+- Runs 410–421 were diagnostic/fix iterations and are not release evidence.
+- Final run 422 / 35709968535 passed all required CI jobs: Ruff lint ✓, Ruff format ✓, mypy ✓, pytest 3.11 ✓, pytest 3.12 ✓, Heavy OCR runtime ✓.
+- Advanced regression coverage now passes for second derivative, Taylor series, finite sums, matrix determinant, number theory and trigonometric equations.
+- The trigonometric test no longer times out on SymPy infinite-set iteration; periodic ImageSet/Union results are verified without materializing infinite sets.
+- CI-T01 is verified for repository/CI integration. Live Telegram, labeled OCR/handwriting benchmarks, load/recovery and production deployment evidence remain pending.
+
+
+## Multi-problem Telegram batch regression — 2026-09-22
+- Added tests for explicit «سؤال N» delimiters and numbered `1)`, `2)` delimiters.
+- Added protection against splitting multiline linear systems and multi-part function-analysis prompts.
+- Added application-level test proving all problems are processed and returned in one logical response while each input is recorded independently in history.
+- Added maximum 12-problem batch and 12000-character input bounds.
+- CI run 431 / 35712792646 passed all required jobs.
+- Pytest Python 3.11: 125 passed, 1 warning.
+- Pytest Python 3.12: 125 passed, 1 warning.
+- Ruff lint ✓, Ruff format ✓, mypy ✓, Heavy OCR runtime ✓.
+- Live Telegram batch behavior remains external E2E evidence and is not inferred from CI.

@@ -118,3 +118,29 @@ Execute the live Windows/Tailscale/Telegram E2E matrix and build the real labele
 - Regression coverage now exercises the exact reported advanced cases.
 - CI run 35700711582 passed Ruff lint, Ruff format, mypy, pytest Python 3.11/3.12 and Heavy OCR runtime.
 - Current status: repository/CI integration verified; live Telegram re-test pending. The platform is being expanded domain-by-domain and no universal mathematical coverage claim is made until benchmark evidence supports it.
+
+
+## Current hardening state — 2026-09-22
+- Active branch: feature/comprehensive-math-coverage.
+- Current work: resolving advanced mathematical verification failures from CI run 410 and isolating heavyweight OCR runtime from duplicate full-suite execution.
+- Code fixes are committed; repository/CI verification is pending on the new branch head.
+- Run 410 (35707233250) is pre-fix evidence and is not verification evidence for the corrected implementation.
+
+
+## CI hardening verification — 2026-09-22
+- CI-T01 status: VERIFIED for repository/CI integration.
+- Root causes from runs 410–421 were resolved: higher-order derivative parsing/verification, Taylor-series routing/verification, finite-sum symbol assumptions, matrix routing, number-theory verification alignment, and periodic trigonometric solution-set verification.
+- Heavy OCR was isolated from the duplicate full-suite execution and remains green.
+- Final verification run 422 (GitHub Actions run ID 35709968535) passed all required jobs on commit 6dcee08d2d3858acdbe7f9e6963c9942f55b1854.
+- Live Telegram, real-world OCR benchmark, production accuracy and external deployment evidence remain separate evidence gates.
+
+
+## Multi-problem Telegram batch support — 2026-09-22
+- Added bounded multi-problem text batching at the application layer.
+- A single Telegram text message can contain up to 12 independently delimited problems using labels such as «سؤال ۱:» or numbered forms such as «1)».
+- Each problem is processed independently through the existing solver and verification pipeline; one failure does not suppress the other problem results.
+- Multi-part mathematical prompts such as multiline systems and function-analysis requests are protected from accidental batch splitting.
+- Results are rendered as one logical combined response; when the response exceeds Telegram's 4096-character sendMessage text limit, the runtime safely emits ordered chunks instead of failing.
+- Added regression coverage for splitting, false-positive prevention, all-problem aggregation, history tracking and batch limits.
+- Verification: CI run 431 / 35712792646 fully green; Pytest 3.11 and 3.12 each reported 125 passed, plus Ruff lint/format, mypy and Heavy OCR runtime success.
+- This feature is repository/CI verified. Live Telegram execution is still required before claiming end-to-end production runtime verification.

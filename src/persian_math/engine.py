@@ -20,6 +20,7 @@ from .verification import (
     verify_equation_independently,
     verify_expression_result,
     verify_limit_result,
+    verify_structured_result,
     verify_system_result,
 )
 
@@ -62,7 +63,10 @@ def process(text: str, *, symbol_name: str = "x") -> EngineResult:
         metadata = solver_result.metadata or {}
         expression = parse_expression(str(metadata["source_expression"])).expression
         verification = verify_derivative_result(
-            expression, sp.Symbol(str(metadata["symbol"])), solver_result.value
+            expression,
+            sp.Symbol(str(metadata["symbol"])),
+            solver_result.value,
+            int(metadata.get("order", 1)),
         )
     elif solver_result.method == "integral":
         metadata = solver_result.metadata or {}
@@ -99,6 +103,26 @@ def process(text: str, *, symbol_name: str = "x") -> EngineResult:
             metadata["equations"],
             metadata["symbols"],
             solver_result.value,
+        )
+    elif solver_result.method in {
+        "series_expansion",
+        "finite_sum",
+        "finite_product",
+        "matrix_det",
+        "matrix_inv",
+        "matrix_rank",
+        "matrix_transpose",
+        "number_theory",
+        "statistics",
+        "gcd",
+        "lcm",
+        "combinations",
+        "permutation",
+        "trigonometric",
+        "complex_equation",
+    }:
+        verification = verify_structured_result(
+            solver_result.method, solver_result.value, solver_result.metadata
         )
     elif solver_result.method == "function_analysis":
         metadata = solver_result.metadata or {}
