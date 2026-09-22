@@ -198,3 +198,9 @@ def test_trigonometric_equation_is_verified():
     result = process("معادله مثلثاتی: sin(x) = 0")
     assert result.solver.success
     assert result.verification is not None and result.verification.verified
+
+def test_multiline_trigonometric_prompt_is_verified():
+    result = process("معادله مثلثاتی زیر را حل کنید:\nsin(x) = 0")
+    assert result.solver.success
+    assert result.solver.method == "trigonometric"
+    assert result.verification is not None and result.verification.verified
