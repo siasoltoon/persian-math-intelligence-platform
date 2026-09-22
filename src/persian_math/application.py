@@ -140,8 +140,7 @@ class ApplicationService:
         except Exception:  # noqa: BLE001
             rendered = (
                 False,
-                "این مسئله به‌دلیل یک خطای داخلی قابل پردازش نبود. "
-                "لطفاً صورت همین سؤال را دوباره ارسال کن.",
+                "این مسئله به‌دلیل یک خطای داخلی قابل پردازش نبود. لطفاً صورت همین سؤال را دوباره ارسال کن.",
             )
         self._sessions[user_id] = replace(session, history=(*session.history[-19:], text))
         return rendered
