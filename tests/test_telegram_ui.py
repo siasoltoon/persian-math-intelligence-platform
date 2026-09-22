@@ -72,6 +72,38 @@ def test_batch_does_not_split_multiline_system_or_function_analysis() -> None:
     assert split_problem_batch(analysis) == (analysis,)
 
 
+def test_batch_application_isolates_internal_problem_failures(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    service = ApplicationService()
+    calls = iter(("ok", "fail", "ok"))
+
+    class Verification:
+        verified = True
+
+    class Solver:
+        success = True
+        value = 9
+
+    class Result:
+        solver = Solver()
+        verification = Verification()
+
+    def fake_process(_: str) -> Result:
+        if next(calls) == "fail":
+            raise ValueError("simulated internal failure")
+        return Result()
+
+    monkeypatch.setattr("persian_math.application.process", fake_process)
+    response = service.handle(message("1", "1) 3 + 6\n2) bad\n3) 4 + 5"))
+    assert "نتیجه 3 مسئله" in response.text_fa
+    assert "سؤال 1:" in response.text_fa
+    assert "سؤال 2:" in response.text_fa
+    assert "سؤال 3:" in response.text_fa
+    assert "خطای داخلی" in response.text_fa
+    assert len(service.session("1").history) == 3
+
+
 def test_batch_application_solves_all_problems_in_one_response(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
