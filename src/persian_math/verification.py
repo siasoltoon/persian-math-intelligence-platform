@@ -259,19 +259,49 @@ def verify_structured_result(
         elif method == "permutation":
             expected = sp.factorial(metadata["n"])
         elif method == "trigonometric":
-            expected = sp.solveset(metadata["expression"], metadata["symbol"], domain=sp.S.Reals)
-            if expected == claimed:
-                return VerificationResult(
-                    True,
-                    ConfidenceLevel.HIGH,
-                    ("independent_trigonometric_recheck",),
-                    (expected,),
-                )
+            expression = metadata["expression"]
+            symbol = metadata["symbol"]
+            # Avoid re-running solveset here: periodic solution sets such as
+            # sin(x)=0 can be represented as ImageSet and iterating/expanding
+            # them may be unbounded. Independently validate the claimed
+            # parameterization instead.
+            if isinstance(claimed, sp.ImageSet):
+                lam = claimed.lamda
+                parameter = lam.variables[0]
+                base_set = claimed.base_set
+                if base_set != sp.S.Integers:
+                    return VerificationResult(
+                        False,
+                        ConfidenceLevel.HIGH,
+                        ("unsupported_trigonometric_parameter_domain",),
+                        (claimed,),
+                    )
+                generated = sp.simplify(expression.subs(symbol, lam.expr))
+                if sp.trigsimp(generated) == 0:
+                    return VerificationResult(
+                        True,
+                        ConfidenceLevel.HIGH,
+                        ("independent_trigonometric_identity_recheck",),
+                        (claimed, parameter),
+                    )
+            elif isinstance(claimed, sp.Set):
+                # Finite/explicit sets can be checked element-by-element without
+                # invoking an unbounded symbolic set solver.
+                elements = tuple(claimed)
+                if len(elements) <= 32 and all(
+                    sp.simplify(expression.subs(symbol, item)) == 0 for item in elements
+                ):
+                    return VerificationResult(
+                        True,
+                        ConfidenceLevel.HIGH,
+                        ("independent_trigonometric_element_recheck",),
+                        (claimed,),
+                    )
             return VerificationResult(
                 False,
                 ConfidenceLevel.HIGH,
                 ("trigonometric_solution_mismatch",),
-                (expected, claimed),
+                (claimed,),
             )
         elif method == "complex_equation":
             expected = sp.solveset(metadata["expression"], metadata["symbol"], domain=sp.Complexes)
