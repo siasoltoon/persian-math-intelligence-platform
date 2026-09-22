@@ -3,6 +3,7 @@ from __future__ import annotations
 import re
 
 
+
 MAX_BATCH_ITEMS = 12
 MAX_BATCH_CHARS = 12000
 
