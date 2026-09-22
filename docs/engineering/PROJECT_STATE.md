@@ -118,3 +118,10 @@ Execute the live Windows/Tailscale/Telegram E2E matrix and build the real labele
 - Regression coverage now exercises the exact reported advanced cases.
 - CI run 35700711582 passed Ruff lint, Ruff format, mypy, pytest Python 3.11/3.12 and Heavy OCR runtime.
 - Current status: repository/CI integration verified; live Telegram re-test pending. The platform is being expanded domain-by-domain and no universal mathematical coverage claim is made until benchmark evidence supports it.
+
+
+## Current hardening state — 2026-09-22
+- Active branch: feature/comprehensive-math-coverage.
+- Current work: resolving advanced mathematical verification failures from CI run 410 and isolating heavyweight OCR runtime from duplicate full-suite execution.
+- Code fixes are committed; repository/CI verification is pending on the new branch head.
+- Run 410 (35707233250) is pre-fix evidence and is not verification evidence for the corrected implementation.

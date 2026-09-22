@@ -90,3 +90,12 @@
 - Added regression tests for the exact advanced failures observed during live Telegram testing.
 - CI run 35700711582 passed all required jobs, including Heavy OCR runtime.
 - Remaining evidence: live Telegram re-test and broader labeled mathematical benchmark coverage. Universal mathematical mastery is not claimed from this extension alone.
+
+
+## CI / advanced mathematical coverage hardening — 2026-09-22
+- Status: IMPLEMENTED / VERIFICATION PENDING
+- Fixed independent verification for higher-order derivatives and Taylor series.
+- Fixed matrix routing when operation text precedes the matrix.
+- Normalized number-theory solver method naming for verification dispatch.
+- Isolated Heavy OCR CI from duplicate full-suite execution.
+- Fresh CI run required before VERIFIED.

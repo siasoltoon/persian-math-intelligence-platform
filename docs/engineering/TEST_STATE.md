@@ -74,3 +74,10 @@
 - Independent verification covers derivative re-differentiation, antiderivative re-differentiation, definite-integral symbolic comparison, limit recomputation, linear-system solver/substitution, and independent calculus-analysis recomputation.
 - CI run 35700711582: Ruff lint ✓, Ruff format ✓, mypy ✓, pytest Python 3.11 ✓, pytest Python 3.12 ✓, Heavy OCR runtime ✓.
 - Live Telegram evidence is still required after the branch is merged/deployed; broader mathematical coverage remains benchmark-gated.
+
+
+## CI regression failure isolation — 2026-09-22
+- Run 410 (35707233250) exposed five failing advanced tests while pytest continued: second derivative, Taylor series, finite sum, matrix determinant and number theory.
+- Implemented fixes for higher-order derivative verification, Taylor-series verification, matrix natural-language routing and number-theory method alignment.
+- Heavy OCR CI no longer repeats the full regression suite; it targets OCR/document tests after the standard Python 3.11/3.12 full suites.
+- Verification pending fresh CI evidence.

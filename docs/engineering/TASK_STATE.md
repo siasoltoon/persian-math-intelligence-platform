@@ -120,3 +120,11 @@
 - Regression coverage: all reported advanced cases, including real radical equation preservation, now pass in pytest on Python 3.11/3.12.
 - CI verification: run 35700711582 passed Ruff lint, Ruff format, mypy, pytest Python 3.11/3.12 and Heavy OCR runtime.
 - Remaining: live Telegram re-test and expansion of the labeled mathematical benchmark across additional domains. This task does not claim universal mathematical coverage.
+
+
+### CI-T01 — Regression failure isolation and advanced verification fixes
+- Status: IN_PROGRESS / CI verification pending
+- Phase: 19–25 hardening / CI reliability
+- Resolved higher-order derivative verification semantics, Taylor-series verification dispatch/metadata, matrix operation routing, and number-theory verification method alignment.
+- Heavy OCR CI now runs OCR/document-focused regression tests instead of duplicating the complete mathematical suite.
+- Fresh CI evidence is required before VERIFIED.
