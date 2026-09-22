@@ -407,7 +407,14 @@ def _solve_extended_word_problem(
             n = sp.Symbol("n", integer=True)
             expression = _parse_math_fragment(body)
             value = sp.summation(expression, (n, int(lower), int(upper)))
-            result = _ok(value, "finite_sum", expression=expression, variable=n, lower=int(lower), upper=int(upper))
+            result = _ok(
+                value,
+                "finite_sum",
+                expression=expression,
+                variable=n,
+                lower=int(lower),
+                upper=int(upper),
+            )
             return result, value, "expression"
         except (TypeError, ValueError):
             pass
@@ -423,7 +430,14 @@ def _solve_extended_word_problem(
             n = sp.Symbol("n", integer=True)
             expression = _parse_math_fragment(body)
             value = sp.product(expression, (n, int(lower), int(upper)))
-            result = _ok(value, "finite_product", expression=expression, variable=n, lower=int(lower), upper=int(upper))
+            result = _ok(
+                value,
+                "finite_product",
+                expression=expression,
+                variable=n,
+                lower=int(lower),
+                upper=int(upper),
+            )
             return result, value, "expression"
         except (TypeError, ValueError):
             pass
@@ -436,16 +450,26 @@ def _solve_extended_word_problem(
     if matrix_match:
         try:
             rows = matrix_match.group(1).strip("[]").split("],[")
-            matrix = sp.Matrix([[_parse_math_fragment(item) for item in row.split(",")] for row in rows])
+            matrix = sp.Matrix(
+                [[_parse_math_fragment(item) for item in row.split(",")] for row in rows]
+            )
             operation = (
-                "det" if "دترمینان" in normalized or "det" in normalized.lower()
-                else "inv" if "معکوس" in normalized or "inverse" in normalized.lower()
-                else "rank" if "رتبه" in normalized or "rank" in normalized.lower()
+                "det"
+                if "دترمینان" in normalized or "det" in normalized.lower()
+                else "inv"
+                if "معکوس" in normalized or "inverse" in normalized.lower()
+                else "rank"
+                if "رتبه" in normalized or "rank" in normalized.lower()
                 else "transpose"
             )
             result = solve_matrix(matrix, operation)
             if result.success:
-                result = SolverResult(True, result.value, result.method, metadata={**(result.metadata or {}), "matrix": matrix})
+                result = SolverResult(
+                    True,
+                    result.value,
+                    result.method,
+                    metadata={**(result.metadata or {}), "matrix": matrix},
+                )
                 return result, result.value, "matrix"
         except (TypeError, ValueError, sp.NonInvertibleMatrixError):
             pass
@@ -460,7 +484,9 @@ def _solve_extended_word_problem(
             values = [sp.Rational(item.strip()) for item in re.split(r"[,،]", stat_match.group(1))]
             result = solve_statistics(values)
             if result.success:
-                result = SolverResult(True, result.value, result.method, metadata={"values": values})
+                result = SolverResult(
+                    True, result.value, result.method, metadata={"values": values}
+                )
                 return result, result.value, "statistics"
         except (TypeError, ValueError):
             pass
@@ -485,7 +511,12 @@ def _solve_extended_word_problem(
     if number_theory:
         result = solve_number_theory(sp.Integer(number_theory.group(1)))
         if result.success:
-            result = SolverResult(True, result.value, result.method, metadata={"number": sp.Integer(number_theory.group(1))})
+            result = SolverResult(
+                True,
+                result.value,
+                result.method,
+                metadata={"number": sp.Integer(number_theory.group(1))},
+            )
             return result, result.value, "number_theory"
 
     gcd_match = re.search(
@@ -514,7 +545,12 @@ def _solve_extended_word_problem(
             expression = _parse_math_fragment(trig.group(1).strip())
             result = solve_trigonometric(expression, x)
             if result.success:
-                result = SolverResult(True, result.value, result.method, metadata={"expression": expression, "symbol": x})
+                result = SolverResult(
+                    True,
+                    result.value,
+                    result.method,
+                    metadata={"expression": expression, "symbol": x},
+                )
                 return result, result.value, "trigonometric"
         except (TypeError, ValueError):
             pass
