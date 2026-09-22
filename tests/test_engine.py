@@ -118,3 +118,78 @@ def test_function_analysis_word_problem_is_verified():
     assert value["critical_points"] == ((-1, 32, "max"), (3, 0, "min"))
     assert value["inflection_points"] == ((1, 16),)
     assert result.verification is not None and result.verification.verified
+
+
+def test_second_derivative_is_verified():
+    result = process("مشتق مرتبه 2 تابع f(x) = x^4 - 2x^2 + 1 را به دست آورید.")
+    assert result.solver.success
+    x = sp.Symbol("x")
+    assert sp.simplify(result.solver.value - sp.diff(x**4 - 2*x**2 + 1, x, 2)) == 0
+    assert result.verification is not None and result.verification.verified
+
+
+def test_taylor_series_is_verified():
+    result = process("بسط تیلور f(x) = sin(x) حول x = 0 تا مرتبه 6 را به دست آورید.")
+    assert result.solver.success
+    x = sp.Symbol("x")
+    assert result.solver.value == sp.series(sp.sin(x), x, 0, 6)
+    assert result.verification is not None and result.verification.verified
+
+
+def test_finite_sum_is_verified():
+    result = process("مجموع از 1 تا 10: n^2")
+    assert result.solver.success
+    assert result.solver.value == 385
+    assert result.verification is not None and result.verification.verified
+
+
+def test_matrix_determinant_is_verified():
+    result = process("دترمینان ماتریس [[1,2],[3,4]] را محاسبه کنید.")
+    assert result.solver.success
+    assert result.solver.value == -2
+    assert result.verification is not None and result.verification.verified
+
+
+def test_statistics_are_verified():
+    result = process("میانگین، میانه و واریانس داده‌های زیر را محاسبه کنید: 1,2,3,4,5")
+    assert result.solver.success
+    assert result.solver.value["mean"] == 3
+    assert result.solver.value["median"] == 3
+    assert result.solver.value["variance"] == 2
+    assert result.verification is not None and result.verification.verified
+
+
+def test_combinations_are_verified():
+    result = process("تعداد ترکیب 2 از 5 را به دست آورید.")
+    assert result.solver.success
+    assert result.solver.value == 10
+    assert result.verification is not None and result.verification.verified
+
+
+def test_number_theory_is_verified():
+    result = process("تجزیه به عوامل اول عدد 360 را به دست آورید.")
+    assert result.solver.success
+    assert result.solver.value == {2: 3, 3: 2, 5: 1}
+    assert result.verification is not None and result.verification.verified
+
+
+def test_gcd_and_lcm_are_verified():
+    gcd_result = process("ب.م.م 84 و 126 را محاسبه کنید.")
+    lcm_result = process("ک.م.م 12 و 18 را محاسبه کنید.")
+    assert gcd_result.solver.value == 42
+    assert lcm_result.solver.value == 36
+    assert gcd_result.verification is not None and gcd_result.verification.verified
+    assert lcm_result.verification is not None and lcm_result.verification.verified
+
+
+def test_circle_geometry_is_verified():
+    result = process("مساحت دایره با شعاع 3 را محاسبه کنید.")
+    assert result.solver.success
+    assert result.solver.value == 9 * sp.pi
+    assert result.verification is not None and result.verification.verified
+
+
+def test_trigonometric_equation_is_verified():
+    result = process("معادله مثلثاتی: sin(x) = 0")
+    assert result.solver.success
+    assert result.verification is not None and result.verification.verified
