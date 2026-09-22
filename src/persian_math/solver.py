@@ -426,7 +426,7 @@ def _solve_extended_word_problem(
         lower, upper, body = sum_match.groups()
         try:
             n = sp.Symbol("n", integer=True)
-            expression = _parse_math_fragment(body)
+            expression = _parse_math_fragment(body).xreplace({sp.Symbol("n"): n})
             value = sp.summation(expression, (n, int(lower), int(upper)))
             result = _ok(
                 value,
@@ -449,7 +449,7 @@ def _solve_extended_word_problem(
         lower, upper, body = product_match.groups()
         try:
             n = sp.Symbol("n", integer=True)
-            expression = _parse_math_fragment(body)
+            expression = _parse_math_fragment(body).xreplace({sp.Symbol("n"): n})
             value = sp.product(expression, (n, int(lower), int(upper)))
             result = _ok(
                 value,
