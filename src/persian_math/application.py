@@ -134,9 +134,17 @@ class ApplicationService:
 
     def _handle_single_problem(self, user_id: str, text: str) -> tuple[bool, str]:
         session = self.session(user_id)
-        result = process(text)
+        try:
+            result = process(text)
+            rendered = self._render_result(result)
+        except Exception:
+            rendered = (
+                False,
+                "این مسئله به‌دلیل یک خطای داخلی قابل پردازش نبود. "
+                "لطفاً صورت همین سؤال را دوباره ارسال کن."
+            )
         self._sessions[user_id] = replace(session, history=(*session.history[-19:], text))
-        return self._render_result(result)
+        return rendered
 
     def handle_batch(self, user_id: str, problems: tuple[str, ...]) -> OutgoingMessage:
         if not problems:
