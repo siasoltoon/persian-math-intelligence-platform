@@ -179,7 +179,9 @@ def verify_derivative_result(
         expected = sp.diff(expression, symbol)
         return verify_expression_result(expected, claimed)
     except (TypeError, ValueError, NotImplementedError):
-        return VerificationResult(False, ConfidenceLevel.LOW, ("derivative_verification_failed",), ())
+        return VerificationResult(
+            False, ConfidenceLevel.LOW, ("derivative_verification_failed",), ()
+        )
 
 
 def verify_antiderivative_result(
@@ -245,7 +247,9 @@ def verify_system_result(
             return VerificationResult(False, ConfidenceLevel.LOW, ("invalid_system_output",), ())
         expected_tuples = tuple(expected)
         if not expected_tuples:
-            return VerificationResult(False, ConfidenceLevel.HIGH, ("system_solution_mismatch",), ())
+            return VerificationResult(
+                False, ConfidenceLevel.HIGH, ("system_solution_mismatch",), ()
+            )
         actual = tuple(sp.simplify(value) for value in actual_tuple)
         expected_tuple = tuple(sp.simplify(value) for value in expected_tuples[0])
         if actual != expected_tuple:
@@ -262,6 +266,8 @@ def verify_system_result(
                 ("independent_linear_solver", "system_substitution"),
                 (expected_tuple,),
             )
-        return VerificationResult(False, ConfidenceLevel.HIGH, ("system_nonzero_residual",), residuals)
+        return VerificationResult(
+            False, ConfidenceLevel.HIGH, ("system_nonzero_residual",), residuals
+        )
     except (KeyError, TypeError, ValueError, NotImplementedError):
         return VerificationResult(False, ConfidenceLevel.LOW, ("system_verification_failed",), ())
