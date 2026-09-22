@@ -214,9 +214,15 @@ def verify_structured_result(
     metadata = metadata or {}
     try:
         if method == "finite_sum":
-            expected = sp.summation(metadata["expression"], (metadata["variable"], metadata["lower"], metadata["upper"]))
+            expected = sp.summation(
+                metadata["expression"],
+                (metadata["variable"], metadata["lower"], metadata["upper"]),
+            )
         elif method == "finite_product":
-            expected = sp.product(metadata["expression"], (metadata["variable"], metadata["lower"], metadata["upper"]))
+            expected = sp.product(
+                metadata["expression"],
+                (metadata["variable"], metadata["lower"], metadata["upper"]),
+            )
         elif method == "matrix_det":
             expected = metadata["matrix"].det()
         elif method == "matrix_inv":
@@ -247,20 +253,48 @@ def verify_structured_result(
         elif method == "trigonometric":
             expected = sp.solveset(metadata["expression"], metadata["symbol"], domain=sp.S.Reals)
             if set(expected) == set(claimed):
-                return VerificationResult(True, ConfidenceLevel.HIGH, ("independent_trigonometric_recheck",), (expected,))
-            return VerificationResult(False, ConfidenceLevel.HIGH, ("trigonometric_solution_mismatch",), (expected, claimed))
+                return VerificationResult(
+                    True,
+                    ConfidenceLevel.HIGH,
+                    ("independent_trigonometric_recheck",),
+                    (expected,),
+                )
+            return VerificationResult(
+                False,
+                ConfidenceLevel.HIGH,
+                ("trigonometric_solution_mismatch",),
+                (expected, claimed),
+            )
         elif method == "complex_equation":
             expected = sp.solveset(metadata["expression"], metadata["symbol"], domain=sp.Complexes)
             if set(expected) == set(claimed):
-                return VerificationResult(True, ConfidenceLevel.HIGH, ("independent_complex_recheck",), (expected,))
-            return VerificationResult(False, ConfidenceLevel.HIGH, ("complex_solution_mismatch",), (expected, claimed))
+                return VerificationResult(
+                    True,
+                    ConfidenceLevel.HIGH,
+                    ("independent_complex_recheck",),
+                    (expected,),
+                )
+            return VerificationResult(
+                False,
+                ConfidenceLevel.HIGH,
+                ("complex_solution_mismatch",),
+                (expected, claimed),
+            )
         else:
-            return VerificationResult(False, ConfidenceLevel.LOW, ("unsupported_structured_method",), ())
+            return VerificationResult(
+                False, ConfidenceLevel.LOW, ("unsupported_structured_method",), ()
+            )
         if expected == claimed or sp.simplify(expected - claimed) == 0:
-            return VerificationResult(True, ConfidenceLevel.HIGH, ("independent_structured_recheck",), (expected,))
-        return VerificationResult(False, ConfidenceLevel.HIGH, ("structured_result_mismatch",), (expected, claimed))
+            return VerificationResult(
+                True, ConfidenceLevel.HIGH, ("independent_structured_recheck",), (expected,)
+            )
+        return VerificationResult(
+            False, ConfidenceLevel.HIGH, ("structured_result_mismatch",), (expected, claimed)
+        )
     except (KeyError, TypeError, ValueError, NotImplementedError, sp.NonInvertibleMatrixError):
-        return VerificationResult(False, ConfidenceLevel.LOW, ("structured_verification_failed",), ())
+        return VerificationResult(
+            False, ConfidenceLevel.LOW, ("structured_verification_failed",), ()
+        )
 
 
 def verify_definite_integral_result(
