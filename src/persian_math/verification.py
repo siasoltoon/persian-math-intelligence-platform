@@ -173,10 +173,12 @@ def verify_equation_independently(
 
 
 def verify_derivative_result(
-    expression: sp.Expr, symbol: sp.Symbol, claimed: Any
+    expression: sp.Expr, symbol: sp.Symbol, claimed: Any, order: int = 1
 ) -> VerificationResult:
     try:
-        expected = sp.diff(expression, symbol)
+        if order < 1:
+            raise ValueError("derivative order must be positive")
+        expected = sp.diff(expression, symbol, order)
         return verify_expression_result(expected, claimed)
     except (TypeError, ValueError, NotImplementedError):
         return VerificationResult(
