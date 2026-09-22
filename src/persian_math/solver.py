@@ -296,8 +296,16 @@ def _solve_function_analysis(expression: sp.Expr, symbol: sp.Symbol) -> dict[str
 
 
 _DERIVATIVE_ORDER_WORDS = {
-    "اول": 1, "دوم": 2, "سوم": 3, "چهارم": 4, "پنجم": 5,
-    "ششم": 6, "هفتم": 7, "هشتم": 8, "نهم": 9, "دهم": 10,
+    "اول": 1,
+    "دوم": 2,
+    "سوم": 3,
+    "چهارم": 4,
+    "پنجم": 5,
+    "ششم": 6,
+    "هفتم": 7,
+    "هشتم": 8,
+    "نهم": 9,
+    "دهم": 10,
 }
 
 
@@ -444,7 +452,11 @@ def _solve_extended_word_problem(
             if difference > 0 and (last - first) % difference == 0:
                 n = int((last - first) / difference) + 1
                 value = sp.simplify(n * (first + last) / 2)
-                return _ok(value, "arithmetic_sequence_sum", n=n, first=first, difference=difference), value, "expression"
+                return (
+                    _ok(value, "arithmetic_sequence_sum", n=n, first=first, difference=difference),
+                    value,
+                    "expression",
+                )
         except (TypeError, ValueError):
             pass
 
