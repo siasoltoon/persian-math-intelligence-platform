@@ -295,6 +295,18 @@ def _solve_function_analysis(expression: sp.Expr, symbol: sp.Symbol) -> dict[str
     }
 
 
+_DERIVATIVE_ORDER_WORDS = {
+    "اول": 1, "دوم": 2, "سوم": 3, "چهارم": 4, "پنجم": 5,
+    "ششم": 6, "هفتم": 7, "هشتم": 8, "نهم": 9, "دهم": 10,
+}
+
+
+def _parse_derivative_order(value: str | None) -> int:
+    if not value:
+        return 1
+    return int(value) if value.isdigit() else _DERIVATIVE_ORDER_WORDS[value]
+
+
 def _parse_math_fragment(text: str) -> sp.Expr:
     value = text.strip().replace("،", ",").replace("؛", ";")
     value = value.replace("ln(", "log(")
@@ -307,7 +319,7 @@ def _solve_extended_word_problem(
     x = sp.Symbol("x")
 
     higher_derivative = re.search(
-        r"(?:مشتق|دیفرانسیل)\s+مرتبه\s*(\d+)\s+"
+        r"(?:مشتق|دیفرانسیل)\s+مرتبه\s*(\d+|اول|دوم|سوم|چهارم|پنجم|ششم|هفتم|هشتم|نهم|دهم)\s+"
         r"(?:تابع\s+)?(?:f\s*\(\s*x\s*\)\s*=\s*)"
         r"(.+?)\s+را\s+به\s+دست\s+آورید\s*\.?$",
         normalized,
@@ -317,14 +329,14 @@ def _solve_extended_word_problem(
         order_text, source = higher_derivative.groups()
         try:
             expression = _parse_math_fragment(source.strip())
-            result = differentiate(expression, x, int(order_text))
+            result = differentiate(expression, x, _parse_derivative_order(order_text))
             if result.success:
                 return result, result.value, "expression"
         except (TypeError, ValueError):
             pass
 
     derivative = re.search(
-        r"(?:مشتق|دیفرانسیل).*?(?:مرتبه\s*(\d+))?.*?"
+        r"(?:مشتق|دیفرانسیل).*?(?:مرتبه\s*(\d+|اول|دوم|سوم|چهارم|پنجم|ششم|هفتم|هشتم|نهم|دهم))?.*?"
         r"(?:f\s*\(\s*x\s*\)\s*=\s*)?(.+?)(?:\s*باشد|\s*$)",
         normalized,
         re.DOTALL,
@@ -334,7 +346,7 @@ def _solve_extended_word_problem(
         source = derivative.group(2).strip().rstrip(".")
         try:
             expression = _parse_math_fragment(source)
-            order = int(order_text) if order_text else 1
+            order = _parse_derivative_order(order_text)
             result = differentiate(expression, x, order)
             if result.success:
                 return result, result.value, "expression"
@@ -394,7 +406,7 @@ def _solve_extended_word_problem(
 
     series_match = re.search(
         r"(?:سری|بسط تیلور|بسط مک.?لورین).*?"
-        r"f\s*\(\s*x\s*\)\s*=\s*(.+?)\s+"
+        r"(?:f\s*\(\s*x\s*\)\s*=\s*|تابع\s+)(.+?)\s+"
         r"(?:در\s*x\s*=\s*([-+]?\d+(?:\.\d+)?)|حول\s*x\s*=\s*([-+]?\d+(?:\.\d+)?))"
         r".*?(?:مرتبه|تا)\s*(\d+)",
         normalized,
@@ -415,6 +427,23 @@ def _solve_extended_word_problem(
                 order=int(order_text),
             )
             return result, value, "expression"
+        except (TypeError, ValueError):
+            pass
+
+    arithmetic_ellipsis = re.search(
+        r"(?:مجموع).*?([0-9]+)\s*\+\s*([0-9]+).*?\.\.\.\s*\+\s*([0-9]+)\s*$",
+        normalized,
+        re.DOTALL,
+    )
+    if arithmetic_ellipsis:
+        first_text, second_text, last_text = arithmetic_ellipsis.groups()
+        try:
+            first, second, last = map(sp.Integer, (first_text, second_text, last_text))
+            difference = second - first
+            if difference > 0 and (last - first) % difference == 0:
+                n = int((last - first) / difference) + 1
+                value = sp.simplify(n * (first + last) / 2)
+                return _ok(value, "arithmetic_sequence_sum", n=n, first=first, difference=difference), value, "expression"
         except (TypeError, ValueError):
             pass
 
