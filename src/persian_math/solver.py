@@ -147,7 +147,7 @@ def limit(
 def solve_trigonometric(expression: sp.Expr, symbol: sp.Symbol) -> SolverResult:
     try:
         return _ok(
-            tuple(sp.solveset(expression, symbol, domain=sp.S.Reals)),
+            sp.solveset(expression, symbol, domain=sp.S.Reals),
             "trigonometric",
             symbol=str(symbol),
         )
