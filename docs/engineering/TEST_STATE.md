@@ -101,3 +101,10 @@
 - Pytest Python 3.12: 125 passed, 1 warning.
 - Ruff lint ✓, Ruff format ✓, mypy ✓, Heavy OCR runtime ✓.
 - Live Telegram batch behavior remains external E2E evidence and is not inferred from CI.
+
+## Telegram 12-problem batch live-regression — 2026-09-22
+- Initial live failure was reproduced and traced to matrix parsing plus an invalid SymPy exception reference; the latter masked the original parser failure.
+- Added exact 12-problem regression coverage and per-problem failure-isolation coverage.
+- Branch CI 450 / 35718713885: Ruff lint ✓, Ruff format ✓, mypy ✓, pytest 3.11 ✓, pytest 3.12 ✓, Heavy OCR ✓.
+- Main CI 451 / 35718844173: all required jobs ✓.
+- Live Telegram/VPS evidence is still required after runtime restart; CI evidence is not substituted for live E2E.
