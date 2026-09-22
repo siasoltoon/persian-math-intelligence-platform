@@ -150,6 +150,13 @@ def test_matrix_determinant_is_verified():
     assert result.verification is not None and result.verification.verified
 
 
+def test_matrix_determinant_with_spaced_rows_is_verified():
+    result = process("دترمینان A را محاسبه کنید: A = [[2, 1], [3, 4]]")
+    assert result.solver.success
+    assert result.solver.value == 5
+    assert result.verification is not None and result.verification.verified
+
+
 def test_statistics_are_verified():
     result = process("میانگین، میانه و واریانس داده‌های زیر را محاسبه کنید: 1,2,3,4,5")
     assert result.solver.success
@@ -192,4 +199,11 @@ def test_circle_geometry_is_verified():
 def test_trigonometric_equation_is_verified():
     result = process("معادله مثلثاتی: sin(x) = 0")
     assert result.solver.success
+    assert result.verification is not None and result.verification.verified
+
+
+def test_multiline_trigonometric_prompt_is_verified():
+    result = process("معادله مثلثاتی زیر را حل کنید:\nsin(x) = 0")
+    assert result.solver.success
+    assert result.solver.method == "trigonometric"
     assert result.verification is not None and result.verification.verified

@@ -72,6 +72,99 @@ def test_batch_does_not_split_multiline_system_or_function_analysis() -> None:
     assert split_problem_batch(analysis) == (analysis,)
 
 
+def test_batch_application_isolates_internal_problem_failures(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    service = ApplicationService()
+    calls = iter(("ok", "fail", "ok"))
+
+    class Verification:
+        verified = True
+
+    class Solver:
+        success = True
+        value = 9
+
+    class Result:
+        solver = Solver()
+        verification = Verification()
+
+    def fake_process(_: str) -> Result:
+        if next(calls) == "fail":
+            raise ValueError("simulated internal failure")
+        return Result()
+
+    monkeypatch.setattr("persian_math.application.process", fake_process)
+    response = service.handle(message("1", "1) 3 + 6\n2) 4 + 4\n3) 4 + 5"))
+    assert "نتیجه 3 مسئله" in response.text_fa
+    assert "سؤال 1:" in response.text_fa
+    assert "سؤال 2:" in response.text_fa
+    assert "سؤال 3:" in response.text_fa
+    assert "خطای داخلی" in response.text_fa
+    assert len(service.session("1").history) == 3
+
+
+def test_realistic_twelve_problem_batch_completes_all_items() -> None:
+    service = ApplicationService()
+    text = """سؤال ۱:
+18 + 7 × 3 - 10
+
+سؤال ۲:
+اگر 3x + 7 = 22 باشد، مقدار x را به دست آورید.
+
+سؤال ۳:
+دستگاه معادلات زیر را حل کنید:
+2x + y = 7
+x - y = 2
+
+سؤال ۴:
+مشتق تابع زیر را به دست آورید:
+f(x) = x^4 - 3x^2 + 5x - 7
+
+سؤال ۵:
+مشتق مرتبه دوم تابع زیر را به دست آورید:
+f(x) = x^5 - 4x^3 + 2x^2 - 8
+
+سؤال ۶:
+انتگرال زیر را محاسبه کنید:
+∫(3x^2 - 4x + 5) dx
+
+سؤال ۷:
+حد زیر را به دست آورید:
+lim(x→0) [sin(x) / x]
+
+سؤال ۸:
+ماتریس زیر را در نظر بگیرید:
+A = [[2, 1], [3, 4]]
+دترمینان A را محاسبه کنید.
+
+سؤال ۹:
+معادله زیر را در اعداد حقیقی حل کنید:
+x^2 - 5x + 6 = 0
+
+سؤال ۱۰:
+معادله مثلثاتی زیر را حل کنید:
+sin(x) = 0
+
+سؤال ۱۱:
+مجموع زیر را محاسبه کنید:
+1 + 2 + 3 + ... + 100
+
+سؤال ۱۲:
+سری تیلور تابع e^x را حول نقطه x=0 تا مرتبه 5 به دست آورید."""
+    response = service.handle(message("batch-e2e", text))
+    assert "نتیجه 12 مسئله" in response.text_fa
+    for index in range(1, 13):
+        assert f"سؤال {index}:" in response.text_fa
+    assert "پاسخ: 29" in response.text_fa
+    assert "پاسخ: {5}" in response.text_fa
+    assert "4*x**3 - 6*x + 5" in response.text_fa
+    assert "5*x**3 - 6*x + 1" in response.text_fa
+    assert "پاسخ: 5" in response.text_fa
+    assert "پاسخ: 5050" in response.text_fa
+    assert "نتیجه مستقل تأیید شد." in response.text_fa
+
+
 def test_batch_application_solves_all_problems_in_one_response(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:

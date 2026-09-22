@@ -6,6 +6,7 @@ from dataclasses import dataclass
 from typing import Any
 
 import sympy as sp
+from sympy.matrices.exceptions import NonInvertibleMatrixError
 
 from .canonical import parse_equation, parse_expression, parse_inequality
 
@@ -239,7 +240,7 @@ def solve_matrix(matrix: sp.MatrixBase, operation: str) -> SolverResult:
         if operation not in operations:
             raise ValueError("unsupported matrix operation")
         return _ok(operations[operation](), f"matrix_{operation}")
-    except (TypeError, ValueError, sp.NonInvertibleMatrixError) as exc:
+    except (TypeError, ValueError, NonInvertibleMatrixError) as exc:
         return _fail("matrix", exc)
 
 
@@ -294,6 +295,26 @@ def _solve_function_analysis(expression: sp.Expr, symbol: sp.Symbol) -> dict[str
     }
 
 
+_DERIVATIVE_ORDER_WORDS = {
+    "اول": 1,
+    "دوم": 2,
+    "سوم": 3,
+    "چهارم": 4,
+    "پنجم": 5,
+    "ششم": 6,
+    "هفتم": 7,
+    "هشتم": 8,
+    "نهم": 9,
+    "دهم": 10,
+}
+
+
+def _parse_derivative_order(value: str | None) -> int:
+    if not value:
+        return 1
+    return int(value) if value.isdigit() else _DERIVATIVE_ORDER_WORDS[value]
+
+
 def _parse_math_fragment(text: str) -> sp.Expr:
     value = text.strip().replace("،", ",").replace("؛", ";")
     value = value.replace("ln(", "log(")
@@ -305,9 +326,26 @@ def _solve_extended_word_problem(
 ) -> tuple[SolverResult, Any | None, str | None]:
     x = sp.Symbol("x")
 
+    natural_higher_derivative = re.search(
+        r"(?:مشتق|دیفرانسیل)\s+مرتبه\s*(\d+|اول|دوم|سوم|چهارم|پنجم|ششم|هفتم|هشتم|نهم|دهم).*?"
+        r"را\s+به\s+دست\s+آورید\s*[:：]?\s*"
+        r"f\s*\(\s*x\s*\)\s*=\s*(.+?)\s*$",
+        normalized,
+        re.DOTALL,
+    )
+    if natural_higher_derivative:
+        order_text, source = natural_higher_derivative.groups()
+        try:
+            expression = _parse_math_fragment(source.strip())
+            result = differentiate(expression, x, _parse_derivative_order(order_text))
+            if result.success:
+                return result, result.value, "expression"
+        except (TypeError, ValueError):
+            pass
+
     higher_derivative = re.search(
-        r"(?:مشتق|دیفرانسیل)\s+مرتبه\s*(\d+)\s+"
-        r"(?:تابع\s+)?(?:f\s*\(\s*x\s*\)\s*=\s*)"
+        r"(?:مشتق|دیفرانسیل)\s+مرتبه\s*(\d+|اول|دوم|سوم|چهارم|پنجم|ششم|هفتم|هشتم|نهم|دهم).*?"
+        r"f\s*\(\s*x\s*\)\s*=\s*"
         r"(.+?)\s+را\s+به\s+دست\s+آورید\s*\.?$",
         normalized,
         re.DOTALL,
@@ -316,14 +354,14 @@ def _solve_extended_word_problem(
         order_text, source = higher_derivative.groups()
         try:
             expression = _parse_math_fragment(source.strip())
-            result = differentiate(expression, x, int(order_text))
+            result = differentiate(expression, x, _parse_derivative_order(order_text))
             if result.success:
                 return result, result.value, "expression"
         except (TypeError, ValueError):
             pass
 
     derivative = re.search(
-        r"(?:مشتق|دیفرانسیل).*?(?:مرتبه\s*(\d+))?.*?"
+        r"(?:مشتق|دیفرانسیل).*?(?:مرتبه\s*(\d+|اول|دوم|سوم|چهارم|پنجم|ششم|هفتم|هشتم|نهم|دهم))?.*?"
         r"(?:f\s*\(\s*x\s*\)\s*=\s*)?(.+?)(?:\s*باشد|\s*$)",
         normalized,
         re.DOTALL,
@@ -333,7 +371,7 @@ def _solve_extended_word_problem(
         source = derivative.group(2).strip().rstrip(".")
         try:
             expression = _parse_math_fragment(source)
-            order = int(order_text) if order_text else 1
+            order = _parse_derivative_order(order_text)
             result = differentiate(expression, x, order)
             if result.success:
                 return result, result.value, "expression"
@@ -393,8 +431,8 @@ def _solve_extended_word_problem(
 
     series_match = re.search(
         r"(?:سری|بسط تیلور|بسط مک.?لورین).*?"
-        r"f\s*\(\s*x\s*\)\s*=\s*(.+?)\s+"
-        r"(?:در\s*x\s*=\s*([-+]?\d+(?:\.\d+)?)|حول\s*x\s*=\s*([-+]?\d+(?:\.\d+)?))"
+        r"(?:f\s*\(\s*x\s*\)\s*=\s*|تابع\s+)(.+?)(?:\s+را)?\s+"
+        r"(?:در\s*x\s*=\s*([-+]?\d+(?:\.\d+)?)|حول\s+(?:نقطه\s+)?x\s*=\s*([-+]?\d+(?:\.\d+)?))"
         r".*?(?:مرتبه|تا)\s*(\d+)",
         normalized,
         re.DOTALL,
@@ -414,6 +452,27 @@ def _solve_extended_word_problem(
                 order=int(order_text),
             )
             return result, value, "expression"
+        except (TypeError, ValueError):
+            pass
+
+    arithmetic_ellipsis = re.search(
+        r"(?:مجموع).*?([0-9]+)\s*\+\s*([0-9]+).*?\.\.\.\s*\+\s*([0-9]+)\s*$",
+        normalized,
+        re.DOTALL,
+    )
+    if arithmetic_ellipsis:
+        first_text, second_text, last_text = arithmetic_ellipsis.groups()
+        try:
+            first, second, last = map(sp.Integer, (first_text, second_text, last_text))
+            difference = second - first
+            if difference > 0 and (last - first) % difference == 0:
+                n = int((last - first) / difference) + 1
+                value = sp.simplify(n * (first + last) / 2)
+                return (
+                    _ok(value, "arithmetic_sequence_sum", n=n, first=first, difference=difference),
+                    value,
+                    "expression",
+                )
         except (TypeError, ValueError):
             pass
 
@@ -473,10 +532,18 @@ def _solve_extended_word_problem(
     )
     if matrix_match and has_matrix_operation:
         try:
-            rows = matrix_match.group(1).strip("[]").split("],[")
-            matrix = sp.Matrix(
-                [[_parse_math_fragment(item) for item in row.split(",")] for row in rows]
-            )
+            matrix_text = matrix_match.group(1).strip()
+            inner = matrix_text[2:-2].strip()
+            row_texts = re.split(r"\]\s*,\s*\[", inner)
+            if not row_texts or any(not row.strip() for row in row_texts):
+                raise ValueError("invalid matrix rows")
+            rows = [[item.strip() for item in row.split(",")] for row in row_texts]
+            if not rows or any(not row for row in rows):
+                raise ValueError("invalid matrix rows")
+            width = len(rows[0])
+            if width == 0 or any(len(row) != width for row in rows):
+                raise ValueError("matrix rows must have equal length")
+            matrix = sp.Matrix([[_parse_math_fragment(item) for item in row] for row in rows])
             operation = (
                 "det"
                 if "دترمینان" in normalized or "det" in normalized.lower()
@@ -495,7 +562,7 @@ def _solve_extended_word_problem(
                     metadata={**(result.metadata or {}), "matrix": matrix},
                 )
                 return result, result.value, "matrix"
-        except (TypeError, ValueError, sp.NonInvertibleMatrixError):
+        except (TypeError, ValueError, NonInvertibleMatrixError):
             pass
 
     stat_match = re.search(
@@ -562,6 +629,28 @@ def _solve_extended_word_problem(
         a, b = map(int, lcm_match.groups())
         value = sp.ilcm(a, b)
         return _ok(value, "lcm", a=a, b=b), value, "expression"
+
+    trig_equation = re.search(
+        r"(?:معادله\s+مثلثاتی|مثلثاتی).*?"
+        r"((?:sin|cos|tan|cot|sec|csc)\s*\([^)]*\)\s*=\s*[^,؛\\n]+)",
+        normalized,
+        re.DOTALL | re.IGNORECASE,
+    )
+    if trig_equation:
+        try:
+            lhs, rhs = parse_equation(trig_equation.group(1).strip())
+            expression = lhs - rhs
+            result = solve_trigonometric(expression, x)
+            if result.success:
+                result = SolverResult(
+                    True,
+                    result.value,
+                    result.method,
+                    metadata={"expression": expression, "symbol": x},
+                )
+                return result, result.value, "trigonometric"
+        except (TypeError, ValueError):
+            pass
 
     trig = re.search(r"(?:معادله مثلثاتی|مثلثاتی).*?:?\s*(.+)$", normalized, re.DOTALL)
     if trig:

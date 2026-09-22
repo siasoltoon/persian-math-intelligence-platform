@@ -4,6 +4,7 @@ import math
 from typing import Any
 
 import sympy as sp
+from sympy.matrices.exceptions import NonInvertibleMatrixError
 
 from .domain import ConfidenceLevel, VerificationResult
 
@@ -339,7 +340,7 @@ def verify_structured_result(
         return VerificationResult(
             False, ConfidenceLevel.HIGH, ("structured_result_mismatch",), (expected, claimed)
         )
-    except (KeyError, TypeError, ValueError, NotImplementedError, sp.NonInvertibleMatrixError):
+    except (KeyError, TypeError, ValueError, NotImplementedError, NonInvertibleMatrixError):
         return VerificationResult(
             False, ConfidenceLevel.LOW, ("structured_verification_failed",), ()
         )
