@@ -572,6 +572,28 @@ def _solve_extended_word_problem(
         value = sp.ilcm(a, b)
         return _ok(value, "lcm", a=a, b=b), value, "expression"
 
+    trig_equation = re.search(
+        r"(?:معادله\s+مثلثاتی|مثلثاتی).*?"
+        r"((?:sin|cos|tan|cot|sec|csc)\s*\([^)]*\)\s*=\s*[^,؛\\n]+)",
+        normalized,
+        re.DOTALL | re.IGNORECASE,
+    )
+    if trig_equation:
+        try:
+            lhs, rhs = parse_equation(trig_equation.group(1).strip())
+            expression = lhs - rhs
+            result = solve_trigonometric(expression, x)
+            if result.success:
+                result = SolverResult(
+                    True,
+                    result.value,
+                    result.method,
+                    metadata={"expression": expression, "symbol": x},
+                )
+                return result, result.value, "trigonometric"
+        except (TypeError, ValueError):
+            pass
+
     trig = re.search(r"(?:معادله مثلثاتی|مثلثاتی).*?:?\s*(.+)$", normalized, re.DOTALL)
     if trig:
         try:
