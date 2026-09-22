@@ -388,7 +388,14 @@ def _solve_extended_word_problem(
             point = sp.Rational(point_a or point_b)
             expression = _parse_math_fragment(source.strip())
             value = sp.series(expression, x, point, int(order_text))
-            result = _ok(value, "series_expansion", symbol="x", point=point, order=int(order_text))
+            result = _ok(
+                value,
+                "series_expansion",
+                expression=expression,
+                symbol=x,
+                point=point,
+                order=int(order_text),
+            )
             return result, value, "expression"
         except (TypeError, ValueError):
             pass
