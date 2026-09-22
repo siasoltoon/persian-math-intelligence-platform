@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import re
+
+
 MAX_BATCH_ITEMS = 12
 MAX_BATCH_CHARS = 12000
 
@@ -72,7 +74,7 @@ def split_problem_batch(text: str) -> tuple[str, ...]:
         raise ValueError("batch input exceeds limit")
 
     lines = normalized.splitlines()
-    chunks = _split_by_label(lines, _QUESTION_LABEL)
+    chunks: list[str] = _split_by_label(lines, _QUESTION_LABEL)
     if not chunks:
         chunks = _split_numbered(lines)
     if not chunks:
@@ -80,10 +82,10 @@ def split_problem_batch(text: str) -> tuple[str, ...]:
     if not chunks:
         return (normalized,)
 
-    chunks = tuple(_clean_block(chunk) for chunk in chunks if chunk.strip())
-    if len(chunks) > MAX_BATCH_ITEMS:
+    result = tuple(_clean_block(chunk) for chunk in chunks if chunk.strip())
+    if len(result) > MAX_BATCH_ITEMS:
         raise ValueError("too many problems in one batch")
-    return chunks
+    return result
 
 
 def is_batch_input(text: str) -> bool:
