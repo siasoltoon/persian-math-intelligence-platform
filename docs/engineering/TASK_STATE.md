@@ -141,3 +141,15 @@
 - Documentation/state: updated after final green verification.
 - Known issues: live Telegram and real-world benchmark evidence remain external gates.
 - Next Action: proceed to live Telegram/E2E and benchmark evidence; do not infer production-wide mathematical accuracy from CI alone.
+
+
+### INPUT-T04 — Multi-problem Telegram batch solving
+- Status: VERIFIED for repository/CI integration / live Telegram verification pending
+- Phase: 19/23/24
+- Objective: allow a user to send multiple mathematical problems in one Telegram text message and receive all independently solved/verified results together.
+- Acceptance: bounded parsing, no accidental splitting of multiline systems or multi-part analysis, independent per-problem processing, combined Persian response, safe resource limits and Telegram message-length handling.
+- Implementation: new batch module; application-level handle_batch; explicit «سؤال N» and numbered delimiters; maximum 12 problems and 12000 input characters; per-problem history recording; ordered response chunking at the Telegram text limit.
+- Tests: batch splitting, false-positive prevention, aggregate response, independent history entries and item limits.
+- Validation: CI run 431 / 35712792646 fully green; Python 3.11 = 125 passed; Python 3.12 = 125 passed; Ruff lint/format ✓; mypy ✓; Heavy OCR runtime ✓.
+- Known issue: live Telegram execution evidence remains pending.
+- Next Action: perform live Telegram E2E matrix including one-message multi-problem text, mixed supported domains, one intentionally unsupported problem, and long aggregate responses.

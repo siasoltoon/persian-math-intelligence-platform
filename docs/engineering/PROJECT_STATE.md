@@ -133,3 +133,14 @@ Execute the live Windows/Tailscale/Telegram E2E matrix and build the real labele
 - Heavy OCR was isolated from the duplicate full-suite execution and remains green.
 - Final verification run 422 (GitHub Actions run ID 35709968535) passed all required jobs on commit 6dcee08d2d3858acdbe7f9e6963c9942f55b1854.
 - Live Telegram, real-world OCR benchmark, production accuracy and external deployment evidence remain separate evidence gates.
+
+
+## Multi-problem Telegram batch support — 2026-09-22
+- Added bounded multi-problem text batching at the application layer.
+- A single Telegram text message can contain up to 12 independently delimited problems using labels such as «سؤال ۱:» or numbered forms such as «1)».
+- Each problem is processed independently through the existing solver and verification pipeline; one failure does not suppress the other problem results.
+- Multi-part mathematical prompts such as multiline systems and function-analysis requests are protected from accidental batch splitting.
+- Results are rendered as one logical combined response; when the response exceeds Telegram's 4096-character sendMessage text limit, the runtime safely emits ordered chunks instead of failing.
+- Added regression coverage for splitting, false-positive prevention, all-problem aggregation, history tracking and batch limits.
+- Verification: CI run 431 / 35712792646 fully green; Pytest 3.11 and 3.12 each reported 125 passed, plus Ruff lint/format, mypy and Heavy OCR runtime success.
+- This feature is repository/CI verified. Live Telegram execution is still required before claiming end-to-end production runtime verification.

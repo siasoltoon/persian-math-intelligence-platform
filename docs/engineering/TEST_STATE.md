@@ -89,3 +89,15 @@
 - Advanced regression coverage now passes for second derivative, Taylor series, finite sums, matrix determinant, number theory and trigonometric equations.
 - The trigonometric test no longer times out on SymPy infinite-set iteration; periodic ImageSet/Union results are verified without materializing infinite sets.
 - CI-T01 is verified for repository/CI integration. Live Telegram, labeled OCR/handwriting benchmarks, load/recovery and production deployment evidence remain pending.
+
+
+## Multi-problem Telegram batch regression — 2026-09-22
+- Added tests for explicit «سؤال N» delimiters and numbered `1)`, `2)` delimiters.
+- Added protection against splitting multiline linear systems and multi-part function-analysis prompts.
+- Added application-level test proving all problems are processed and returned in one logical response while each input is recorded independently in history.
+- Added maximum 12-problem batch and 12000-character input bounds.
+- CI run 431 / 35712792646 passed all required jobs.
+- Pytest Python 3.11: 125 passed, 1 warning.
+- Pytest Python 3.12: 125 passed, 1 warning.
+- Ruff lint ✓, Ruff format ✓, mypy ✓, Heavy OCR runtime ✓.
+- Live Telegram batch behavior remains external E2E evidence and is not inferred from CI.

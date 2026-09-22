@@ -106,3 +106,13 @@
 - Final CI run 422 / 35709968535: Ruff lint ✓, Ruff format ✓, mypy ✓, pytest Python 3.11 ✓, pytest Python 3.12 ✓, Heavy OCR runtime ✓.
 - Advanced regression failures and the trigonometric timeout were fixed without removing coverage or weakening verification.
 - Remaining evidence gates are live Telegram validation and broader real-world mathematical/OCR benchmarks.
+
+
+## Phase 19/23/24 — Multi-problem Telegram input
+- Status: VERIFIED for repository/CI integration; live Telegram verification pending.
+- Added bounded batch parsing for up to 12 independently delimited mathematical problems in one text message.
+- Preserved multiline systems and multi-part analysis as single problems.
+- Added independent per-problem solving/verification and combined Persian response rendering.
+- Added Telegram-safe response chunking for the Bot API text limit.
+- CI run 431 / 35712792646 passed Ruff lint, Ruff format, mypy, pytest 3.11, pytest 3.12 and Heavy OCR runtime.
+- Remaining evidence: live Telegram batch E2E and broader real-world mathematical benchmark coverage.
