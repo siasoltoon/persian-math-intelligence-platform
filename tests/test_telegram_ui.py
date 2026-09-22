@@ -95,7 +95,7 @@ def test_batch_application_isolates_internal_problem_failures(
         return Result()
 
     monkeypatch.setattr("persian_math.application.process", fake_process)
-    response = service.handle(message("1", "1) 3 + 6\n2) bad\n3) 4 + 5"))
+    response = service.handle(message("1", "1) 3 + 6\n2) 4 + 4\n3) 4 + 5"))
     assert "نتیجه 3 مسئله" in response.text_fa
     assert "سؤال 1:" in response.text_fa
     assert "سؤال 2:" in response.text_fa
