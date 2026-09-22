@@ -35,7 +35,6 @@ _LOCALS = {
     "asinh": sp.asinh,
     "acosh": sp.acosh,
     "atanh": sp.atanh,
-    "sqrt": sp.sqrt,
     "factorial": sp.factorial,
     "gamma": sp.gamma,
     "erf": sp.erf,
