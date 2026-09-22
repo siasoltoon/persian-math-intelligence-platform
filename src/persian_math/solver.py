@@ -51,9 +51,7 @@ def solve_equation(lhs: sp.Expr, rhs: sp.Expr, symbol: sp.Symbol) -> SolverResul
         return _fail("symbolic_equation", exc)
 
 
-def solve_inequality(
-    lhs: sp.Expr, operator: str, rhs: sp.Expr, symbol: sp.Symbol
-) -> SolverResult:
+def solve_inequality(lhs: sp.Expr, operator: str, rhs: sp.Expr, symbol: sp.Symbol) -> SolverResult:
     try:
         relation = {"<": sp.Lt, "<=": sp.Le, ">": sp.Gt, ">=": sp.Ge}[operator](lhs, rhs)
         return _ok(
@@ -276,7 +274,9 @@ def _solve_function_analysis(expression: sp.Expr, symbol: sp.Symbol) -> dict[str
     critical_points = []
     for point in critical:
         second_value = sp.simplify(second.subs(symbol, point))
-        classification = "max" if second_value < 0 else "min" if second_value > 0 else "inconclusive"
+        classification = (
+            "max" if second_value < 0 else "min" if second_value > 0 else "inconclusive"
+        )
         critical_points.append(
             (point, sp.simplify(expression.subs(symbol, point)), classification)
         )
@@ -330,7 +330,17 @@ def solve_word_problem(
         except (TypeError, ValueError):
             pass
 
-    if any(token in normalized for token in ("نقاط بحرانی", "ماکزیمم", "مینیمم", "بازه‌های صعود", "بازه های صعود", "نقاط عطف")):
+    if any(
+        token in normalized
+        for token in (
+            "نقاط بحرانی",
+            "ماکزیمم",
+            "مینیمم",
+            "بازه‌های صعود",
+            "بازه های صعود",
+            "نقاط عطف",
+        )
+    ):
         try:
             definition = _function_definition(normalized)
             if definition:
