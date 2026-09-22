@@ -322,7 +322,15 @@ def verify_structured_result(
             return VerificationResult(
                 False, ConfidenceLevel.LOW, ("unsupported_structured_method",), ()
             )
-        if expected == claimed or sp.simplify(expected - claimed) == 0:
+        if expected == claimed:
+            return VerificationResult(
+                True, ConfidenceLevel.HIGH, ("independent_structured_recheck",), (expected,)
+            )
+        try:
+            equivalent = sp.simplify(expected - claimed) == 0
+        except (TypeError, ValueError):
+            equivalent = False
+        if equivalent:
             return VerificationResult(
                 True, ConfidenceLevel.HIGH, ("independent_structured_recheck",), (expected,)
             )
