@@ -63,7 +63,10 @@ def process(text: str, *, symbol_name: str = "x") -> EngineResult:
         metadata = solver_result.metadata or {}
         expression = parse_expression(str(metadata["source_expression"])).expression
         verification = verify_derivative_result(
-            expression, sp.Symbol(str(metadata["symbol"])), solver_result.value
+            expression,
+            sp.Symbol(str(metadata["symbol"])),
+            solver_result.value,
+            int(metadata.get("order", 1)),
         )
     elif solver_result.method == "integral":
         metadata = solver_result.metadata or {}
@@ -102,6 +105,7 @@ def process(text: str, *, symbol_name: str = "x") -> EngineResult:
             solver_result.value,
         )
     elif solver_result.method in {
+        "series_expansion",
         "finite_sum",
         "finite_product",
         "matrix_det",
