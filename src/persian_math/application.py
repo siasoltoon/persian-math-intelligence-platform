@@ -4,7 +4,7 @@ from dataclasses import dataclass, replace
 
 from .batch import split_problem_batch
 from .domain import Difficulty, EducationalLevel, UserProfile
-from .engine import process
+from .engine import EngineResult, process
 from .exercises import ExerciseSpec, generate, validate_exercise
 from .telegram_adapter import IncomingMessage, MessageKind, OutgoingMessage, validate_incoming
 
@@ -103,7 +103,7 @@ class ApplicationService:
         )
 
     @staticmethod
-    def _render_result(result: object) -> tuple[bool, str]:
+    def _render_result(result: EngineResult) -> tuple[bool, str]:
         solver = result.solver
         if not solver.success:
             return False, "این مسئله فعلاً با اطمینان کافی قابل حل نیست."
@@ -142,7 +142,9 @@ class ApplicationService:
         if not problems:
             return OutgoingMessage("هیچ مسئله‌ای برای پردازش دریافت نشد.")
         if len(problems) > 12:
-            return OutgoingMessage("تعداد مسائل یک پیام بیش از حد مجاز است. حداکثر ۱۲ مسئله ارسال کن.")
+            return OutgoingMessage(
+                "تعداد مسائل یک پیام بیش از حد مجاز است. حداکثر ۱۲ مسئله ارسال کن."
+            )
         rendered: list[str] = []
         for index, problem in enumerate(problems, 1):
             _, answer = self._handle_single_problem(user_id, problem)
@@ -154,7 +156,6 @@ class ApplicationService:
 
     def handle(self, message: IncomingMessage) -> OutgoingMessage:
         validate_incoming(message)
-        session = self.session(message.user_id)
         if message.kind != MessageKind.TEXT:
             return OutgoingMessage("فایل دریافت شد. پس از اعتبارسنجی، پردازش آن آغاز می‌شود.")
         text = message.text.strip()

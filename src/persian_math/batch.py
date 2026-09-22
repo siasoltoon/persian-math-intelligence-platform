@@ -1,8 +1,6 @@
 from __future__ import annotations
 
 import re
-from collections.abc import Iterable
-
 MAX_BATCH_ITEMS = 12
 MAX_BATCH_CHARS = 12000
 
@@ -57,6 +55,8 @@ def _split_numbered(lines: list[str]) -> list[str]:
 def _split_blank_blocks(text: str) -> list[str]:
     blocks = [_clean_block(block) for block in re.split(r"\n\s*\n", text) if block.strip()]
     if len(blocks) < 2 or not all(_math_like(block) for block in blocks):
+        return []
+    if any(_NUMBERED_LABEL.match(block) for block in blocks[1:]):
         return []
     # A multiline linear system is one problem, not a batch.
     if sum(1 for block in blocks if "\n" in block and "=" in block) >= 1:
