@@ -116,3 +116,9 @@
 - Added Telegram-safe response chunking for the Bot API text limit.
 - CI run 431 / 35712792646 passed Ruff lint, Ruff format, mypy, pytest 3.11, pytest 3.12 and Heavy OCR runtime.
 - Remaining evidence: live Telegram batch E2E and broader real-world mathematical benchmark coverage.
+
+## Phase 19/20/23/24 — Telegram batch runtime regression hardening
+- Status: VERIFIED for repository/CI integration; live Telegram E2E pending.
+- Fixed matrix parsing with spaces, Persian ordinal derivative routing, natural Taylor wording, arithmetic-sequence ellipsis routing, periodic trigonometric rendering and per-problem failure isolation.
+- Branch CI 450 / 35718713885 and main CI 451 / 35718844173 passed all required jobs.
+- Remaining evidence: restart/verify the Windows Math VPS runtime on current main and repeat the exact 12-question Telegram message.
