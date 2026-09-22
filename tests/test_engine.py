@@ -124,7 +124,7 @@ def test_second_derivative_is_verified():
     result = process("مشتق مرتبه 2 تابع f(x) = x^4 - 2x^2 + 1 را به دست آورید.")
     assert result.solver.success
     x = sp.Symbol("x")
-    assert sp.simplify(result.solver.value - sp.diff(x**4 - 2*x**2 + 1, x, 2)) == 0
+    assert sp.simplify(result.solver.value - sp.diff(x**4 - 2 * x**2 + 1, x, 2)) == 0
     assert result.verification is not None and result.verification.verified
 
 
