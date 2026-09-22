@@ -128,3 +128,16 @@
 - Resolved higher-order derivative verification semantics, Taylor-series verification dispatch/metadata, matrix operation routing, and number-theory verification method alignment.
 - Heavy OCR CI now runs OCR/document-focused regression tests instead of duplicating the complete mathematical suite.
 - Fresh CI evidence is required before VERIFIED.
+
+
+### CI-T01 — Regression failure isolation and advanced verification fixes
+- Status: VERIFIED
+- Phase: 19–25 hardening / CI reliability
+- Objective: eliminate deterministic advanced-test failures/timeouts while preserving full regression coverage and independent verification.
+- Implementation: higher-order derivative parsing/verification; Taylor-series metadata/verification; matrix routing; number-theory method alignment; finite-sum variable-assumption preservation; periodic trigonometric union verification without infinite set iteration; Heavy OCR suite isolation; per-test pytest timeout.
+- Tests: full pytest on Python 3.11 and 3.12; Ruff lint/format; mypy; Heavy OCR runtime.
+- Validation: GitHub Actions run 422 (35709968535) fully green.
+- Integration: both standard Python suites and Heavy OCR runtime passed.
+- Documentation/state: updated after final green verification.
+- Known issues: live Telegram and real-world benchmark evidence remain external gates.
+- Next Action: proceed to live Telegram/E2E and benchmark evidence; do not infer production-wide mathematical accuracy from CI alone.

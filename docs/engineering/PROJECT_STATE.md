@@ -125,3 +125,11 @@ Execute the live Windows/Tailscale/Telegram E2E matrix and build the real labele
 - Current work: resolving advanced mathematical verification failures from CI run 410 and isolating heavyweight OCR runtime from duplicate full-suite execution.
 - Code fixes are committed; repository/CI verification is pending on the new branch head.
 - Run 410 (35707233250) is pre-fix evidence and is not verification evidence for the corrected implementation.
+
+
+## CI hardening verification — 2026-09-22
+- CI-T01 status: VERIFIED for repository/CI integration.
+- Root causes from runs 410–421 were resolved: higher-order derivative parsing/verification, Taylor-series routing/verification, finite-sum symbol assumptions, matrix routing, number-theory verification alignment, and periodic trigonometric solution-set verification.
+- Heavy OCR was isolated from the duplicate full-suite execution and remains green.
+- Final verification run 422 (GitHub Actions run ID 35709968535) passed all required jobs on commit 6dcee08d2d3858acdbe7f9e6963c9942f55b1854.
+- Live Telegram, real-world OCR benchmark, production accuracy and external deployment evidence remain separate evidence gates.

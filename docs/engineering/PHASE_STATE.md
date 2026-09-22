@@ -99,3 +99,10 @@
 - Normalized number-theory solver method naming for verification dispatch.
 - Isolated Heavy OCR CI from duplicate full-suite execution.
 - Fresh CI run required before VERIFIED.
+
+
+## Phase 19–24 — CI regression hardening
+- Status: VERIFIED for repository/CI integration.
+- Final CI run 422 / 35709968535: Ruff lint ✓, Ruff format ✓, mypy ✓, pytest Python 3.11 ✓, pytest Python 3.12 ✓, Heavy OCR runtime ✓.
+- Advanced regression failures and the trigonometric timeout were fixed without removing coverage or weakening verification.
+- Remaining evidence gates are live Telegram validation and broader real-world mathematical/OCR benchmarks.

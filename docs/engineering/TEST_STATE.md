@@ -81,3 +81,11 @@
 - Implemented fixes for higher-order derivative verification, Taylor-series verification, matrix natural-language routing and number-theory method alignment.
 - Heavy OCR CI no longer repeats the full regression suite; it targets OCR/document tests after the standard Python 3.11/3.12 full suites.
 - Verification pending fresh CI evidence.
+
+
+## CI regression hardening verification — 2026-09-22
+- Runs 410–421 were diagnostic/fix iterations and are not release evidence.
+- Final run 422 / 35709968535 passed all required CI jobs: Ruff lint ✓, Ruff format ✓, mypy ✓, pytest 3.11 ✓, pytest 3.12 ✓, Heavy OCR runtime ✓.
+- Advanced regression coverage now passes for second derivative, Taylor series, finite sums, matrix determinant, number theory and trigonometric equations.
+- The trigonometric test no longer times out on SymPy infinite-set iteration; periodic ImageSet/Union results are verified without materializing infinite sets.
+- CI-T01 is verified for repository/CI integration. Live Telegram, labeled OCR/handwriting benchmarks, load/recovery and production deployment evidence remain pending.
