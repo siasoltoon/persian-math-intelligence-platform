@@ -432,6 +432,7 @@ def solve_word_problem(
         point_text, expression_text = limit_match.groups()
         try:
             point = sp.Rational(point_text)
+            expression_text = expression_text.replace("[", "(").replace("]", ")")
             expression = parse_expression(expression_text.strip()).expression
             result = limit(expression, sp.Symbol("x"), point)
             if result.success:
