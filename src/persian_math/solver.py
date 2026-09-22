@@ -246,9 +246,11 @@ def solve_matrix(matrix: sp.MatrixBase, operation: str) -> SolverResult:
 
 
 def _normalize_problem_digits(text: str) -> str:
-    return text.translate(str.maketrans("۰۱۲۳۴۵۶۷۸۹", "0123456789")).translate(
+    value = text.translate(str.maketrans("۰۱۲۳۴۵۶۷۸۹", "0123456789")).translate(
         str.maketrans("٠١٢٣٤٥٦٧٨٩", "0123456789")
     )
+    value = value.translate(str.maketrans("₀₁₂₃₄₅₆₇₈₉", "0123456789"))
+    return value.translate(str.maketrans("⁰¹²³⁴⁵⁶⁷⁸⁹", "0123456789"))
 
 
 def _function_definition(text: str) -> tuple[sp.Expr, sp.Symbol] | None:
