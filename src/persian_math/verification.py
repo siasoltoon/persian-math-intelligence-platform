@@ -251,7 +251,7 @@ def verify_structured_result(
             expected = sp.factorial(metadata["n"])
         elif method == "trigonometric":
             expected = sp.solveset(metadata["expression"], metadata["symbol"], domain=sp.S.Reals)
-            if sp.simplify(expected - claimed) == sp.EmptySet:
+            if expected == claimed:
                 return VerificationResult(
                     True,
                     ConfidenceLevel.HIGH,
