@@ -2,8 +2,6 @@ from __future__ import annotations
 
 import re
 
-
-
 MAX_BATCH_ITEMS = 12
 MAX_BATCH_CHARS = 12000
 
@@ -70,6 +68,7 @@ def _split_blank_blocks(text: str) -> list[str]:
 
 MAX_BATCH_ITEMS = 12
 MAX_BATCH_CHARS = 12000
+
 
 def split_problem_batch(text: str) -> tuple[str, ...]:
     normalized = text.replace("\r\n", "\n").replace("\r", "\n").strip()
