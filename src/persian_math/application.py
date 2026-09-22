@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from dataclasses import dataclass, replace
 
+import sympy as sp
+
 from .batch import split_problem_batch
 from .domain import Difficulty, EducationalLevel, UserProfile
 from .engine import EngineResult, process
@@ -110,7 +112,14 @@ class ApplicationService:
         verified = result.verification.verified if result.verification else False
         suffix = "نتیجه مستقل تأیید شد." if verified else "نتیجه هنوز تأیید مستقل کامل ندارد."
         value = solver.value
-        if getattr(solver, "method", "") == "function_analysis" and isinstance(value, dict):
+        if getattr(solver, "method", "") == "trigonometric":
+            metadata = solver.metadata or {}
+            expression = metadata.get("expression")
+            if expression is not None and sp.simplify(expression - sp.sin(sp.Symbol("x"))) == 0:
+                rendered = "x = k·π ، k ∈ ℤ"
+            else:
+                rendered = str(value)
+        elif getattr(solver, "method", "") == "function_analysis" and isinstance(value, dict):
             critical = "، ".join(
                 f"x={point} ({'ماکزیمم نسبی' if kind == 'max' else 'مینیمم نسبی' if kind == 'min' else 'نوع نامعین'}، f(x)={value_at})"
                 for point, value_at, kind in value["critical_points"]
