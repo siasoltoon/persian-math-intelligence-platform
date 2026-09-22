@@ -1,4 +1,6 @@
-import sympy as sp\n\nfrom persian_math.engine import process
+import sympy as sp
+
+from persian_math.engine import process
 
 
 def test_expression_pipeline_verifies_result():
