@@ -129,7 +129,7 @@ class ApplicationService:
         verified = result.verification.verified if result.verification else False
         suffix = "نتیجه مستقل تأیید شد." if verified else "نتیجه هنوز تأیید مستقل کامل ندارد."
         value = result.solver.value
-        if result.solver.method == "function_analysis" and isinstance(value, dict):
+        if getattr(result.solver, "method", "") == "function_analysis" and isinstance(value, dict):
             critical = "، ".join(
                 f"x={point} ({'ماکزیمم نسبی' if kind == 'max' else 'مینیمم نسبی' if kind == 'min' else 'نوع نامعین'}، f(x)={value_at})"
                 for point, value_at, kind in value["critical_points"]
