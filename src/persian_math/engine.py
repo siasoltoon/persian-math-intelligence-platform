@@ -123,10 +123,6 @@ def process(text: str, *, symbol_name: str = "x") -> EngineResult:
                 for point in sp.solve(second, symbol)
             ),
         }
-        verification = verify_expression_result(
-            sp.Symbol("_analysis_expected"),
-            sp.Symbol("_analysis_expected"),
-        )
         if solver_result.value != expected_value:
             verification = VerificationResult(
                 False,
