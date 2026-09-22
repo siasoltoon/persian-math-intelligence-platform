@@ -326,6 +326,23 @@ def _solve_extended_word_problem(
 ) -> tuple[SolverResult, Any | None, str | None]:
     x = sp.Symbol("x")
 
+    natural_higher_derivative = re.search(
+        r"(?:مشتق|دیفرانسیل)\s+مرتبه\s*(\d+|اول|دوم|سوم|چهارم|پنجم|ششم|هفتم|هشتم|نهم|دهم).*?"
+        r"را\s+به\s+دست\s+آورید\s*[:：]?\s*"
+        r"f\s*\(\s*x\s*\)\s*=\s*(.+?)\s*$",
+        normalized,
+        re.DOTALL,
+    )
+    if natural_higher_derivative:
+        order_text, source = natural_higher_derivative.groups()
+        try:
+            expression = _parse_math_fragment(source.strip())
+            result = differentiate(expression, x, _parse_derivative_order(order_text))
+            if result.success:
+                return result, result.value, "expression"
+        except (TypeError, ValueError):
+            pass
+
     higher_derivative = re.search(
         r"(?:مشتق|دیفرانسیل)\s+مرتبه\s*(\d+|اول|دوم|سوم|چهارم|پنجم|ششم|هفتم|هشتم|نهم|دهم).*?"
         r"f\s*\(\s*x\s*\)\s*=\s*"
