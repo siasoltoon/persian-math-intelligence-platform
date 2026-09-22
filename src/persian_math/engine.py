@@ -110,10 +110,10 @@ def process(text: str, *, symbol_name: str = "x") -> EngineResult:
         expected = []
         for point in critical:
             second_value = sp.simplify(second.subs(symbol, point))
-            classification = (
+            extremum_type = (
                 "max" if second_value < 0 else "min" if second_value > 0 else "inconclusive"
             )
-            expected.append((point, sp.simplify(expression.subs(symbol, point)), classification))
+            expected.append((point, sp.simplify(expression.subs(symbol, point)), extremum_type))
         expected_value = {
             "critical_points": tuple(expected),
             "increasing": sp.solve_univariate_inequality(derivative > 0, symbol),
