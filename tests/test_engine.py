@@ -95,12 +95,7 @@ def test_limit_word_problem_is_verified():
 
 
 def test_linear_system_word_problem_is_verified():
-    result = process(
-        "دستگاه معادلات زیر را حل کنید:\n\n"
-        "x + y + z = 6\n"
-        "2x - y + 3z = 9\n"
-        "3x + 2y - z = 4"
-    )
+    result = process("دستگاه معادلات زیر را حل کنید:\n\nx + y + z = 6\n2x - y + 3z = 9\n3x + 2y - z = 4")
     assert result.solver.success
     assert result.solver.value == [{sp.Symbol("x"): 1, sp.Symbol("y"): 2, sp.Symbol("z"): 3}]
     assert result.verification is not None and result.verification.verified
