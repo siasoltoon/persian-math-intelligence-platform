@@ -1,4 +1,4 @@
-from persian_math.engine import process
+import sympy as sp\n\nfrom persian_math.engine import process
 
 
 def test_expression_pipeline_verifies_result():
@@ -51,4 +51,72 @@ def test_arithmetic_sequence_sum_word_problem_is_verified():
     result = process("مجموع 20 جمله اول دنباله حسابی زیر را به دست آورید: 3, 7, 11, 15, ...")
     assert result.solver.success
     assert result.solver.value == 820
+    assert result.verification is not None and result.verification.verified
+
+
+def test_radical_equation_with_real_domain_is_verified():
+    result = process("معادله زیر را در اعداد حقیقی حل کنید: √(x + 5) + √(x - 1) = 4")
+    assert result.solver.success
+    assert result.solver.value == (sp.Rational(41, 16),)
+    assert result.verification is not None and result.verification.verified
+
+
+def test_derivative_word_problem_is_verified():
+    result = process("مشتق تابع زیر را به دست آورید: f(x) = (x² + 1)³ / (x - 2)")
+    assert result.solver.success
+    x = sp.Symbol("x")
+    expected = sp.diff((x**2 + 1) ** 3 / (x - 2), x)
+    assert sp.simplify(result.solver.value - expected) == 0
+    assert result.verification is not None and result.verification.verified
+
+
+def test_indefinite_integral_word_problem_is_verified():
+    result = process("انتگرال زیر را محاسبه کنید: ∫ x² ln(x) dx")
+    assert result.solver.success
+    x = sp.Symbol("x")
+    assert sp.simplify(sp.diff(result.solver.value, x) - x**2 * sp.log(x)) == 0
+    assert result.verification is not None and result.verification.verified
+
+
+def test_definite_integral_word_problem_is_verified():
+    result = process("انتگرال زیر را به صورت دقیق محاسبه کنید: ∫₀¹ x² / (1 + x²) dx")
+    assert result.solver.success
+    assert result.solver.value == 1 - sp.pi / 4
+    assert result.verification is not None and result.verification.verified
+
+
+def test_limit_word_problem_is_verified():
+    result = process("حد زیر را محاسبه کنید: lim(x→0) [sin(x) - x + x³/6] / x⁵")
+    assert result.solver.success
+    assert result.solver.value == sp.Rational(1, 120)
+    assert result.verification is not None and result.verification.verified
+
+
+def test_linear_system_word_problem_is_verified():
+    result = process(
+        "دستگاه معادلات زیر را حل کنید:\n\n"
+        "x + y + z = 6\n"
+        "2x - y + 3z = 9\n"
+        "3x + 2y - z = 4"
+    )
+    assert result.solver.success
+    assert result.solver.value == [{sp.Symbol("x"): 1, sp.Symbol("y"): 2, sp.Symbol("z"): 3}]
+    assert result.verification is not None and result.verification.verified
+
+
+def test_function_analysis_word_problem_is_verified():
+    result = process(
+        "تابع زیر را در نظر بگیرید:\n\n"
+        "f(x) = x³ - 3x² - 9x + 27\n\n"
+        "1. تمام نقاط بحرانی تابع را پیدا کنید.\n"
+        "2. مشخص کنید هر نقطه ماکزیمم یا مینیمم نسبی است.\n"
+        "3. بازه‌های صعود و نزول تابع را تعیین کنید.\n"
+        "4. نقاط عطف تابع را پیدا کنید.\n"
+        "5. جدول تغییرات تابع را ارائه دهید.\n"
+        "6. پاسخ‌ها را با محاسبات مستقل بررسی کنید."
+    )
+    assert result.solver.success
+    value = result.solver.value
+    assert value["critical_points"] == ((-1, 32, "max"), (3, 0, "min"))
+    assert value["inflection_points"] == ((1, 16),)
     assert result.verification is not None and result.verification.verified
