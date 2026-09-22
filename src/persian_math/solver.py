@@ -260,7 +260,7 @@ def _normalize_problem_digits(text: str) -> str:
 
 
 def _function_definition(text: str) -> tuple[sp.Expr, sp.Symbol] | None:
-    match = re.search(r"f\s*\(\s*x\s*\)\s*=\s*([^،\n]+?)(?:\s*باشد|\s*$)", text, re.DOTALL)
+    match = re.search(r"f\s*\(\s*x\s*\)\s*=\s*([^،\n]+)", text)
     if not match:
         return None
     expression = parse_expression(match.group(1).strip()).expression
@@ -409,13 +409,13 @@ def solve_word_problem(
             pass
 
     indefinite_integral = re.search(
-        r"(?:∫|انتگرال).*?(?:[:،]?\s*)(.*?)\s*d\s*x",
+        r"∫\s*(.*?)\s*d\s*x",
         normalized,
         re.DOTALL,
     )
     if indefinite_integral:
         try:
-            integrand = indefinite_integral.group(1).strip(" []()")
+            integrand = indefinite_integral.group(1).strip()
             expression = parse_expression(integrand).expression
             result = integrate(expression, sp.Symbol("x"))
             if result.success:
@@ -424,7 +424,7 @@ def solve_word_problem(
             pass
 
     limit_match = re.search(
-        r"lim\s*\(\s*x\s*(?:→|->)\s*([-+]?\d+(?:\.\d+)?)\s*\)\s*\[?(.*?)\]?$",
+        r"lim\s*\(\s*x\s*(?:→|->)\s*([-+]?\d+(?:\.\d+)?)\s*\)\s*(.+)$",
         normalized,
         re.DOTALL,
     )
@@ -432,11 +432,11 @@ def solve_word_problem(
         point_text, expression_text = limit_match.groups()
         try:
             point = sp.Rational(point_text)
-            expression = parse_expression(expression_text.strip(" []")).expression
+            expression = parse_expression(expression_text.strip()).expression
             result = limit(expression, sp.Symbol("x"), point)
             if result.success:
                 return result, result.value, "expression"
-        except (TypeError, ValueError):
+        except (IndexError, TypeError, ValueError, NotImplementedError):
             pass
 
     system_lines = []
