@@ -170,3 +170,104 @@ def verify_equation_independently(
         return VerificationResult(
             False, ConfidenceLevel.LOW, ("independent_verification_failed",), ()
         )
+
+
+def verify_derivative_result(
+    expression: sp.Expr, symbol: sp.Symbol, claimed: Any
+) -> VerificationResult:
+    try:
+        expected = sp.diff(expression, symbol)
+        return verify_expression_result(expected, claimed)
+    except (TypeError, ValueError, NotImplementedError):
+        return VerificationResult(
+            False, ConfidenceLevel.LOW, ("derivative_verification_failed",), ()
+        )
+
+
+def verify_antiderivative_result(
+    integrand: sp.Expr, symbol: sp.Symbol, claimed: Any
+) -> VerificationResult:
+    try:
+        recovered = sp.diff(claimed, symbol)
+        equivalent = sp.simplify(recovered - integrand) == 0
+        if equivalent:
+            return VerificationResult(
+                True,
+                ConfidenceLevel.HIGH,
+                ("independent_derivative_recheck", "symbolic_equivalence"),
+                (recovered,),
+            )
+        return VerificationResult(
+            False,
+            ConfidenceLevel.HIGH,
+            ("antiderivative_mismatch",),
+            (integrand, recovered),
+        )
+    except (TypeError, ValueError, NotImplementedError):
+        return VerificationResult(False, ConfidenceLevel.LOW, ("integral_verification_failed",), ())
+
+
+def verify_definite_integral_result(
+    integrand: sp.Expr, symbol: sp.Symbol, lower: Any, upper: Any, claimed: Any
+) -> VerificationResult:
+    try:
+        expected = sp.integrate(integrand, (symbol, lower, upper))
+        return compare_independent_methods(expected, claimed, sp.N(expected, 30))
+    except (TypeError, ValueError, NotImplementedError):
+        return VerificationResult(
+            False, ConfidenceLevel.LOW, ("definite_integral_verification_failed",), ()
+        )
+
+
+def verify_limit_result(
+    expression: sp.Expr, symbol: sp.Symbol, point: Any, claimed: Any
+) -> VerificationResult:
+    try:
+        expected = sp.limit(expression, symbol, point)
+        return compare_independent_methods(expected, claimed, sp.simplify(expected))
+    except (TypeError, ValueError, NotImplementedError):
+        return VerificationResult(False, ConfidenceLevel.LOW, ("limit_verification_failed",), ())
+
+
+def verify_system_result(
+    equations: tuple[tuple[sp.Expr, sp.Expr], ...],
+    symbols: tuple[sp.Symbol, ...],
+    claimed: Any,
+) -> VerificationResult:
+    try:
+        expected = sp.linsolve(
+            tuple(lhs - rhs for lhs, rhs in equations),
+            symbols,
+        )
+        if isinstance(claimed, list) and len(claimed) == 1 and isinstance(claimed[0], dict):
+            actual_tuple = tuple(claimed[0][symbol] for symbol in symbols)
+        elif isinstance(claimed, dict):
+            actual_tuple = tuple(claimed[symbol] for symbol in symbols)
+        else:
+            return VerificationResult(False, ConfidenceLevel.LOW, ("invalid_system_output",), ())
+        expected_tuples = tuple(expected)
+        if not expected_tuples:
+            return VerificationResult(
+                False, ConfidenceLevel.HIGH, ("system_solution_mismatch",), ()
+            )
+        actual = tuple(sp.simplify(value) for value in actual_tuple)
+        expected_tuple = tuple(sp.simplify(value) for value in expected_tuples[0])
+        if actual != expected_tuple:
+            return VerificationResult(
+                False, ConfidenceLevel.HIGH, ("system_solution_mismatch",), (expected_tuple, actual)
+            )
+        residuals = tuple(
+            sp.simplify((lhs - rhs).subs(dict(zip(symbols, actual)))) for lhs, rhs in equations
+        )
+        if all(residual == 0 for residual in residuals):
+            return VerificationResult(
+                True,
+                ConfidenceLevel.HIGH,
+                ("independent_linear_solver", "system_substitution"),
+                (expected_tuple,),
+            )
+        return VerificationResult(
+            False, ConfidenceLevel.HIGH, ("system_nonzero_residual",), residuals
+        )
+    except (KeyError, TypeError, ValueError, NotImplementedError):
+        return VerificationResult(False, ConfidenceLevel.LOW, ("system_verification_failed",), ())

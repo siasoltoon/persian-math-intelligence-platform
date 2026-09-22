@@ -129,9 +129,24 @@ class ApplicationService:
         verified = result.verification.verified if result.verification else False
         suffix = "نتیجه مستقل تأیید شد." if verified else "نتیجه هنوز تأیید مستقل کامل ندارد."
         value = result.solver.value
-        rendered = (
-            "{" + ", ".join(str(item) for item in value) + "}"
-            if isinstance(value, tuple)
-            else str(value)
-        )
+        if getattr(result.solver, "method", "") == "function_analysis" and isinstance(value, dict):
+            critical = "، ".join(
+                f"x={point} ({'ماکزیمم نسبی' if kind == 'max' else 'مینیمم نسبی' if kind == 'min' else 'نوع نامعین'}، f(x)={value_at})"
+                for point, value_at, kind in value["critical_points"]
+            )
+            inflections = "، ".join(
+                f"({point}, {value_at})" for point, value_at in value["inflection_points"]
+            )
+            rendered = (
+                f"نقاط بحرانی: {critical or 'ندارد'}\n"
+                f"بازه‌های صعود: {value['increasing']}\n"
+                f"بازه‌های نزول: {value['decreasing']}\n"
+                f"نقاط عطف: {inflections or 'ندارد'}"
+            )
+        elif isinstance(value, dict):
+            rendered = "، ".join(f"{key} = {item}" for key, item in value.items())
+        elif isinstance(value, tuple):
+            rendered = "{" + ", ".join(str(item) for item in value) + "}"
+        else:
+            rendered = str(value)
         return OutgoingMessage(f"پاسخ: {rendered}\n\n{suffix}")

@@ -97,6 +97,7 @@ def differentiate(expression: sp.Expr, symbol: sp.Symbol, order: int = 1) -> Sol
             "derivative",
             symbol=str(symbol),
             order=order,
+            source_expression=str(expression),
         )
     except (TypeError, ValueError) as exc:
         return _fail("derivative", exc)
@@ -114,7 +115,15 @@ def integrate(
             if lower is not None and upper is not None
             else sp.integrate(expression, symbol)
         )
-        return _ok(value, "integral", symbol=str(symbol), definite=lower is not None)
+        return _ok(
+            value,
+            "definite_integral" if lower is not None and upper is not None else "integral",
+            symbol=str(symbol),
+            definite=lower is not None,
+            lower=lower,
+            upper=upper,
+            source_expression=str(expression),
+        )
     except (TypeError, ValueError, NotImplementedError) as exc:
         return _fail("integral", exc)
 
@@ -128,6 +137,8 @@ def limit(
             "limit",
             symbol=str(symbol),
             point=str(point),
+            direction=direction,
+            source_expression=str(expression),
         )
     except (TypeError, ValueError, NotImplementedError) as exc:
         return _fail("limit", exc)
@@ -181,6 +192,7 @@ def optimize(expression: sp.Expr, symbol: sp.Symbol) -> SolverResult:
             },
             "symbolic_optimization",
             symbol=str(symbol),
+            source_expression=str(expression),
         )
     except (TypeError, ValueError, NotImplementedError) as exc:
         return _fail("symbolic_optimization", exc)
@@ -231,12 +243,62 @@ def solve_matrix(matrix: sp.MatrixBase, operation: str) -> SolverResult:
         return _fail("matrix", exc)
 
 
-def solve_word_problem(
-    text: str,
-) -> tuple[SolverResult, sp.Expr | None, str | None]:
-    normalized = text.translate(str.maketrans("۰۱۲۳۴۵۶۷۸۹", "0123456789")).translate(
+def _normalize_problem_digits(text: str) -> str:
+    value = text.translate(str.maketrans("۰۱۲۳۴۵۶۷۸۹", "0123456789")).translate(
         str.maketrans("٠١٢٣٤٥٦٧٨٩", "0123456789")
     )
+    subscript = "₀₁₂₃₄₅₆₇₈₉"
+    superscript = "⁰¹²³⁴⁵⁶⁷⁸⁹"
+    sub_map = str.maketrans(subscript, "0123456789")
+    super_map = str.maketrans(superscript, "0123456789")
+    value = re.sub(
+        r"∫\s*([₀₁₂₃₄₅₆₇₈₉0-9]+)\s*([⁰¹²³⁴⁵⁶⁷⁸⁹0-9]+)",
+        lambda match: (
+            "∫" + match.group(1).translate(sub_map) + " " + match.group(2).translate(super_map)
+        ),
+        value,
+    )
+    return value
+
+
+def _function_definition(text: str) -> tuple[sp.Expr, sp.Symbol] | None:
+    match = re.search(r"f\s*\(\s*x\s*\)\s*=\s*([^،\n]+)", text)
+    if not match:
+        return None
+    expression = parse_expression(match.group(1).strip()).expression
+    return expression, sp.Symbol("x")
+
+
+def _solve_function_analysis(expression: sp.Expr, symbol: sp.Symbol) -> dict[str, Any]:
+    first = sp.simplify(sp.diff(expression, symbol))
+    second = sp.simplify(sp.diff(expression, symbol, 2))
+    critical = tuple(sp.solve(first, symbol))
+    critical_points = []
+    for point in critical:
+        second_value = sp.simplify(second.subs(symbol, point))
+        classification = (
+            "max" if second_value < 0 else "min" if second_value > 0 else "inconclusive"
+        )
+        critical_points.append((point, sp.simplify(expression.subs(symbol, point)), classification))
+    increasing = sp.solve_univariate_inequality(first > 0, symbol)
+    decreasing = sp.solve_univariate_inequality(first < 0, symbol)
+    inflection_x = tuple(sp.solve(second, symbol))
+    inflection_points = tuple(
+        (point, sp.simplify(expression.subs(symbol, point))) for point in inflection_x
+    )
+    return {
+        "critical_points": tuple(critical_points),
+        "increasing": increasing,
+        "decreasing": decreasing,
+        "inflection_points": inflection_points,
+    }
+
+
+def solve_word_problem(
+    text: str,
+) -> tuple[SolverResult, Any | None, str | None]:
+    normalized = _normalize_problem_digits(text)
+
     rectangle = re.search(
         r"مساحت.*?مستطیل.*?طول\s*([0-9]+(?:\.\d+)?)\s*(?:سانتی.?متر|متر)?.*?"
         r"عرض\s*([0-9]+(?:\.\d+)?)",
@@ -249,8 +311,9 @@ def solve_word_problem(
         return (
             _ok(expression, "geometry_rectangle_area", length=length, width=width),
             expression,
-            "rectangle_area",
+            "expression",
         )
+
     function = re.search(
         r"f\s*\(\s*x\s*\)\s*=\s*([^،\n]+?)\s*باشد.*?"
         r"f\s*\(\s*([-+]?\d+(?:\.\d+)?)\s*\)",
@@ -263,9 +326,153 @@ def solve_word_problem(
         try:
             parsed = parse_expression(definition).expression
             value = sp.simplify(parsed.subs(sp.Symbol("x"), point))
-            return _ok(value, "function_evaluation", point=point), value, "function_evaluation"
+            return _ok(value, "function_evaluation", point=point), value, "expression"
         except (TypeError, ValueError):
             pass
+
+    if any(
+        token in normalized
+        for token in (
+            "نقاط بحرانی",
+            "ماکزیمم",
+            "مینیمم",
+            "بازه‌های صعود",
+            "بازه های صعود",
+            "نقاط عطف",
+        )
+    ):
+        try:
+            definition = _function_definition(normalized)
+            if definition:
+                expression, symbol = definition
+                value = _solve_function_analysis(expression, symbol)
+                return (
+                    _ok(
+                        value,
+                        "function_analysis",
+                        source_expression=str(expression),
+                        symbol=str(symbol),
+                    ),
+                    None,
+                    "function_analysis",
+                )
+        except (TypeError, ValueError, NotImplementedError):
+            pass
+
+    derivative_match = re.search(
+        r"(?:مشتق).*?f\s*\(\s*x\s*\)\s*=\s*([^،\n]+?)(?:\s*باشد|\s*$)",
+        normalized,
+        re.DOTALL,
+    )
+    if derivative_match:
+        try:
+            expression = parse_expression(derivative_match.group(1).strip()).expression
+            symbol = sp.Symbol("x")
+            result = differentiate(expression, symbol)
+            if result.success:
+                return result, result.value, "expression"
+        except (TypeError, ValueError):
+            pass
+
+    definite_integral = re.search(
+        r"∫\s*([0-9]+(?:\.\d+)?)\s*([0-9]+(?:\.\d+)?)\s*(.*?)\s*d\s*x",
+        normalized,
+        re.DOTALL,
+    )
+    if definite_integral:
+        lower_text, upper_text, integrand_text = definite_integral.groups()
+        try:
+            lower = sp.Rational(lower_text)
+            upper = sp.Rational(upper_text)
+            expression = parse_expression(integrand_text.strip()).expression
+            result = integrate(expression, sp.Symbol("x"), lower, upper)
+            if result.success:
+                return result, result.value, "expression"
+        except (TypeError, ValueError):
+            pass
+
+    textual_definite = re.search(
+        r"انتگرال.*?از\s*([0-9]+(?:\.\d+)?)\s*تا\s*([0-9]+(?:\.\d+)?).*?:?\s*(.*?)\s*d\s*x",
+        normalized,
+        re.DOTALL,
+    )
+    if textual_definite:
+        lower_text, upper_text, integrand_text = textual_definite.groups()
+        try:
+            lower = sp.Rational(lower_text)
+            upper = sp.Rational(upper_text)
+            expression = parse_expression(integrand_text.strip()).expression
+            result = integrate(expression, sp.Symbol("x"), lower, upper)
+            if result.success:
+                return result, result.value, "expression"
+        except (TypeError, ValueError):
+            pass
+
+    indefinite_integral = re.search(
+        r"∫\s*(.*?)\s*d\s*x",
+        normalized,
+        re.DOTALL,
+    )
+    if indefinite_integral:
+        try:
+            integrand = indefinite_integral.group(1).strip()
+            expression = parse_expression(integrand).expression
+            result = integrate(expression, sp.Symbol("x"))
+            if result.success:
+                return result, result.value, "expression"
+        except (TypeError, ValueError):
+            pass
+
+    limit_match = re.search(
+        r"lim\s*\(\s*x\s*(?:→|->)\s*([-+]?\d+(?:\.\d+)?)\s*\)\s*(.+)$",
+        normalized,
+        re.DOTALL,
+    )
+    if limit_match:
+        point_text, expression_text = limit_match.groups()
+        try:
+            point = sp.Rational(point_text)
+            expression_text = expression_text.replace("[", "(").replace("]", ")")
+            expression = parse_expression(expression_text.strip()).expression
+            result = limit(expression, sp.Symbol("x"), point)
+            if result.success:
+                return result, result.value, "expression"
+        except (IndexError, TypeError, ValueError, NotImplementedError):
+            pass
+
+    system_lines = []
+    for line in normalized.splitlines():
+        if line.count("=") == 1 and any(ch.isalpha() for ch in line):
+            system_lines.append(line.strip())
+    if len(system_lines) >= 2 and ("دستگاه" in normalized or "معادلات" in normalized):
+        try:
+            equations = tuple(parse_equation(line) for line in system_lines)
+            symbols = tuple(
+                sorted(
+                    set().union(*(lhs.free_symbols | rhs.free_symbols for lhs, rhs in equations)),
+                    key=str,
+                )
+            )
+            if len(symbols) >= 2:
+                result = solve_system(equations, symbols)
+                if result.success:
+                    return (
+                        SolverResult(
+                            True,
+                            result.value,
+                            result.method,
+                            metadata={
+                                **(result.metadata or {}),
+                                "equations": equations,
+                                "symbols": symbols,
+                            },
+                        ),
+                        None,
+                        "system",
+                    )
+        except (TypeError, ValueError):
+            pass
+
     arithmetic = re.search(
         r"مجموع\s+(\d+)\s+جمله.*?دنباله\s+حسابی.*?([0-9]+(?:\.\d+)?)\s*,\s*"
         r"([0-9]+(?:\.\d+)?)\s*,\s*([0-9]+(?:\.\d+)?)",
@@ -279,15 +486,11 @@ def solve_word_problem(
         return (
             _ok(expression, "arithmetic_sequence_sum", n=n, first=a1, difference=d),
             expression,
-            "arithmetic_sequence",
+            "expression",
         )
+
     return (
-        SolverResult(
-            False,
-            None,
-            "word_problem_router",
-            "no supported structured word problem",
-        ),
+        SolverResult(False, None, "word_problem_router", "no supported structured word problem"),
         None,
         None,
     )
