@@ -149,6 +149,12 @@ def test_matrix_determinant_is_verified():
     assert result.solver.value == -2
     assert result.verification is not None and result.verification.verified
 
+def test_matrix_determinant_with_spaced_rows_is_verified():
+    result = process("دترمینان A را محاسبه کنید: A = [[2, 1], [3, 4]]")
+    assert result.solver.success
+    assert result.solver.value == 5
+    assert result.verification is not None and result.verification.verified
+
 
 def test_statistics_are_verified():
     result = process("میانگین، میانه و واریانس داده‌های زیر را محاسبه کنید: 1,2,3,4,5")
