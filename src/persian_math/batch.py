@@ -64,8 +64,6 @@ def _split_blank_blocks(text: str) -> list[str]:
         return []
     return blocks
 
-
-
 MAX_BATCH_ITEMS = 12
 MAX_BATCH_CHARS = 12000
 
