@@ -265,36 +265,34 @@ def verify_structured_result(
             # sin(x)=0 can be represented as ImageSet and iterating/expanding
             # them may be unbounded. Independently validate the claimed
             # parameterization instead.
-            if isinstance(claimed, sp.ImageSet):
-                lam = claimed.lamda
-                parameter = lam.variables[0]
-                base_set = claimed.base_set
-                if base_set != sp.S.Integers:
-                    return VerificationResult(
-                        False,
-                        ConfidenceLevel.HIGH,
-                        ("unsupported_trigonometric_parameter_domain",),
-                        (claimed,),
-                    )
-                generated = sp.expand_trig(expression.subs(symbol, lam.expr))
-                if sp.simplify(generated) == 0:
-                    return VerificationResult(
-                        True,
-                        ConfidenceLevel.HIGH,
-                        ("independent_trigonometric_identity_recheck",),
-                        (claimed, parameter),
-                    )
+            image_sets = claimed.args if isinstance(claimed, sp.Union) else (claimed,)
+            if all(isinstance(item, sp.ImageSet) for item in image_sets):
+                for image_set in image_sets:
+                    lam = image_set.lamda
+                    if image_set.base_set != sp.S.Integers:
+                        return VerificationResult(
+                            False,
+                            ConfidenceLevel.HIGH,
+                            ("unsupported_trigonometric_parameter_domain",),
+                            (claimed,),
+                        )
+                    generated = sp.expand_trig(expression.subs(symbol, lam.expr))
+                    if sp.simplify(generated) != 0:
+                        return VerificationResult(
+                            False,
+                            ConfidenceLevel.HIGH,
+                            ("trigonometric_identity_mismatch",),
+                            (claimed,),
+                        )
                 return VerificationResult(
-                    False,
+                    True,
                     ConfidenceLevel.HIGH,
-                    ("trigonometric_identity_mismatch",),
+                    ("independent_trigonometric_identity_recheck",),
                     (claimed,),
                 )
             if isinstance(claimed, sp.FiniteSet):
                 elements = tuple(claimed)
-                if all(
-                    sp.simplify(expression.subs(symbol, item)) == 0 for item in elements
-                ):
+                if all(sp.simplify(expression.subs(symbol, item)) == 0 for item in elements):
                     return VerificationResult(
                         True,
                         ConfidenceLevel.HIGH,
