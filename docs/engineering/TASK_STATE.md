@@ -109,3 +109,14 @@
 - Implemented: bounded structured handlers for rectangle area, function evaluation and arithmetic-sequence sums; independent verification through canonical expression representation; user-facing solution-set rendering; regression coverage.
 - CI verification: run 35659054757 passed Ruff lint, Ruff format, mypy, pytest Python 3.11/3.12 and Heavy OCR runtime.
 - Remaining: repeat the Telegram live matrix with these exact cases and expand the labeled real-world benchmark.
+
+
+### INPUT-T03 — Advanced calculus, systems and multi-part analysis routing
+- Status: VERIFIED for repository/CI integration / live re-test pending
+- Phase: 19/20/23/24
+- Objective: expand structured Persian math coverage for calculus, linear systems and multi-part function analysis while preserving independent verification and no-guess behavior.
+- Live failure classes addressed: derivative of a composite rational function returned an empty solution set; indefinite integral was misparsed as a generic expression; a three-variable linear system was rejected; a definite integral with Unicode bounds was rejected; a limit with bracketed numerator crashed in the restricted parser; a multi-part function-analysis request was rejected.
+- Implemented: bounded handlers for derivatives, indefinite/definite integrals, limits, linear systems and critical-point/monotonicity/inflection analysis; independent verification paths; safe bracket/bound normalization; structured user-facing rendering.
+- Regression coverage: all reported advanced cases, including real radical equation preservation, now pass in pytest on Python 3.11/3.12.
+- CI verification: run 35700711582 passed Ruff lint, Ruff format, mypy, pytest Python 3.11/3.12 and Heavy OCR runtime.
+- Remaining: live Telegram re-test and expansion of the labeled mathematical benchmark across additional domains. This task does not claim universal mathematical coverage.
