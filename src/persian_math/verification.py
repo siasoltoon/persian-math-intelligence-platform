@@ -207,7 +207,6 @@ def verify_antiderivative_result(
         return VerificationResult(False, ConfidenceLevel.LOW, ("integral_verification_failed",), ())
 
 
-
 def verify_structured_result(
     method: str, claimed: Any, metadata: dict[str, Any] | None = None
 ) -> VerificationResult:
