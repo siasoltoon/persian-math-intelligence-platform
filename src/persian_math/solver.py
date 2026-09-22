@@ -249,8 +249,16 @@ def _normalize_problem_digits(text: str) -> str:
     value = text.translate(str.maketrans("۰۱۲۳۴۵۶۷۸۹", "0123456789")).translate(
         str.maketrans("٠١٢٣٤٥٦٧٨٩", "0123456789")
     )
-    value = value.translate(str.maketrans("₀₁₂₃₄₅₆₇₈₉", "0123456789"))
-    return value.translate(str.maketrans("⁰¹²³⁴⁵⁶⁷⁸⁹", "0123456789"))
+    subscript = "₀₁₂₃₄₅₆₇₈₉"
+    superscript = "⁰¹²³⁴⁵⁶⁷⁸⁹"
+    sub_map = str.maketrans(subscript, "0123456789")
+    super_map = str.maketrans(superscript, "0123456789")
+    value = re.sub(
+        r"∫\s*([₀₁₂₃₄₅₆₇₈₉0-9]+)\s*([⁰¹²³⁴⁵⁶⁷⁸⁹0-9]+)",
+        lambda match: "∫" + match.group(1).translate(sub_map) + " " + match.group(2).translate(super_map),
+        value,
+    )
+    return value
 
 
 def _function_definition(text: str) -> tuple[sp.Expr, sp.Symbol] | None:
