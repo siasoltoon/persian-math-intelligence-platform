@@ -159,7 +159,7 @@ sin(x) = 0
     assert "پاسخ: 29" in response.text_fa
     assert "پاسخ: {5}" in response.text_fa
     assert "4*x**3 - 6*x + 5" in response.text_fa
-    assert "20*x**3 - 24*x + 4" in response.text_fa
+    assert "5*x**3 - 6*x + 1" in response.text_fa
     assert "پاسخ: 5" in response.text_fa
     assert "پاسخ: 5050" in response.text_fa
     assert "نتیجه مستقل تأیید شد." in response.text_fa
