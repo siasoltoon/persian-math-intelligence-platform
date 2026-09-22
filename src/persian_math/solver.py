@@ -446,12 +446,15 @@ def _solve_extended_word_problem(
         except (TypeError, ValueError):
             pass
 
-    matrix_match = re.search(
-        r"(?:ماتریس|matrix).*?(\[\[.*?\]\]).*?(?:دترمینان|determinant|det|معکوس|inverse|رتبه|rank|ترانهاده|transpose)",
-        normalized,
-        re.DOTALL | re.IGNORECASE,
+    matrix_match = re.search(r"(\[\[.*?\]\])", normalized, re.DOTALL)
+    has_matrix_operation = bool(
+        re.search(
+            r"(?:دترمینان|determinant|det|معکوس|inverse|رتبه|rank|ترانهاده|transpose)",
+            normalized,
+            re.IGNORECASE,
+        )
     )
-    if matrix_match:
+    if matrix_match and has_matrix_operation:
         try:
             rows = matrix_match.group(1).strip("[]").split("],[")
             matrix = sp.Matrix(
