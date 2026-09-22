@@ -407,7 +407,7 @@ def _solve_extended_word_problem(
             n = sp.Symbol("n", integer=True)
             expression = _parse_math_fragment(body)
             value = sp.summation(expression, (n, int(lower), int(upper)))
-            result = _ok(value, "finite_sum", variable="n")
+            result = _ok(value, "finite_sum", expression=expression, variable=n, lower=int(lower), upper=int(upper))
             return result, value, "expression"
         except (TypeError, ValueError):
             pass
@@ -423,7 +423,7 @@ def _solve_extended_word_problem(
             n = sp.Symbol("n", integer=True)
             expression = _parse_math_fragment(body)
             value = sp.product(expression, (n, int(lower), int(upper)))
-            result = _ok(value, "finite_product", variable="n")
+            result = _ok(value, "finite_product", expression=expression, variable=n, lower=int(lower), upper=int(upper))
             return result, value, "expression"
         except (TypeError, ValueError):
             pass
@@ -445,6 +445,7 @@ def _solve_extended_word_problem(
             )
             result = solve_matrix(matrix, operation)
             if result.success:
+                result = SolverResult(True, result.value, result.method, metadata={**(result.metadata or {}), "matrix": matrix})
                 return result, result.value, "matrix"
         except (TypeError, ValueError, sp.NonInvertibleMatrixError):
             pass
@@ -459,6 +460,7 @@ def _solve_extended_word_problem(
             values = [sp.Rational(item.strip()) for item in re.split(r"[,،]", stat_match.group(1))]
             result = solve_statistics(values)
             if result.success:
+                result = SolverResult(True, result.value, result.method, metadata={"values": values})
                 return result, result.value, "statistics"
         except (TypeError, ValueError):
             pass
@@ -473,7 +475,7 @@ def _solve_extended_word_problem(
     permutation = re.search(r"(?:جایگشت|permutation)\s*(\d+)", normalized, re.IGNORECASE)
     if permutation:
         value = sp.factorial(int(permutation.group(1)))
-        return _ok(value, "permutation"), value, "expression"
+        return _ok(value, "permutation", n=int(permutation.group(1))), value, "expression"
 
     number_theory = re.search(
         r"(?:تجزیه به عوامل اول|فاکتورگیری عدد|prime factorization).*?(\d+)",
@@ -483,6 +485,7 @@ def _solve_extended_word_problem(
     if number_theory:
         result = solve_number_theory(sp.Integer(number_theory.group(1)))
         if result.success:
+            result = SolverResult(True, result.value, result.method, metadata={"number": sp.Integer(number_theory.group(1))})
             return result, result.value, "number_theory"
 
     gcd_match = re.search(
@@ -493,7 +496,7 @@ def _solve_extended_word_problem(
     if gcd_match:
         a, b = map(int, gcd_match.groups())
         value = sp.gcd(a, b)
-        return _ok(value, "gcd"), value, "expression"
+        return _ok(value, "gcd", a=a, b=b), value, "expression"
 
     lcm_match = re.search(
         r"(?:ک\.م\.م|lcm|کوچکترین مضرب مشترک).*?(\d+).*?(\d+)",
@@ -503,7 +506,7 @@ def _solve_extended_word_problem(
     if lcm_match:
         a, b = map(int, lcm_match.groups())
         value = sp.ilcm(a, b)
-        return _ok(value, "lcm"), value, "expression"
+        return _ok(value, "lcm", a=a, b=b), value, "expression"
 
     trig = re.search(r"(?:معادله مثلثاتی|مثلثاتی).*?:?\s*(.+)$", normalized, re.DOTALL)
     if trig:
@@ -511,6 +514,7 @@ def _solve_extended_word_problem(
             expression = _parse_math_fragment(trig.group(1).strip())
             result = solve_trigonometric(expression, x)
             if result.success:
+                result = SolverResult(True, result.value, result.method, metadata={"expression": expression, "symbol": x})
                 return result, result.value, "trigonometric"
         except (TypeError, ValueError):
             pass
