@@ -66,3 +66,11 @@
 - Added application-level coverage for clean solution-set rendering.
 - CI run 35659054757: Ruff lint ✓, Ruff format ✓, mypy ✓, pytest Python 3.11 ✓, pytest Python 3.12 ✓, Heavy OCR runtime ✓.
 - Live re-test is still required after deployment/restart; the observed pre-fix Telegram failures are not treated as production verification evidence.
+
+
+## Advanced mathematical routing regression — 2026-09-22
+- Added regression coverage for derivative, indefinite integral, definite integral with Unicode bounds, limit, three-variable linear system and multi-part function analysis.
+- Existing radical real-domain equation coverage remains green.
+- Independent verification covers derivative re-differentiation, antiderivative re-differentiation, definite-integral symbolic comparison, limit recomputation, linear-system solver/substitution, and independent calculus-analysis recomputation.
+- CI run 35700711582: Ruff lint ✓, Ruff format ✓, mypy ✓, pytest Python 3.11 ✓, pytest Python 3.12 ✓, Heavy OCR runtime ✓.
+- Live Telegram evidence is still required after the branch is merged/deployed; broader mathematical coverage remains benchmark-gated.
