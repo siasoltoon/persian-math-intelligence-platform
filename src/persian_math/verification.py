@@ -276,19 +276,23 @@ def verify_structured_result(
                         ("unsupported_trigonometric_parameter_domain",),
                         (claimed,),
                     )
-                generated = sp.simplify(expression.subs(symbol, lam.expr))
-                if sp.trigsimp(generated) == 0:
+                generated = sp.expand_trig(expression.subs(symbol, lam.expr))
+                if sp.simplify(generated) == 0:
                     return VerificationResult(
                         True,
                         ConfidenceLevel.HIGH,
                         ("independent_trigonometric_identity_recheck",),
                         (claimed, parameter),
                     )
-            elif isinstance(claimed, sp.Set):
-                # Finite/explicit sets can be checked element-by-element without
-                # invoking an unbounded symbolic set solver.
+                return VerificationResult(
+                    False,
+                    ConfidenceLevel.HIGH,
+                    ("trigonometric_identity_mismatch",),
+                    (claimed,),
+                )
+            if isinstance(claimed, sp.FiniteSet):
                 elements = tuple(claimed)
-                if len(elements) <= 32 and all(
+                if all(
                     sp.simplify(expression.subs(symbol, item)) == 0 for item in elements
                 ):
                     return VerificationResult(
