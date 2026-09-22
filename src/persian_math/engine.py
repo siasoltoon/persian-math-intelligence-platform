@@ -21,6 +21,7 @@ from .verification import (
     verify_expression_result,
     verify_limit_result,
     verify_system_result,
+    verify_structured_result,
 )
 
 
@@ -99,6 +100,25 @@ def process(text: str, *, symbol_name: str = "x") -> EngineResult:
             metadata["equations"],
             metadata["symbols"],
             solver_result.value,
+        )
+    elif solver_result.method in {
+        "finite_sum",
+        "finite_product",
+        "matrix_det",
+        "matrix_inv",
+        "matrix_rank",
+        "matrix_transpose",
+        "number_theory",
+        "statistics",
+        "gcd",
+        "lcm",
+        "combinations",
+        "permutation",
+        "trigonometric",
+        "complex_equation",
+    }:
+        verification = verify_structured_result(
+            solver_result.method, solver_result.value, solver_result.metadata
         )
     elif solver_result.method == "function_analysis":
         metadata = solver_result.metadata or {}
