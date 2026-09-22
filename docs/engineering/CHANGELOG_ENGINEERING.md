@@ -58,3 +58,11 @@
 - Added photo OCR handling with validation and confidence gating.
 - Added Telegram runtime dependency and configuration tests.
 - Added explicit security and operational limitations to engineering state.
+
+## 2026-09-22 — Telegram 12-problem batch runtime hardening
+- Reproduced the exact live Telegram batch failure from Windows runtime logs.
+- Fixed matrix parsing, SymPy exception handling, batch failure isolation and Persian natural-language routing gaps.
+- Added exact 12-question regression coverage and human-readable periodic trigonometric rendering.
+- PR #17 merged to main as `1dc0bb81e7078ca39033e90b4d26fc754ce5389b`.
+- Branch CI 450 / 35718713885 and main CI 451 / 35718844173 passed all required jobs.
+- Live Telegram E2E remains pending until the Windows runtime is restarted on the merged commit.
