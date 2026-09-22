@@ -20,8 +20,8 @@ from .verification import (
     verify_equation_independently,
     verify_expression_result,
     verify_limit_result,
-    verify_system_result,
     verify_structured_result,
+    verify_system_result,
 )
 
 
