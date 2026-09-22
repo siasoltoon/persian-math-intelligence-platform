@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, replace
 
+from .batch import split_problem_batch
 from .domain import Difficulty, EducationalLevel, UserProfile
 from .engine import process
 from .exercises import ExerciseSpec, generate, validate_exercise
@@ -92,12 +93,63 @@ class ApplicationService:
         return OutgoingMessage(
             "راهنما\n\n"
             "• حل مسئله: متن سؤال یا عکس واضح بفرست.\n"
+            "• برای چند سؤال، همه را در یک پیام و با «۱.»، «۲.» یا «سؤال ۱:» جدا کن.\n"
             "• تمرین: موضوع و سختی را انتخاب کن.\n"
             "• پروفایل: سطح آموزشی را ببین یا تغییر بده.\n"
             "• تاریخچه: مسائل همین نشست را ببین.\n"
             "• تنظیمات: تنظیمات فعلی را مشاهده کن.\n\n"
             "می‌توانی هر زمان /start یا /menu را هم ارسال کنی.",
             ("بازگشت",),
+        )
+
+    @staticmethod
+    def _render_result(result: object) -> tuple[bool, str]:
+        solver = result.solver
+        if not solver.success:
+            return False, "این مسئله فعلاً با اطمینان کافی قابل حل نیست."
+        verified = result.verification.verified if result.verification else False
+        suffix = "نتیجه مستقل تأیید شد." if verified else "نتیجه هنوز تأیید مستقل کامل ندارد."
+        value = solver.value
+        if getattr(solver, "method", "") == "function_analysis" and isinstance(value, dict):
+            critical = "، ".join(
+                f"x={point} ({'ماکزیمم نسبی' if kind == 'max' else 'مینیمم نسبی' if kind == 'min' else 'نوع نامعین'}، f(x)={value_at})"
+                for point, value_at, kind in value["critical_points"]
+            )
+            inflections = "، ".join(
+                f"({point}, {value_at})" for point, value_at in value["inflection_points"]
+            )
+            rendered = (
+                f"نقاط بحرانی: {critical or 'ندارد'}\n"
+                f"بازه‌های صعود: {value['increasing']}\n"
+                f"بازه‌های نزول: {value['decreasing']}\n"
+                f"نقاط عطف: {inflections or 'ندارد'}"
+            )
+        elif isinstance(value, dict):
+            rendered = "، ".join(f"{key} = {item}" for key, item in value.items())
+        elif isinstance(value, tuple):
+            rendered = "{" + ", ".join(str(item) for item in value) + "}"
+        else:
+            rendered = str(value)
+        return verified, f"پاسخ: {rendered}\n\n{suffix}"
+
+    def _handle_single_problem(self, user_id: str, text: str) -> tuple[bool, str]:
+        session = self.session(user_id)
+        result = process(text)
+        self._sessions[user_id] = replace(session, history=(*session.history[-19:], text))
+        return self._render_result(result)
+
+    def handle_batch(self, user_id: str, problems: tuple[str, ...]) -> OutgoingMessage:
+        if not problems:
+            return OutgoingMessage("هیچ مسئله‌ای برای پردازش دریافت نشد.")
+        if len(problems) > 12:
+            return OutgoingMessage("تعداد مسائل یک پیام بیش از حد مجاز است. حداکثر ۱۲ مسئله ارسال کن.")
+        rendered: list[str] = []
+        for index, problem in enumerate(problems, 1):
+            _, answer = self._handle_single_problem(user_id, problem)
+            rendered.append(f"سؤال {index}:\n{answer}")
+        return OutgoingMessage(
+            f"نتیجه {len(problems)} مسئله:\n\n" + "\n\n".join(rendered),
+            ("حل مسئله", "منوی اصلی"),
         )
 
     def handle(self, message: IncomingMessage) -> OutgoingMessage:
@@ -120,33 +172,8 @@ class ApplicationService:
             return self.settings(message.user_id)
         if text == "/exercise":
             return self.exercises(message.user_id)
-        result = process(text)
-        self._sessions[message.user_id] = replace(session, history=(*session.history[-19:], text))
-        if not result.solver.success:
-            return OutgoingMessage(
-                "این مسئله فعلاً با اطمینان کافی قابل حل نیست. لطفاً صورت سؤال را واضح‌تر ارسال کن."
-            )
-        verified = result.verification.verified if result.verification else False
-        suffix = "نتیجه مستقل تأیید شد." if verified else "نتیجه هنوز تأیید مستقل کامل ندارد."
-        value = result.solver.value
-        if getattr(result.solver, "method", "") == "function_analysis" and isinstance(value, dict):
-            critical = "، ".join(
-                f"x={point} ({'ماکزیمم نسبی' if kind == 'max' else 'مینیمم نسبی' if kind == 'min' else 'نوع نامعین'}، f(x)={value_at})"
-                for point, value_at, kind in value["critical_points"]
-            )
-            inflections = "، ".join(
-                f"({point}, {value_at})" for point, value_at in value["inflection_points"]
-            )
-            rendered = (
-                f"نقاط بحرانی: {critical or 'ندارد'}\n"
-                f"بازه‌های صعود: {value['increasing']}\n"
-                f"بازه‌های نزول: {value['decreasing']}\n"
-                f"نقاط عطف: {inflections or 'ندارد'}"
-            )
-        elif isinstance(value, dict):
-            rendered = "، ".join(f"{key} = {item}" for key, item in value.items())
-        elif isinstance(value, tuple):
-            rendered = "{" + ", ".join(str(item) for item in value) + "}"
-        else:
-            rendered = str(value)
-        return OutgoingMessage(f"پاسخ: {rendered}\n\n{suffix}")
+        problems = split_problem_batch(text)
+        if len(problems) > 1:
+            return self.handle_batch(message.user_id, problems)
+        _, rendered = self._handle_single_problem(message.user_id, text)
+        return OutgoingMessage(rendered)

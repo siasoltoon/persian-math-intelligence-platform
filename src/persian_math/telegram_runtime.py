@@ -28,6 +28,8 @@ from .ocr import ImageMetadata, TesseractOcrBackend, reconstruct_math_text, vali
 from .runtime_config import load_runtime_config
 from .telegram_adapter import IncomingMessage, MessageKind, OutgoingMessage
 
+TELEGRAM_TEXT_LIMIT = 4096
+
 LOGGER = logging.getLogger(__name__)
 _SERVICE = ApplicationService()
 _OCR = TesseractOcrBackend(
@@ -65,10 +67,34 @@ def _inline(rows: list[list[tuple[str, str]]]) -> InlineKeyboardMarkup:
     )
 
 
+def _telegram_chunks(text: str, limit: int = TELEGRAM_TEXT_LIMIT) -> list[str]:
+    if len(text) <= limit:
+        return [text]
+    chunks: list[str] = []
+    remaining = text
+    while remaining:
+        if len(remaining) <= limit:
+            chunks.append(remaining)
+            break
+        cut = remaining.rfind("\n\n", 0, limit)
+        if cut < 1:
+            cut = remaining.rfind("\n", 0, limit)
+        if cut < 1:
+            cut = limit
+        chunks.append(remaining[:cut].rstrip())
+        remaining = remaining[cut:].lstrip()
+    return chunks
+
+
 async def _send_response(update: Update, response: OutgoingMessage) -> None:
     if not update.message:
         return
-    await update.message.reply_text(response.text_fa, reply_markup=MAIN_MENU)
+    chunks = _telegram_chunks(response.text_fa)
+    for index, chunk in enumerate(chunks):
+        await update.message.reply_text(
+            chunk,
+            reply_markup=MAIN_MENU if index == len(chunks) - 1 else None,
+        )
 
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
