@@ -479,18 +479,13 @@ def _solve_extended_word_problem(
             row_texts = re.split(r"\]\s*,\s*\[", inner)
             if not row_texts or any(not row.strip() for row in row_texts):
                 raise ValueError("invalid matrix rows")
-            rows = [
-                [item.strip() for item in row.split(",")]
-                for row in row_texts
-            ]
+            rows = [[item.strip() for item in row.split(",")] for row in row_texts]
             if not rows or any(not row for row in rows):
                 raise ValueError("invalid matrix rows")
             width = len(rows[0])
             if width == 0 or any(len(row) != width for row in rows):
                 raise ValueError("matrix rows must have equal length")
-            matrix = sp.Matrix(
-                [[_parse_math_fragment(item) for item in row] for row in rows]
-            )
+            matrix = sp.Matrix([[_parse_math_fragment(item) for item in row] for row in rows])
             operation = (
                 "det"
                 if "دترمینان" in normalized or "det" in normalized.lower()
