@@ -6,6 +6,7 @@ from dataclasses import dataclass
 from typing import Any
 
 import sympy as sp
+from sympy.matrices.exceptions import NonInvertibleMatrixError
 
 from .canonical import parse_equation, parse_expression, parse_inequality
 
@@ -239,7 +240,7 @@ def solve_matrix(matrix: sp.MatrixBase, operation: str) -> SolverResult:
         if operation not in operations:
             raise ValueError("unsupported matrix operation")
         return _ok(operations[operation](), f"matrix_{operation}")
-    except (TypeError, ValueError, sp.NonInvertibleMatrixError) as exc:
+    except (TypeError, ValueError, NonInvertibleMatrixError) as exc:
         return _fail("matrix", exc)
 
 
@@ -473,9 +474,22 @@ def _solve_extended_word_problem(
     )
     if matrix_match and has_matrix_operation:
         try:
-            rows = matrix_match.group(1).strip("[]").split("],[")
+            matrix_text = matrix_match.group(1).strip()
+            inner = matrix_text[2:-2].strip()
+            row_texts = re.split(r"\]\s*,\s*\[", inner)
+            if not row_texts or any(not row.strip() for row in row_texts):
+                raise ValueError("invalid matrix rows")
+            rows = [
+                [item.strip() for item in row.split(",")]
+                for row in row_texts
+            ]
+            if not rows or any(not row for row in rows):
+                raise ValueError("invalid matrix rows")
+            width = len(rows[0])
+            if width == 0 or any(len(row) != width for row in rows):
+                raise ValueError("matrix rows must have equal length")
             matrix = sp.Matrix(
-                [[_parse_math_fragment(item) for item in row.split(",")] for row in rows]
+                [[_parse_math_fragment(item) for item in row] for row in rows]
             )
             operation = (
                 "det"
@@ -495,7 +509,7 @@ def _solve_extended_word_problem(
                     metadata={**(result.metadata or {}), "matrix": matrix},
                 )
                 return result, result.value, "matrix"
-        except (TypeError, ValueError, sp.NonInvertibleMatrixError):
+        except (TypeError, ValueError, NonInvertibleMatrixError):
             pass
 
     stat_match = re.search(
