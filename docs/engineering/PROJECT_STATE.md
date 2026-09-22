@@ -109,3 +109,12 @@ Execute the live Windows/Tailscale/Telegram E2E matrix and build the real labele
 - Equation solution tuples are rendered as mathematical solution sets rather than Python tuple syntax.
 - CI run 35659054757 passed Ruff lint, Ruff format, mypy, pytest Python 3.11/3.12 and Heavy OCR runtime.
 - Live Telegram re-test after this fix remains pending; no claim of production-wide natural-language coverage is made.
+
+
+## Advanced mathematical routing hardening — 2026-09-22
+- Live Telegram testing exposed additional domain-routing failures after the initial Persian word-problem fixes: derivative, indefinite/definite integral, limit, linear-system and multi-part calculus-analysis prompts.
+- Implemented bounded structured handlers for these classes and dedicated independent verification paths rather than weakening the restricted generic parser.
+- Added user-facing rendering for structured system solutions and function-analysis results.
+- Regression coverage now exercises the exact reported advanced cases.
+- CI run 35700711582 passed Ruff lint, Ruff format, mypy, pytest Python 3.11/3.12 and Heavy OCR runtime.
+- Current status: repository/CI integration verified; live Telegram re-test pending. The platform is being expanded domain-by-domain and no universal mathematical coverage claim is made until benchmark evidence supports it.
