@@ -328,8 +328,7 @@ def _solve_extended_word_problem(
 
     higher_derivative = re.search(
         r"(?:مشتق|دیفرانسیل)\s+مرتبه\s*(\d+|اول|دوم|سوم|چهارم|پنجم|ششم|هفتم|هشتم|نهم|دهم).*?"
-        r"(?:f\s*\(\s*x\s*\)\s*=\s*)"
-        r"(?:تابع\s+)?(?:f\s*\(\s*x\s*\)\s*=\s*)"
+        r"f\s*\(\s*x\s*\)\s*=\s*"
         r"(.+?)\s+را\s+به\s+دست\s+آورید\s*\.?$",
         normalized,
         re.DOTALL,
