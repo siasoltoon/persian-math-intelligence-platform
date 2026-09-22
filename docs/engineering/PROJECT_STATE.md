@@ -144,3 +144,10 @@ Execute the live Windows/Tailscale/Telegram E2E matrix and build the real labele
 - Added regression coverage for splitting, false-positive prevention, all-problem aggregation, history tracking and batch limits.
 - Verification: CI run 431 / 35712792646 fully green; Pytest 3.11 and 3.12 each reported 125 passed, plus Ruff lint/format, mypy and Heavy OCR runtime success.
 - This feature is repository/CI verified. Live Telegram execution is still required before claiming end-to-end production runtime verification.
+
+## Telegram 12-problem live-regression hardening — 2026-09-22
+- Reproduced the exact live Telegram batch failure and fixed whitespace-safe matrix parsing, the unsupported SymPy matrix exception reference, per-problem failure isolation, Persian ordinal derivative wording, arithmetic-sequence ellipsis input, Taylor wording with «تابع ... را حول نقطه», and periodic trigonometric rendering.
+- Added exact 12-question Telegram regression coverage.
+- PR #17 merged to main as `1dc0bb81e7078ca39033e90b4d26fc754ce5389b`.
+- Branch CI run 450 / 35718713885 passed all required jobs; main CI run 451 / 35718844173 passed all required jobs.
+- Live Telegram E2E after the merged runtime fix remains the final external verification gate.
